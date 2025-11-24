@@ -1,13 +1,36 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify
 from controllers.auth_controller import AuthController
 
 auth_bp = Blueprint("auth", __name__)
 controller = AuthController()
 
-@auth_bp.get("/")
-def index():
-    """GET /api/auth/  -> listado / prueba"""
-    return jsonify(controller.index())
+@auth_bp.route('/clientes', methods=['GET'])
+def list_clientes():
+    """
+    GET /api/auth/clientes  
+    Obtiene la lista completa de clientes registrados.
+    """
+    try:
+        clientes = controller.list_clientes()
+        
+        return jsonify({
+            "success": True,
+            "total": len(clientes),
+            "data": clientes
+        }), 200
+
+    except ConnectionError as e:
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 503
+
+    except Exception as e:
+        print(f"Error al obtener clientes: {e}")
+        return jsonify({
+            "success": False,
+            "message": "Error interno del servidor al consultar clientes."
+        }), 500
 
 @auth_bp.post("/create")
 def create():
