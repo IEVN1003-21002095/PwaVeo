@@ -1,0 +1,141 @@
+<div class="container-fluid py-5" style="background-color: #f7f8fa;">
+  <style>
+    /* Botón Agregar Producto */
+    .btn-agregar {
+      background-color: #CAD8E5;
+      color: #00325E;
+      border: none;
+    }
+
+    /* Mensaje de alerta cuando no hay productos */
+    .alert-filtro {
+      background-color: #CAD8E5;
+      color: #00325E;
+    }
+
+    /* Encabezado de tabla (opcional, si quieres azul oscuro) */
+    table thead {
+      background-color: #00325E;
+      color: #ffffff;
+    }
+  </style>
+
+  <div class="row justify-content-center mt-4">
+    <div class="col-lg-11 col-md-12">
+      <h2 class="mb-4">Gestión de Catálogo</h2>
+
+      <div class="card shadow-sm border-0 bg-white">
+        <div class="card-body p-4">
+
+          <div class="row mb-4 align-items-center">
+            <div class="col-md-3 mb-2">
+              <input
+                [(ngModel)]="filtros.texto"
+                name="filterTexto"
+                placeholder="Buscar por nombre o SKU…"
+                class="form-control"
+                type="text"
+              />
+            </div>
+
+            <div class="col-md-2 mb-2">
+              <select [(ngModel)]="filtros.estado" name="filterEstado" class="form-select">
+                <option value="">Estado</option>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+              </select>
+            </div>
+
+            <div class="col-md-auto ms-auto mb-2">
+              <button class="btn btn-agregar" (click)="irAgregar()">Agregar Producto</button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle text-center" *ngIf="productosFiltrados.length">
+              <thead class="table-dark">
+                <tr>
+                  <th>Foto</th>
+                  <th>Producto</th>
+                  <th>Descripción</th>
+                  <th>Tipo / Colección</th>
+                  <th>Precio Base</th>
+                  <th>Stock Detallado</th>
+                  <th>Estado</th>
+                  <th colspan="2">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let p of productosFiltrados">
+                  <td>
+                    <img [src]="p.imagen" alt="foto" class="rounded" style="width:50px;height:50px;object-fit:cover;">
+                  </td>
+
+                  <td class="fw-semibold">
+                    {{ p.nombre }}<br>
+                    <small class="text-muted">SKU: {{ p.sku }}</small>
+                  </td>
+
+                  <td>{{ p.descripcion }}</td>
+
+                  <td>{{ p.tipo }}</td>
+                  <td class="fw-semibold">${{ p.precio }}</td>
+
+                  <td class="p-0">
+                    <table class="table table-bordered mb-0" style="font-size:0.85rem;">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Color</th>
+                          <th>S</th>
+                          <th>M</th>
+                          <th>L</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td class="fw-bold text-capitalize">Blanco</td>
+                          <td>{{ p.stock.blanco.S || 0 }}</td>
+                          <td>{{ p.stock.blanco.M || 0 }}</td>
+                          <td>{{ p.stock.blanco.L || 0 }}</td>
+                        </tr>
+                        <tr>
+                          <td class="fw-bold text-capitalize">Negro</td>
+                          <td>{{ p.stock.negro.S || 0 }}</td>
+                          <td>{{ p.stock.negro.M || 0 }}</td>
+                          <td>{{ p.stock.negro.L || 0 }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+
+                  <td>
+                    <span class="badge px-3 py-2"
+                          [ngClass]="{
+                            'bg-success': p.estado === 'activo',
+                            'bg-danger': p.estado === 'inactivo'
+                          }">
+                      {{ p.estado === 'activo' ? 'Activo' : 'Inactivo' }}
+                    </span>
+                  </td>
+
+                  <td>
+                    <button class="btn btn-sm btn-success" (click)="irEditar(p.id)">Editar</button>
+                  </td>
+
+                  <td>
+                    <button class="btn btn-sm btn-danger" (click)="irEliminar(p.id)">Eliminar</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="!productosFiltrados.length" class="alert alert-filtro text-center mt-4">
+            No hay productos que coincidan con los filtros.
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

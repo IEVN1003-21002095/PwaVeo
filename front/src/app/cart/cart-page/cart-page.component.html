@@ -1,1 +1,363 @@
-<p>cart-page works!</p>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras Interactivo</title>
+    <!-- Dependencia de Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Iconos de Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            padding: 40px 20px;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .cart-container {
+            max-width: 900px;
+            width: 100%;
+            margin: auto;
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+        }
+
+        /* Título del Carrito */
+        .cart-container h2 {
+            font-weight: 700;
+            color: #0d2a58;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 0;
+        }
+
+        /* Fila de Encabezados */
+        .cart-header {
+            font-weight: 600;
+            color: #6c757d;
+            padding: 1rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        /* Estilo de la Tarjeta de Producto */
+        .cart-item-row {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .cart-item-row:last-child {
+            border-bottom: none;
+        }
+
+        .item-image {
+            width: 80px;
+            height: 80px;
+            background-color: #f0f0f0;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-right: 1rem;
+        }
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-info {
+            flex-grow: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #343a40;
+        }
+        .item-details {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        /* Controles de Cantidad */
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ced4da;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        .quantity-control button {
+            background: none;
+            border: none;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            color: #0d2a58;
+        }
+        .quantity-control button:disabled {
+            color: #adb5bd;
+            cursor: not-allowed;
+            background-color: #f8f9fa;
+        }
+        .quantity-control input {
+            width: 50px;
+            text-align: center;
+            border: none;
+            outline: none;
+            font-weight: 600;
+        }
+
+        /* Columna de Precio */
+        .item-price-total {
+            font-weight: 700;
+            color: #0d2a58;
+            font-size: 1.15rem;
+        }
+
+        /* Botón de Remover */
+        .btn-remove {
+            color: #dc3545;
+            transition: color 0.2s;
+        }
+        .btn-remove:hover {
+            color: #bd2130;
+        }
+
+        /* Resumen de Totales */
+        .summary-card {
+            background-color: #f8f9fa;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+        .summary-card h5 {
+            font-weight: 700;
+            color: #0d2a58;
+            margin-bottom: 1rem;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 0;
+        }
+        .summary-row.total {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #000000;
+            padding-top: 1rem;
+            border-top: 1px solid #dee2e6;
+            margin-top: 0.5rem;
+        }
+        .summary-row span:first-child {
+            color: #495057;
+        }
+
+        /* Footer del carrito */
+        .cart-footer {
+            padding-top: 1.5rem;
+            border-top: 1px solid #dee2e6;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="cart-container p-4">
+    <h2 class="mb-4">Tu Carrito de Compras</h2>
+    
+    <div class="row cart-header d-none d-md-flex">
+        <div class="col-md-5">Producto</div>
+        <div class="col-md-3 text-center">Cantidad</div>
+        <div class="col-md-2 text-end">Precio Total</div>
+        <div class="col-md-2 text-end">Acción</div>
+    </div>
+
+    <!-- Lista de Productos en el Carrito (Contenedor de JS) -->
+    <div id="cart-items-list">
+        <!-- Los elementos del carrito se renderizarán aquí -->
+    </div>
+    
+    <div class="row cart-footer">
+        <div class="col-md-6 mb-3 mb-md-0">
+            <a href="#" class="btn btn-outline-secondary rounded-pill"><i class="fas fa-chevron-left me-2"></i> Continuar Comprando</a>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="summary-card">
+                <h5>Resumen de la Compra</h5>
+                
+                <div class="summary-row">
+                    <span>Subtotal (<span id="total-items">0</span> artículos)</span>
+                    <span id="summary-subtotal">MXN 0.00</span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Envío Estimado</span>
+                    <span id="summary-shipping">MXN 0.00</span>
+                </div>
+
+                <div class="summary-row total">
+                    <span>Total Final</span>
+                    <span id="summary-total">MXN 0.00</span>
+                </div>
+                
+                <div class="mt-3">
+                    <button type="button" class="btn btn-primary w-100 rounded-pill">Proceder al Pago</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Configuración inicial de los datos del carrito
+    let cart = [
+        { id: 1, name: "Playera Oversize - Diseño Galaxia", price: 399.00, quantity: 2, imageUrl: "https://placehold.co/80x80/000000/ffffff?text=Oversize+G" },
+        { id: 2, name: "Playera Oversize - Estilo Urbano", price: 399.00, quantity: 1, imageUrl: "https://placehold.co/80x80/f0f0f0/333333?text=Oversize+U" },
+        { id: 3, name: "Playera Oversize - Logotipo Clásico", price: 399.00, quantity: 3, imageUrl: "https://placehold.co/80x80/cc5500/ffffff?text=Oversize+C" }
+    ];
+
+    // Constantes de costos (fijos por simplicidad)
+    const SHIPPING_COST = 20.30; // Costo de envío fijo
+
+    /**
+     * Renderiza un único elemento del carrito como una fila HTML.
+     * @param {Object} item - Objeto del producto del carrito.
+     * @returns {string} HTML de la fila del carrito.
+     */
+    function renderCartItem(item) {
+        // Deshabilitar el botón de disminuir si la cantidad es 1
+        const minusDisabled = item.quantity <= 1 ? 'disabled' : '';
+        const itemTotal = (item.price * item.quantity).toFixed(2);
+
+        return `
+            <div class="row cart-item-row" data-id="${item.id}">
+                
+                <!-- Columna de Producto y Detalles -->
+                <div class="col-12 col-md-5 d-flex align-items-center mb-3 mb-md-0">
+                    <div class="item-image">
+                        <img src="${item.imageUrl}" onerror="this.onerror=null; this.src='https://placehold.co/80x80/f0f0f0/6c757d?text=Prod';" alt="${item.name}">
+                    </div>
+                    <div class="item-info">
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-details">MXN ${item.price.toFixed(2)} c/u</div>
+                    </div>
+                </div>
+
+                <!-- Columna de Cantidad -->
+                <div class="col-8 col-md-3 mb-3 mb-md-0 d-flex justify-content-center">
+                    <div class="quantity-control">
+                        <button onclick="updateQuantity(${item.id}, -1)" ${minusDisabled} title="Quitar uno">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <input type="number" value="${item.quantity}" min="1" readonly id="quantity-${item.id}">
+                        <button onclick="updateQuantity(${item.id}, 1)" title="Añadir uno">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Columna de Precio Total -->
+                <div class="col-4 col-md-2 mb-3 mb-md-0 text-end">
+                    <span class="item-price-total" id="total-price-${item.id}">MXN ${itemTotal}</span>
+                </div>
+
+                <!-- Columna de Acción (Remover) -->
+                <div class="col-12 col-md-2 text-center text-md-end">
+                    <button class="btn btn-link btn-remove" onclick="removeItem(${item.id})" title="Eliminar Producto">
+                        <i class="fas fa-trash-alt fa-lg"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Recalcula y renderiza el resumen de totales.
+     */
+    function updateSummary() {
+        // 1. Calcular el subtotal y el conteo de artículos
+        let subtotal = 0;
+        let totalItemsCount = 0;
+
+        cart.forEach(item => {
+            subtotal += item.price * item.quantity;
+            totalItemsCount += item.quantity;
+        });
+        
+        // 2. Calcular el total final
+        const total = subtotal + SHIPPING_COST;
+
+        // 3. Actualizar el DOM
+        document.getElementById('total-items').textContent = totalItemsCount;
+        document.getElementById('summary-subtotal').textContent = `MXN ${subtotal.toFixed(2)}`;
+        document.getElementById('summary-shipping').textContent = `MXN ${SHIPPING_COST.toFixed(2)}`;
+        document.getElementById('summary-total').textContent = `MXN ${total.toFixed(2)}`;
+    }
+
+    /**
+     * Función principal para renderizar todo el carrito.
+     */
+    function renderCart() {
+        const cartList = document.getElementById('cart-items-list');
+        cartList.innerHTML = cart.map(renderCartItem).join('');
+        updateSummary();
+    }
+
+    /**
+     * Actualiza la cantidad de un producto en el carrito.
+     * @param {number} id - ID del producto a actualizar.
+     * @param {number} delta - Cambio en la cantidad (+1 o -1).
+     */
+    function updateQuantity(id, delta) {
+        const itemIndex = cart.findIndex(item => item.id === id);
+
+        if (itemIndex > -1) {
+            const currentQuantity = cart[itemIndex].quantity;
+            const newQuantity = currentQuantity + delta;
+
+            // La cantidad NUNCA puede ser 0 o menos.
+            if (newQuantity >= 1) {
+                cart[itemIndex].quantity = newQuantity;
+                renderCart(); // Vuelve a renderizar para actualizar el DOM y los totales
+            }
+        }
+    }
+
+    /**
+     * Elimina un producto del carrito.
+     * @param {number} id - ID del producto a eliminar.
+     */
+    function removeItem(id) {
+        const initialLength = cart.length;
+        cart = cart.filter(item => item.id !== id);
+        
+        if (cart.length < initialLength) {
+            renderCart(); // Vuelve a renderizar si se eliminó un elemento
+            // Opcional: mostrar un mensaje de éxito
+        }
+        
+        // Si el carrito está vacío, mostrar un mensaje
+        if (cart.length === 0) {
+            const cartList = document.getElementById('cart-items-list');
+            cartList.innerHTML = `<div class="p-5 text-center text-muted">El carrito está vacío.</div>`;
+            updateSummary(); // Recalcular totales (serán 0)
+        }
+    }
+
+    // Inicializar el carrito al cargar la página
+    document.addEventListener('DOMContentLoaded', renderCart);
+
+</script>
+
+<!-- Script de Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

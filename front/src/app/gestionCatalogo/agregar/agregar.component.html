@@ -1,0 +1,138 @@
+<style>
+    /* Estilos para el botón de Guardar (Confirmar): #00325E */
+    .btn-confirm {
+        background-color: #00325E !important;
+        color: #ffffff !important; 
+        border-color: #00325E !important;
+    }
+
+    .btn-confirm:hover {
+        background-color: #001f3f !important; /* Tono más oscuro al pasar el ratón */
+        border-color: #001f3f !important;
+    }
+
+    /* Estilos para el botón de Cancelar: #CAD8E5 */
+    .btn-cancel-light {
+        background-color: #CAD8E5 !important;
+        color: #333333 !important; 
+        border-color: #CAD8E5 !important;
+    }
+</style>
+
+<div class="container-fluid py-5" style="background-color: #f7f8fa;">
+  <div class="row justify-content-center mt-4">
+    <div class="col-lg-8 col-md-10">
+
+      <div class="card shadow-sm border-0 bg-white">
+        <div class="card-body p-4">
+
+          <h4 class="mb-3">Agregar Nuevo Producto</h4>
+          <p class="text-muted mb-4">Ingrese la información del nuevo artículo en el catálogo.</p>
+
+          <form (ngSubmit)="guardarProducto()">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Nombre del Producto</label>
+                <input type="text" class="form-control" placeholder="Ej. Playera Premium Algodón"
+                       [(ngModel)]="nuevoProducto.nombre" name="nombre" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Tipo / Colección</label>
+                <input type="text" class="form-control" placeholder="Ej. Línea Premium, Básicos, AR Design"
+                       [(ngModel)]="nuevoProducto.tipo" name="tipo" required>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label class="form-label">SKU Base</label>
+                <input type="text" class="form-control" placeholder="SKU-001-BASE"
+                       [(ngModel)]="nuevoProducto.sku" name="sku" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Estado</label>
+                <select class="form-select" [(ngModel)]="nuevoProducto.estado" name="estado" required>
+                  <option value="activo">Activo</option>
+                  <option value="inactivo">Inactivo</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label class="form-label">Precio Base</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="number" class="form-control" placeholder="0.00"
+                              [(ngModel)]="nuevoProducto.precio" name="precio" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Descripción</label>
+              <textarea rows="3" class="form-control" placeholder="Descripción completa del producto"
+                         [(ngModel)]="nuevoProducto.descripcion" name="descripcion"></textarea>
+            </div>
+
+            <h5 class="mt-4 mb-2">Stock por Color y Talla</h5>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <div class="border rounded p-3">
+                  <h6 class="fw-bold mb-3">Color: Blanco</h6>
+                  <div class="row mb-2">
+                    <div class="col-md-4">
+                      <label class="form-label">S</label>
+                      <input type="number" class="form-control" [(ngModel)]="nuevoProducto.stock.blanco.S" name="blancoS">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">M</label>
+                      <input type="number" class="form-control" [(ngModel)]="nuevoProducto.stock.blanco.M" name="blancoM">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">L</label>
+                      <input type="number" class="form-control" [(ngModel)]="nuevoProducto.stock.blanco.L" name="blancoL">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <div class="border rounded p-3">
+                  <h6 class="fw-bold mb-3">Color: Negro</h6>
+                  <div class="row mb-2">
+                    <div class="col-md-4">
+                      <label class="form-label">S</label>
+                      <input type="number" class="form-control" [(ngModel)]="nuevoProducto.stock.negro.S" name="negroS">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">M</label>
+                      <input type="number" class="form-control" [(ngModel)]="nuevoProducto.stock.negro.M" name="negroM">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">L</label>
+                      <input type="number" class="form-control" [(ngModel)]="nuevoProducto.stock.negro.L" name="negroL">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-4 mt-3">
+              <label class="form-label">Imagen del Producto (Referencia)</label>
+              <input class="form-control" type="file" (change)="onFileSelected($event)">
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-3">
+              <button type="button" class="btn btn-cancel-light" (click)="cancelar()">Cancelar</button>
+              
+              <button type="submit" class="btn btn-confirm">Guardar</button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

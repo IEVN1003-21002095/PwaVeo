@@ -1,0 +1,160 @@
+<div class="container-fluid py-5" style="background-color: #f7f8fa;">
+  <style>
+    /* Encabezado de la tabla azul oscuro */
+    table thead {
+      background-color: #00325E !important;
+      color: #ffffff !important;
+    }
+
+    /* Botón agregar inventario */
+    .btn-agregar {
+      background-color: #CAD8E5;
+      color: #00325E;
+      border: none;
+    }
+
+    /* Botón filtros con borde opaco */
+    .btn-filtro {
+      border: 1px solid rgba(0, 0, 0, 0.2);
+    }
+
+    /* Mensaje de alerta */
+    .alert-filtro {
+      background-color: #CAD8E5;
+      color: #00325E;
+    }
+  </style>
+
+  <div class="row justify-content-center mt-4">
+    <div class="col-lg-11 col-md-12">
+      <h2 class="mb-4">Gestión de Inventario</h2>
+
+      <div class="card shadow-sm border-0 bg-white">
+        <div class="card-body p-4">
+
+          <!-- FILTROS SUPERIORES: Búsqueda + Icono + Agregar -->
+          <div class="row mb-3 align-items-center">
+            <!-- Buscador libre -->
+            <div class="col-md-6 mb-2 d-flex align-items-center gap-2">
+              <input
+                [(ngModel)]="filtros.texto"
+                name="filterText"
+                placeholder="Buscar por SKU, descripción o proveedor…"
+                class="form-control"
+                type="text"
+              />
+
+              <!-- Botón icono filtros -->
+              <button class="btn btn-filtro" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosCollapse" aria-expanded="false" aria-controls="filtrosCollapse">
+                <i class="bi bi-funnel"></i>
+              </button>
+            </div>
+
+            <!-- Botón Agregar Inventario -->
+            <div class="col-auto mb-2 ms-auto">
+              <button class="btn btn-agregar" [routerLink]="['/gestionStock/agregar']">
+                <i class="bi bi-plus-lg"></i> Agregar Inventario
+              </button>
+            </div>
+          </div>
+
+          <!-- Contenedor de filtros colapsable -->
+          <div class="collapse mb-4" id="filtrosCollapse">
+            <div class="card card-body">
+              <div class="row g-2 mb-2">
+                <!-- Gramaje -->
+                <div class="col-md-3">
+                  <select [(ngModel)]="filtros.gramaje" name="filterGramaje" class="form-select">
+                    <option value="">Gramaje</option>
+                    <option *ngFor="let g of gramajesDisponibles" [value]="g">{{ g }} gr</option>
+                  </select>
+                </div>
+
+                <!-- Color -->
+                <div class="col-md-3">
+                  <select [(ngModel)]="filtros.color" name="filterColor" class="form-select">
+                    <option value="">Color</option>
+                    <option *ngFor="let c of coloresDisponibles" [value]="c">{{ c }}</option>
+                  </select>
+                </div>
+
+                <!-- Talla -->
+                <div class="col-md-3">
+                  <select [(ngModel)]="filtros.talla" name="filterTalla" class="form-select">
+                    <option value="">Talla</option>
+                    <option *ngFor="let t of tallasDisponibles" [value]="t">{{ t }}</option>
+                  </select>
+                </div>
+
+                <!-- Estado -->
+                <div class="col-md-3">
+                  <select [(ngModel)]="filtros.estado" name="filterEstado" class="form-select">
+                    <option value="">Estado</option>
+                    <option *ngFor="let e of estadosDisponibles" [value]="e">{{ e }}</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Botón Limpiar Filtros -->
+              <div class="d-flex justify-content-end">
+                <button class="btn btn-outline-danger btn-sm" type="button" (click)="limpiarFiltros()">
+                  <i class="bi bi-x-circle"></i> Limpiar filtros
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- TABLA -->
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle" *ngIf="inventarioFiltrado.length">
+              <thead class="text-center" class="table-dark">
+                <tr>
+                  <th>SKU Base</th>
+                  <th>Descripción</th>
+                  <th>Color</th>
+                  <th>Talla</th>
+                  <th>Gramaje</th>
+                  <th>Costo Unitario</th>
+                  <th>Stock Mínimo</th>
+                  <th>Cantidad Actual</th>
+                  <th>Estado</th>
+                  <th>Proveedor</th>
+                  <th colspan="2">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of inventarioFiltrado" class="text-center">
+                  <td class="fw-semibold">{{ item.sku_base }}</td>
+                  <td>{{ item.descripcion_generica }}</td>
+                  <td>{{ item.color }}</td>
+                  <td>{{ item.talla }}</td>
+                  <td>{{ item.gramaje }}</td>
+                  <td class="fw-semibold">${{ item.costo_adquisicion | number:'1.2-2' }}</td>
+                  <td>{{ item.stock_minimo }}</td>
+                  <td [ngClass]="{ 'text-danger fw-bold': estadoItem(item) === 'Bajo' }">
+                    {{ item.cantidad_actual }}
+                  </td>
+                  <td [ngClass]="{ 'text-danger fw-bold': estadoItem(item) === 'Bajo', 'text-success fw-bold': estadoItem(item) === 'OK' }">
+                    {{ estadoItem(item) }}
+                  </td>
+                  <td>{{ item.proveedor_principal }}</td>
+                  <td>
+                    <button class="btn btn-sm btn-success d-flex align-items-center mx-auto" [routerLink]="['/gestionStock/editar', item.id]">Editar</button>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-danger d-flex align-items-center mx-auto" [routerLink]="['/gestionStock/eliminar', item.id]">Eliminar</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="!inventarioFiltrado.length" class="alert text-center mt-4 alert-filtro">
+            No hay registros que coincidan con los filtros.
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

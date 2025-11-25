@@ -1,0 +1,159 @@
+<style>
+    /* Estilos para el botón de Guardar Cambios (Confirmar): #00325E */
+    .btn-confirm {
+        background-color: #00325E !important;
+        color: #ffffff !important; 
+        border-color: #00325E !important;
+    }
+
+    .btn-confirm:hover {
+        background-color: #001f3f !important;
+        border-color: #001f3f !important;
+    }
+
+    /* Estilos para el botón de Cancelar: #CAD8E5 */
+    .btn-cancel-light {
+        background-color: #CAD8E5 !important;
+        color: #333333 !important; 
+        border-color: #CAD8E5 !important;
+    }
+</style>
+
+<div class="container-fluid py-5" style="background-color: #f7f8fa;" *ngIf="producto">
+  <div class="row justify-content-center mt-4">
+    <div class="col-lg-8 col-md-10">
+      <div class="card shadow-sm border-0 bg-white">
+        <div class="card-body p-4">
+
+          <h4 class="mb-3">Editar Producto: {{ producto.nombre }}</h4>
+          <p class="text-muted mb-4">Modifica la información del artículo seleccionado.</p>
+
+          <form (ngSubmit)="guardarCambios()">
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Nombre del Producto</label>
+                <input type="text" class="form-control"
+                  [(ngModel)]="producto.nombre" name="nombre" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Tipo / Colección</label>
+                <input type="text" class="form-control"
+                  [(ngModel)]="producto.tipo" name="tipo" required>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label class="form-label">SKU</label>
+                <input type="text" class="form-control"
+                  [(ngModel)]="producto.sku" name="sku" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Estado</label>
+                <select class="form-select" [(ngModel)]="producto.estado" name="estado" required>
+                  <option value="activo">Activo</option>
+                  <option value="inactivo">Inactivo</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Precio Base</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="number" class="form-control"
+                    [(ngModel)]="producto.precio" name="precio" required>
+                </div>
+              </div>
+            </div>
+
+            <h5 class="fw-bold mt-4 mb-3">Stock por Variantes</h5>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <div class="border rounded p-3">
+                  <h6 class="fw-bold mb-3">Color Blanco</h6>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Talla S</label>
+                      <input type="number" class="form-control"
+                        [(ngModel)]="producto.stock.blanco.S"
+                        name="stockBlancoS">
+                    </div>
+                    <div class="col-md-4">
+                      <label>Talla M</label>
+                      <input type="number" class="form-control"
+                        [(ngModel)]="producto.stock.blanco.M"
+                        name="stockBlancoM">
+                    </div>
+                    <div class="col-md-4">
+                      <label>Talla L</label>
+                      <input type="number" class="form-control"
+                        [(ngModel)]="producto.stock.blanco.L"
+                        name="stockBlancoL">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <div class="border rounded p-3">
+                  <h6 class="fw-bold mb-3">Color Negro</h6>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label>Talla S</label>
+                      <input type="number" class="form-control"
+                        [(ngModel)]="producto.stock.negro.S"
+                        name="stockNegroS">
+                    </div>
+                    <div class="col-md-4">
+                      <label>Talla M</label>
+                      <input type="number" class="form-control"
+                        [(ngModel)]="producto.stock.negro.M"
+                        name="stockNegroM">
+                    </div>
+                    <div class="col-md-4">
+                      <label>Talla L</label>
+                      <input type="number" class="form-control"
+                        [(ngModel)]="producto.stock.negro.L"
+                        name="stockNegroL">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label class="form-label">Descripción</label>
+              <textarea class="form-control" rows="3"
+                [(ngModel)]="producto.descripcion" name="descripcion"></textarea>
+            </div>
+
+            <div class="mb-3 mt-4" *ngIf="producto.imagen">
+              <label class="form-label d-block">Imagen Actual</label>
+              <img [src]="producto.imagen" class="img-thumbnail mb-2" style="max-width: 180px;">
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Cambiar Imagen</label>
+              <input class="form-control" type="file" (change)="onFileSelected($event)">
+            </div>
+
+            <div class="text-end pt-3 d-flex justify-content-end gap-2">
+              <button type="button" class="btn btn-cancel-light px-4" (click)="cancelar()">
+                Cancelar
+              </button>
+              <button class="btn btn-confirm px-5 py-2" type="submit">
+                Guardar Cambios
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid py-5" style="background-color: #f7f8fa;" *ngIf="!producto">
+  <div class="alert alert-warning text-center">Cargando producto o el ID no es válido...</div>
+</div>

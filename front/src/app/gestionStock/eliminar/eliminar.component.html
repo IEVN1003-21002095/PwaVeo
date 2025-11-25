@@ -1,0 +1,90 @@
+<style>
+    /* Estilos para el botón de Cancelar: #CAD8E5 */
+    /* Se usa !important para asegurar que sobreescribe btn-secondary de Bootstrap */
+    .btn-cancel-light {
+        background-color: #CAD8E5 !important;
+        color: #333333 !important; 
+        border-color: #CAD8E5 !important;
+    }
+</style>
+
+<div class="container mt-4" *ngIf="producto">
+  <div class="card border-red-500 shadow-sm">
+    <div class="card-header text-red-600 font-bold text-lg">
+      Confirmar Eliminación
+    </div>
+
+    <div class="card-body">
+
+      <p class="mb-3">¿Seguro que deseas eliminar este producto del inventario?</p>
+
+      <ul class="list-group mb-4">
+
+        <li class="list-group-item">
+          <b>ID:</b> {{ producto.id }}
+        </li>
+
+        <li class="list-group-item">
+          <b>SKU Base:</b> {{ producto.sku_base }}
+        </li>
+
+        <li class="list-group-item">
+          <b>Descripción:</b> {{ producto.descripcion_generica }}
+        </li>
+
+        <li class="list-group-item">
+          <b>Color:</b> {{ producto.color }}
+        </li>
+
+        <li class="list-group-item">
+          <b>Talla:</b> {{ producto.talla }}
+        </li>
+
+        <li class="list-group-item">
+          <b>Gramaje:</b> {{ producto.gramaje }} gr
+        </li>
+
+        <li class="list-group-item">
+          <b>Costo Adquisición:</b> ${{ producto.costo_adquisicion }}
+        </li>
+
+        <li class="list-group-item">
+          <b>Stock Mínimo:</b> {{ producto.stock_minimo }}
+        </li>
+
+        <li class="list-group-item">
+          <b>Cantidad Actual:</b> {{ producto.cantidad_actual }}
+        </li>
+
+        <li class="list-group-item">
+          <b>Proveedor Principal:</b> {{ producto.proveedor_principal }}
+        </li>
+
+      </ul>
+
+      <div class="d-flex justify-content-end gap-2">
+        <button
+          type="button"
+          class="btn btn-cancel-light px-4"
+          (click)="cancelar()"
+        >
+          Cancelar
+        </button>
+
+        <button
+          class="btn btn-danger px-4"
+          (click)="confirmarEliminacion()"
+        >
+          Eliminar
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="container mt-4" *ngIf="!producto && id">
+  <div class="alert alert-warning text-center">
+    Producto no encontrado en inventario.
+  </div>
+</div>

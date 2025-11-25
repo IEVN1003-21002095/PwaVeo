@@ -1,1 +1,110 @@
-<p>sales-detail works!</p>
+<div class="admin-layout">
+    
+    <aside class="sidebar bg-dark text-white">
+        <div class="sidebar-header">
+            <h3>AdminPro</h3>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="#"><i class="fas fa-box-open"></i> Gestión de Catálogo</a></li>
+                <li><a href="#"><i class="fas fa-warehouse"></i> Gestión de Stock</a></li>
+                <li class="active">
+                    <a href="#"><i class="fas fa-shopping-cart"></i> Gestión de Ventas</a>
+                </li>
+                <li><a href="#"><i class="fas fa-users"></i> Gestión de Clientes</a></li>
+                <li><a href="#"><i class="fas fa-cog"></i> Configuración</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        
+        <header class="top-header">
+            <span>Administrador</span>
+            <div class="user-profile">
+                <span class="initials">AD</span>
+                </div>
+        </header>
+        
+        <div class="page-title">
+            <h1>Gestión de Ventas</h1>
+            <p class="text-muted">Pedidos Recientes</p>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                
+                <thead>
+                    <tr>
+                        <th>ID PEDIDO</th> <th>CLIENTE</th> <th>FECHA</th> <th>TOTAL</th> <th>ESTADO ACTUAL</th> <th>ACTUALIZAR ESTADO</th>
+                    </tr>
+                </thead>
+                
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-pedido">#PED-10521</span></td>
+                        
+                        <td>Ana Garcia</td>
+                        
+                        <td>07/11/2025</td>
+                        
+                        <td>$240.00</td>
+                        
+                        <td>
+                            <span class="badge-status status-aprobacion">Diseño en Aprobación</span>
+                        </td>
+                        
+                        <td>
+                            <select class="form-control form-control-sm update-status-select">
+                                <option selected>Diseño en Aprobación</option>
+                                <option>En Producción</option>
+                                <option>Enviado</option>
+                                <option>Entregado</option>
+                            </select>
+                            <button class="btn btn-sm btn-link"><i class="fas fa-check-circle"></i></button>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td><span class="badge badge-pedido">#PED-10520</span></td>
+                        <td>Carlos Mendoza</td>
+                        <td>06/11/2025</td>
+                        <td>$89.50</td>
+                        <td>
+                            <span class="badge-status status-produccion">En Producción</span>
+                        </td>
+                        <td>
+                            <select class="form-control form-control-sm update-status-select">
+                                <option>Diseño en Aprobación</option>
+                                <option selected>En Producción</option>
+                                <option>Enviado</option>
+                                <option>Entregado</option>
+                            </select>
+                            <button class="btn btn-sm btn-link"><i class="fas fa-check-circle"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-pedido">#PED-10519</span></td>
+                        <td>Laura Jiménez</td>
+                        <td>05/11/2025</td>
+                        <td>$450.00</td>
+                        <td>
+                            <span class="badge-status status-enviado">Enviado</span>
+                        </td>
+                        <td>
+                            <select class="form-control form-control-sm update-status-select">
+                                <option>Diseño en Aprobación</option>
+                                <option>En Producción</option>
+                                <option selected>Enviado</option>
+                                <option>Entregado</option>
+                            </select>
+                            <button class="btn btn-sm btn-link"><i class="fas fa-check-circle"></i></button>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+        </main>
+</div>

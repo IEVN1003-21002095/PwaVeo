@@ -1,0 +1,28 @@
+/* Importar fuente Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+:host {
+    display: block;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Animación para mensajes de error */
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(-5px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Estilos extra por si Tailwind no está cargando algunos colores específicos */
+.font-poppins {
+    font-family: 'Poppins', sans-serif;
+}

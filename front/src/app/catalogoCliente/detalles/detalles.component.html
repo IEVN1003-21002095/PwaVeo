@@ -1,0 +1,230 @@
+<div *ngIf="producto" class="py-5">
+
+  <style>
+    /* Contenedor central */
+    .container-central {
+      max-width: 95%;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* Botón volver al catálogo estilo "VER MÁS" */
+    .btn-volver-catalogo {
+      color: #343a40;
+      display: inline-flex;
+      align-items: center;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 2rem;
+    }
+    .btn-volver-catalogo svg { margin-right: 0.5rem; }
+
+    /* Contenedor principal hero */
+    .row-full {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 5rem;
+    }
+
+    /* Imagen hero */
+    .producto-imagen {
+      width: 50vh;
+      height: 50vh;
+      object-fit: cover;
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+
+    /* Info del producto centrada verticalmente */
+    .info-producto {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      max-width: 500px;
+    }
+
+    /* Stock */
+    .badge-stock {
+      padding: 0.3rem 0.7rem;
+      border-radius: 100px;
+      font-weight: bold;
+      font-size: 0.70rem;
+      display: inline-block;
+      margin-bottom: 0.2rem;
+      opacity: 0.6;
+      border: 1px solid currentColor;
+    }
+    .stock-in { background-color: rgba(0,50,94,0.1); color: #00325E; }
+    .stock-out { background-color: rgba(220,53,69,0.1); color: #dc3545; }
+
+    /* Colores */
+    .color-circle { width: 20px; height: 20px; border-radius: 50%; border: 1px solid #6c757d; cursor: pointer; }
+    .color-circle.selected { border: 2px solid #00325E; }
+
+    /* Tallas */
+    .talla-btn { width: 35px; height: 35px; border-radius: 50%; border: 1px solid #CAD8E5; background-color: transparent; color: #00325E; font-weight: 400; font-size: 0.70rem; cursor: pointer; }
+    .talla-btn.active { background-color: #00325E; color: white; }
+
+    /* Secciones */
+    .seccion { margin-bottom: 2rem; }
+    .seccion-label { text-transform: uppercase; font-size: 0.75rem; margin-bottom: 0.5rem; font-weight: normal; }
+
+    /* Botón carrito grande */
+    .btn-carrito {
+      background-color: #00325E;
+      color: white;
+      border-radius: 10px;
+      border: none;
+      width: 100%;
+      min-width: 300px;
+      padding: 0.75rem 2rem;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .btn-carrito:hover { background-color: #002343; }
+
+    /* Botón favorito */
+    .btn-favorito {
+      background: none;
+      border: none;
+      color: #00325E;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+    }
+    .btn-favorito i.favorito-lleno { color: #002343; }
+
+    /* Cantidad */
+    .cantidad-container { border-radius: 10px; border: 1px solid #6c757d; overflow: hidden; }
+    .cantidad-container button { border: none; }
+
+    /* Productos similares */
+    .producto-similar { height: 320px; border-radius: 10px; }
+
+    /* Precio */
+    .precio-producto { margin-top: 0.2rem; margin-bottom: 1.5rem; }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .row-full { flex-direction: column; gap: 3rem; }
+      .info-producto { max-width: 100%; margin-top: 2rem; justify-content: flex-start; }
+      .producto-imagen { height: 60vh; }
+    }
+    @media (max-width: 768px) {
+      .container-central { padding: 0 1rem; }
+      .row-full { gap: 2rem; }
+      .producto-imagen { height: 50vh; }
+    }
+  </style>
+
+  <div class="container-central">
+    <button class="btn-volver-catalogo" (click)="goBack.emit()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-left-short" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5A.5.5 0 0 1 12 8z"/>
+      </svg>
+      Volver al catálogo
+    </button>
+
+    <div class="row-full">
+      <div class="d-flex justify-content-start align-items-center">
+        <img [src]="producto.imagen || 'https://placehold.co/400x700/6c757d/ffffff?text=Producto'" 
+             [alt]="producto.nombre" 
+             class="producto-imagen">
+      </div>
+
+      <div class="info-producto">
+        <h1 class="fw-bold mb-1 fs-3">{{ producto.nombre }}</h1>
+        <div class="mb-1">
+          <span [ngClass]="{'stock-in': stockTotal > 0, 'stock-out': stockTotal === 0}" class="badge-stock">
+            {{ stockTotal > 0 ? 'IN STOCK' : 'OUT OF STOCK' }}
+          </span>
+        </div>
+        <p class="fs-4 fw-normal precio-producto">{{ producto.precio | currency:'USD':'symbol':'1.2-2' }}</p>
+
+        <div class="seccion">
+          <p class="seccion-label">Available Colors</p>
+          <div class="d-flex gap-2">
+            <div *ngFor="let color of colores" 
+                 (click)="seleccionarColor(color.name)"
+                 class="color-circle"
+                 [class.selected]="colorSeleccionado() === color.name"
+                 [style.background-color]="color.hex">
+            </div>
+          </div>
+        </div>
+
+        <div class="seccion">
+          <p class="seccion-label">Elige una talla</p>
+          <div class="d-flex gap-2">
+            <button *ngFor="let talla of tallas"
+                    (click)="seleccionarTalla(talla)"
+                    class="talla-btn"
+                    [class.active]="tallaSeleccionada() === talla">
+              {{ talla }}
+            </button>
+          </div>
+        </div>
+
+        <div class="seccion">
+          <p class="seccion-label">Cantidad</p>
+          <div class="d-inline-flex align-items-stretch cantidad-container">
+            <button class="btn btn-light px-3" (click)="ajustarCantidad(-1)" [disabled]="cantidad() <= 1">&minus;</button>
+            <span class="px-4 d-flex align-items-center justify-content-center">{{ cantidad() }}</span>
+            <button class="btn btn-light px-3" (click)="ajustarCantidad(1)">&plus;</button>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 mt-3">
+          <button (click)="agregarAlCarrito()" class="btn btn-carrito">Añadir al carrito</button>
+          <button class="btn-favorito" (click)="favorito = !favorito">
+            <i class="bi" [ngClass]="favorito ? 'bi-heart-fill favorito-lleno' : 'bi-heart'" style="font-size: 1.2rem;"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-5 pt-5 px-2">
+      <p class="text-muted">{{ producto.descripcion }}</p>
+      <ul class="list-unstyled small mt-4">
+        <li><span class="me-2 text-dark fw-bold">&bullet;</span> Premium Quality</li>
+        <li><span class="me-2 text-dark fw-bold">&bullet;</span> Versatile Wardrobe Staple</li>
+        <li><span class="me-2 text-dark fw-bold">&bullet;</span> Available in Various Sizes</li>
+        <li><span class="me-2 text-dark fw-bold">&bullet;</span> Tailored Fit</li>
+      </ul>
+    </div>
+
+    <div class="mt-5 pt-5 px-2">
+      <h3 class="fw-bold mb-1">También te podría gustar.</h3>
+      <p class="text-muted small mb-4 text-uppercase" style="font-size: 0.7rem;">PRODUCTOS SIMILARES</p>
+      <div class="row flex-nowrap overflow-x-auto g-4 pb-3">
+        <div *ngFor="let rel of [1,2,3,4]" class="col-12 col-sm-6 col-md-4 col-lg-3 flex-shrink-0">
+          <div class="text-center cursor-pointer">
+            <div class="bg-secondary bg-opacity-50 rounded producto-similar">
+              <div class="d-flex align-items-center justify-content-center h-100">
+                <i class="bi bi-image text-white fs-2"></i>
+              </div>
+            </div>
+            <p class="small fw-normal mt-2 mb-0">Eve Punching Floral {{ rel }}</p>
+            <p class="small text-muted">$22.90</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div *ngIf="!producto" class="py-5 text-center">
+  <p class="lead text-danger">Producto no encontrado o ID inválido.</p>
+  <button (click)="goBack.emit()" class="btn btn-primary">Volver al Catálogo</button>
+</div>

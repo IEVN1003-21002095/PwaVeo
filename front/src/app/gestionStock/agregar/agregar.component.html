@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Producto</title>
+    <style>
+        /* Estilos para el botón de Confirmar/Guardar: #00325E */
+        .btn-confirm {
+            background-color: #00325E;
+            color: #ffffff; /* Texto blanco para alto contraste */
+            border-color: #00325E;
+        }
+
+        .btn-confirm:hover {
+            background-color: #001f3f; /* Tono más oscuro al pasar el ratón */
+            border-color: #001f3f;
+        }
+
+        /* Estilos para el botón de Cancelar: #CAD8E5 (No es necesario, se maneja con style inline o una clase simple) */
+        /* Lo manejaré directamente en la etiqueta del botón para mantener el color exacto */
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+      <h2 class="mb-4">Agregar Nuevo Producto</h2>
+
+      <div class="card shadow-sm border-0 bg-white">
+        <div class="card-body p-4">
+
+          <div class="mb-3">
+            <label class="form-label">SKU Base *</label>
+            <input [(ngModel)]="nuevoProducto.sku_base" class="form-control" type="text" placeholder="SKU del producto"/>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Descripción *</label>
+            <input [(ngModel)]="nuevoProducto.descripcion_generica" class="form-control" type="text" placeholder="Descripción del producto"/>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Color</label>
+              <select [(ngModel)]="nuevoProducto.color" class="form-select">
+                <option value="Blanco">Blanco</option>
+                <option value="Negro">Negro</option>
+                <option value="Azul">Azul</option>
+                <option value="Rojo">Rojo</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Talla</label>
+              <select [(ngModel)]="nuevoProducto.talla" class="form-select">
+                <option value="S">S</option>
+                <option value="M">M</option>
+                <option value="L">L</option>
+                <option value="XL">XL</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Gramaje</label>
+              <input [(ngModel)]="nuevoProducto.gramaje" class="form-control" type="number" placeholder="Gramaje"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Costo Unitario</label>
+              <input [(ngModel)]="nuevoProducto.costo_adquisicion" class="form-control" type="number" placeholder="Costo"/>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Stock Mínimo</label>
+              <input [(ngModel)]="nuevoProducto.stock_minimo" class="form-control" type="number" placeholder="Stock mínimo"/>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Cantidad Actual</label>
+              <input [(ngModel)]="nuevoProducto.cantidad_actual" class="form-control" type="number" placeholder="Cantidad actual"/>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Proveedor Principal</label>
+            <input [(ngModel)]="nuevoProducto.proveedor_principal" class="form-control" type="text" placeholder="Proveedor"/>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2">
+            <button class="btn" style="background-color: #CAD8E5; color: #333333; border-color: #CAD8E5;" (click)="cancelar()">Cancelar</button>
+            
+            <button class="btn btn-confirm" (click)="guardar()">Guardar Producto</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

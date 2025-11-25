@@ -1,1 +1,66 @@
-<p>step-address works!</p>
+<form>
+    <h3>Detalles de entrega:</h3>
+    
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="calle">Calle</label>
+            <input type="text" class="form-control" id="calle" 
+                   name="calle" placeholder="Nombre de la calle" required>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="numero_ext">Num. Exterior</label>
+            <input type="text" class="form-control" id="numero_ext" 
+                   name="numero_ext" placeholder="Núm. Exterior" required>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="numero_int">Num. Interior (Opcional)</label>
+            <input type="text" class="form-control" id="numero_int" 
+                   name="numero_int" placeholder="Núm. Interior">
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="colonia">Colonia / Barrio</label>
+            <input type="text" class="form-control" id="colonia" 
+                   name="colonia" placeholder="Colonia" required>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="codigo_postal">Código postal</label>
+            <input type="text" class="form-control" id="codigo_postal" 
+                   name="codigo_postal" placeholder="Código postal" 
+                   pattern="[0-9A-Za-z]{3,10}" required>
+            </div>
+    </div>
+    
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="ciudad">Ciudad / Municipio</label>
+            <input type="text" class="form-control" id="ciudad" 
+                   name="ciudad" placeholder="Ciudad" required>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="estado">Estado / Provincia</label>
+            <select id="estado" name="estado" class="form-control" required>
+                <option value="" disabled selected>Selecciona un Estado...</option>
+                </select>
+        </div>
+    </div>
+
+    <div class="form-row">
+         <div class="form-group col-md-6">
+            <label for="telefono">Teléfono</label>
+            <input type="tel" class="form-control" id="telefono" 
+                   name="telefono" placeholder="+52 55 1234 5678" required>
+        </div>
+         <div class="form-group col-md-6">
+            <label for="referencia">Referencias (Entre calles, color de casa, etc.)</label>
+            <input type="text" class="form-control" id="referencia" 
+                   name="referencia" placeholder="Referencias de la dirección">
+        </div>
+    </div>
+    
+    <div class="text-right">
+        <button type="submit" class="btn btn-primary">Continuar</button>
+    </div>
+</form>
