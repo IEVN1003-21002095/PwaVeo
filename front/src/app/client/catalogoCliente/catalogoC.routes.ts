@@ -1,24 +1,19 @@
 import { Routes } from '@angular/router';
+import { CatalogoClienteComponent } from './catalogo-c/catalogo-c.component';
+import { DetallesComponent } from './detalles/detalles.component';
+import { ProductDetailComponent } from './product-detail/product-detail.component';
 
-export const CATALOGO_C_ROUTES: Routes = [
+export const CATALOGO_CLIENTE_ROUTES: Routes = [
   {
     path: '',
-    loadComponent: () =>
-      import('./catalogo-c/catalogo-c.component')
-        .then(m => m.CatalogoClienteComponent)
+    component: CatalogoClienteComponent
   },
-
   {
-    path: 'detalle/:id',
-    loadComponent: () =>
-      import('./product-detail/product-detail.component')
-        .then(m => m.ProductDetailComponent)
+    path: 'detalles/:id',
+    component: DetallesComponent
   },
-
   {
-    path: 'info/:id',
-    loadComponent: () =>
-      import('./detalles/detalles.component')
-        .then(m => m.DetallesComponent)
+    path: 'producto/:id',
+    component: ProductDetailComponent
   }
 ];
