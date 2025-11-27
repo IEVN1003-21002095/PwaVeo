@@ -1,109 +1,46 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
 
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <title>Login</title>
-
-    <style>
-        body {
-            background-color: #f5f5f5;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .login-container {
-            max-width: 1100px;
-            margin-top: 50px;
-        }
-
-        .left-panel {
-            padding: 40px;
-        }
-
-        .right-panel {
-            background-color: #8c94a0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .right-panel svg {
-            opacity: 0.25;
-        }
-
-        .btn-primary {
-            background-color: #0d2a58;
-            border: none;
-        }
-        .btn-primary:hover {
-            background-color: #0a2145;
-        }
-    </style>
-</head>
-
-<body>
-
-    <div class="container d-flex justify-content-center">
-        <div class="row shadow-lg bg-white login-container rounded-4 overflow-hidden">
-
-            <!-- LEFT SIDE -->
-            <div class="col-md-6 left-panel">
-
-                <span class="text-secondary small">Home > Login</span>
-                <h1 class="fw-bold mt-2">¡Hola, bienvenido!</h1>
-                <p class="text-muted mb-4">Ingresa tus credenciales para continuar.</p>
-
-                <!-- FORM (sin Angular aún) -->
-                <form>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Email</label>
-                        <input type="email" class="form-control" placeholder="nombre@correo.com">
-                    </div>
-
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between">
-                            <label class="form-label fw-semibold">Contraseña</label>
-                            <a href="#" class="small text-primary text-decoration-none">¿Olvidaste tu contraseña?</a>
-                        </div>
-                        <input type="password" class="form-control" placeholder="••••••••">
-                    </div>
-
-                    <div class="form-check mb-3">
-                        <input type="checkbox" class="form-check-input" id="remember">
-                        <label for="remember" class="form-check-label">Recordarme</label>
-                    </div>
-
-                    <!-- BOTÓN LOGIN -->
-                    <button class="btn btn-primary w-100" (click)="irAlCatalogo()">
-                    Iniciar sesión
-                    </button>
-
-
-                    <div class="text-center mt-4">
-                        <p>¿No tienes cuenta? 
-                            <a href="/auth/register" class="text-primary fw-bold text-decoration-none">Regístrate aquí</a>
-                        </p>
-                    </div>
-
-                </form>
-            </div>
-
-            <!-- RIGHT SIDE IMAGE -->
-            <div class="col-md-6 right-panel d-none d-md-flex">
-                <svg xmlns="http://www.w3.org/2000/svg" width="140" height="140" fill="none" stroke="white" stroke-width="2"
-                     viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h7a3 3 0 0 1 3 3v1"/>
-                </svg>
-            </div>
-
-        </div>
+    <div class="mb-3">
+        <label class="form-label fw-semibold">Email</label>
+        <input type="email" class="form-control" placeholder="nombre@correo.com"
+               formControlName="correo">
+        <small class="text-danger" *ngIf="form.get('correo')?.touched && form.get('correo')?.invalid">
+            Ingresa un correo válido
+        </small>
     </div>
 
-</body>
-</html>
+    <div class="mb-3">
+        <div class="d-flex justify-content-between">
+            <label class="form-label fw-semibold">Contraseña</label>
+            <a href="#" class="small text-primary text-decoration-none">¿Olvidaste tu contraseña?</a>
+        </div>
+        <input type="password" class="form-control" placeholder="••••••••"
+               formControlName="contrasena">
+        <small class="text-danger" *ngIf="form.get('contrasena')?.touched && form.get('contrasena')?.invalid">
+            La contraseña es obligatoria
+        </small>
+    </div>
+
+    <div class="form-check mb-3">
+        <input type="checkbox" class="form-check-input" id="remember">
+        <label for="remember" class="form-check-label">Recordarme</label>
+    </div>
+
+    <!-- MENSAJE DE ERROR BACKEND -->
+    <div *ngIf="errorMsg" class="alert alert-danger py-2">
+        {{ errorMsg }}
+    </div>
+
+    <!-- BOTÓN LOGIN -->
+    <button class="btn btn-primary w-100" type="submit" [disabled]="loading">
+        <span *ngIf="!loading">Iniciar sesión</span>
+        <span *ngIf="loading">Validando...</span>
+    </button>
+
+    <div class="text-center mt-4">
+        <p>¿No tienes cuenta? 
+            <a routerLink="/auth/register" class="text-primary fw-bold text-decoration-none">Regístrate aquí</a>
+        </p>
+    </div>
+
+</form>

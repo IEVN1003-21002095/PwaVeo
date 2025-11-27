@@ -8,24 +8,24 @@ export const ADMIN_ROUTES: Routes = [
       import('./dashboard/dashboard-home/dashboard-home.routes').then(m => m.DASHBOARD_ROUTES)
   },
   {
-    path: 'customers',
+    path: 'clientes',
     loadChildren: () =>
-      import('./customers/customers.routes').then(m => m.CUSTOMERS_ROUTES)
+      import('./clientes/customers.routes').then(m => m.CUSTOMERS_ROUTES)
   },
   {
     path: 'catalogo',
     loadChildren: () =>
-      import('./gestionCatalogo/gestionCatalogo.routes')
+      import('./gestion-catalogo/gestionCatalogo.routes')
   },
   {
     path: 'inventario', 
     loadChildren: () =>
-      import('./gestionStock/inventario.routes').then(m => m.INVENTARIO_ROUTES) 
+      import('./gestion-stock/inventario.routes').then(m => m.INVENTARIO_ROUTES) 
   },
   // Módulo de Ventas
   {
     path: 'sales',
     loadChildren: () =>
-      import('./sales/sales.routes').then(m => m.SALES_ROUTES)
+      import('./ventas/sales.routes').then(m => m.SALES_ROUTES)
   }
 ];
