@@ -3,106 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Tailwind</title>
 
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-    <title>Login</title>
-
-    <style>
-        body {
-            background-color: #f5f5f5;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .login-container {
-            max-width: 1100px;
-            margin-top: 50px;
-        }
-
-        .left-panel {
-            padding: 40px;
-        }
-
-        .right-panel {
-            background-color: #8c94a0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .right-panel svg {
-            opacity: 0.25;
-        }
-
-        .btn-primary {
-            background-color: #0d2a58;
-            border: none;
-        }
-        .btn-primary:hover {
-            background-color: #0a2145;
-        }
-    </style>
 </head>
 
-<body>
+<body class="bg-gray-100 font-sans">
 
-    <div class="container d-flex justify-content-center">
-        <div class="row shadow-lg bg-white login-container rounded-4 overflow-hidden">
+    <div class="w-full min-h-screen flex justify-center items-center px-4">
 
-            <!-- LEFT SIDE -->
-            <div class="col-md-6 left-panel">
+        <div class="flex bg-white shadow-2xl rounded-3xl overflow-hidden max-w-5xl w-full">
 
-                <span class="text-secondary small">Home > Login</span>
-                <h1 class="fw-bold mt-2">¡Hola, bienvenido!</h1>
-                <p class="text-muted mb-4">Ingresa tus credenciales para continuar.</p>
+            <!-- LEFT PANEL -->
+            <div class="w-full md:w-1/2 p-10">
 
-                <!-- FORM (sin Angular aún) -->
-                <form>
+                <span class="text-gray-400 text-sm">Home > Login</span>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Email</label>
-                        <input type="email" class="form-control" placeholder="nombre@correo.com">
+                <h1 class="text-3xl font-extrabold mt-3">¡Hola, bienvenido de nuevo!</h1>
+                <p class="text-gray-500 mb-6">Ingresa tus credenciales para continuar.</p>
+
+                <form class="space-y-5">
+
+                    <!-- EMAIL -->
+                    <div>
+                        <label class="block font-semibold mb-1">Email</label>
+                        <input 
+                            type="email" 
+                            placeholder="nombre@correo.com" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none"
+                        >
                     </div>
 
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between">
-                            <label class="form-label fw-semibold">Contraseña</label>
-                            <a href="#" class="small text-primary text-decoration-none">¿Olvidaste tu contraseña?</a>
+                    <!-- PASSWORD -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="font-semibold">Contraseña</label>
+                            <a href="#" class="text-blue-700 text-sm hover:underline">¿Olvidaste tu contraseña?</a>
                         </div>
-                        <input type="password" class="form-control" placeholder="••••••••">
+
+                        <input 
+                            type="password" 
+                            placeholder="••••••••" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none"
+                        >
                     </div>
 
-                    <div class="form-check mb-3">
-                        <input type="checkbox" class="form-check-input" id="remember">
-                        <label for="remember" class="form-check-label">Recordarme</label>
+                    <!-- REMEMBER -->
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="remember" class="w-4 h-4 accent-blue-700">
+                        <label for="remember" class="text-sm">Recordarme</label>
                     </div>
 
-                    <!-- BOTÓN LOGIN -->
-                    <button class="btn btn-primary w-100" (click)="irAlCatalogo()">
-                    Iniciar sesión
+                    <!-- BUTTON LOGIN -->
+                    <button 
+                        type="submit"
+                        class="w-full bg-blue-900 text-white py-2 rounded-lg font-semibold hover:bg-blue-800 transition"
+                    >
+                        Iniciar sesión
                     </button>
 
-
-                    <div class="text-center mt-4">
-                        <p>¿No tienes cuenta? 
-                            <a href="/auth/register" class="text-primary fw-bold text-decoration-none">Regístrate aquí</a>
-                        </p>
-                    </div>
+                    <p class="text-center pt-2">
+                        ¿No tienes cuenta?
+                        <a href="/auth/register" class="text-blue-700 font-semibold hover:underline">
+                            Regístrate aquí
+                        </a>
+                    </p>
 
                 </form>
             </div>
 
-            <!-- RIGHT SIDE IMAGE -->
-            <div class="col-md-6 right-panel d-none d-md-flex">
-                <svg xmlns="http://www.w3.org/2000/svg" width="140" height="140" fill="none" stroke="white" stroke-width="2"
-                     viewBox="0 0 24 24">
+            <!-- RIGHT PANEL -->
+            <div class="hidden md:flex md:w-1/2 bg-gray-500 justify-center items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" fill="none" stroke="white" stroke-width="2" class="opacity-30"
+                    viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h7a3 3 0 0 1 3 3v1"/>
+                        d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h7a3 3 0 0 1 3 3v1"/>
                 </svg>
             </div>
 
         </div>
+
     </div>
 
 </body>
