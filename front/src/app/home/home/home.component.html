@@ -1,0 +1,309 @@
+<div class="container-fluid bg-white min-vh-100 p-0 font-sans">
+
+  <style>
+    .hover-zoom-container {
+      overflow: hidden;
+      position: relative;
+      display: block;
+      border-radius: 0; 
+    }
+    
+    .bg-image-zoom {
+      transform: scale(1.15); 
+      transition: transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .hover-zoom-container:hover .bg-image-zoom {
+      transform: scale(1.0); 
+    }
+
+    .bg-image-static {
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .text-veo { color: #00325E !important; }
+    .bg-veo-dark { background-color: #00111f; }
+    
+    .text-tracking-wide { letter-spacing: 0.2em; }
+    .text-tracking-widest { letter-spacing: 0.5em; }
+
+    .divider-vertical {
+      width: 1px;
+      height: 50px;
+      background-color: #00325E;
+      margin: 0 auto 20px auto;
+    }
+
+    .btn-link-white {
+      color: white;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255,255,255,0.6);
+      transition: all 0.3s;
+      padding-bottom: 5px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .btn-link-white:hover {
+      border-bottom: 2px solid white;
+      color: #fff;
+    }
+
+    .promo-box {
+        min-height: 320px;
+        padding: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-weight: 400; 
+        font-size: 2.8rem;
+        line-height: 1.05;
+        letter-spacing: -1.5px; 
+        transition: opacity 0.3s;
+        cursor: default;
+        word-wrap: break-word;
+    }
+    
+    .promo-box:hover {
+        opacity: 0.9;
+    }
+
+    .bg-veo-1 { background-color: #00325E; color: white; }
+    .bg-veo-2 { background-color: #CAD8E5; color: #00325E; }
+    .bg-veo-3 { background-color: #00111f; color: white; }
+    .bg-veo-4 { background-color: #f4f4f4; color: #00325E; }
+
+    @keyframes scanBeam {
+        0% { top: 0%; opacity: 0; }
+        20% { opacity: 0.5; } 
+        80% { opacity: 0.5; }
+        100% { top: 100%; opacity: 0; }
+    }
+
+    .hero-scanner-frame {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 85%;
+        height: 85%;
+        border: 1px solid rgba(255, 255, 255, 0.1); 
+        pointer-events: none;
+        z-index: 1;
+        overflow: hidden;
+    }
+
+    .hero-scanner-frame::before, .hero-scanner-frame::after {
+        content: ''; position: absolute; width: 40px; height: 40px; border-color: rgba(255, 255, 255, 0.3); border-style: solid;
+    }
+    .hero-scanner-frame::before { top: 0; left: 0; border-width: 2px 0 0 2px; }
+    .hero-scanner-frame::after { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+    .scanner-beam {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 2px; 
+        background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), transparent); 
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); 
+        animation: scanBeam 4s ease-in-out infinite; 
+    }
+
+    .gallery-overlay-gradient {
+        background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%);
+    }
+    .card-gallery-text {
+        z-index: 2;
+        text-align: left;
+        padding: 2.5rem;
+    }
+    .gallery-title { font-weight: 700; text-transform: uppercase; letter-spacing: -1px; margin-bottom: 0.5rem; }
+    .gallery-subtitle { font-weight: 300; opacity: 0.8; margin-bottom: 1.5rem; font-size: 0.9rem; }
+
+    @media (max-width: 992px) {
+        .promo-box { font-size: 2rem; min-height: 250px; }
+    }
+    @media (max-width: 768px) {
+        .promo-box { font-size: 1.8rem; min-height: 200px; padding: 1.5rem; }
+        .card-gallery-text { padding: 1.5rem; }
+    }
+  </style>
+
+  <header 
+    class="w-100 d-flex align-items-center justify-content-center text-center text-white position-relative" 
+    style="height: 100vh; overflow: hidden; background-color: #000;">
+    
+    <div class="position-absolute top-0 start-0 w-100 h-100"
+         style="
+           background-image: url('assets/banner1.jpg'); 
+           background-size: cover; 
+           background-position: center;
+         ">
+    </div>
+
+    <div class="hero-scanner-frame">
+        <div class="scanner-beam"></div>
+    </div>
+
+    <div class="container p-4 position-relative z-2">
+      <h1 class="display-1 mb-0" 
+          style="
+            font-size: clamp(10rem, 25vw, 22rem); 
+            font-weight: 700; 
+            letter-spacing: -15px; 
+            line-height: 0.8;
+            margin-left: -10px;
+            text-shadow: 0 0 40px rgba(0,0,0,0.6); 
+          ">
+        VEO
+      </h1>
+      
+      <div class="mx-auto" style="max-width: 600px;">
+        <p class="text-uppercase fw-normal text-tracking-wide mb-5 mt-5" style="font-size: 1.1rem; line-height: 1.6; letter-spacing: 4px; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">
+          Vístelo. Escanéalo. Vívelo.
+        </p>
+        <div>
+          <a [routerLink]="['/catalogo']" class="btn-link-white" style="font-size: 1.1rem;">
+            EXPLORAR COLECCIÓN
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="w-100 py-5 bg-white text-dark position-relative">
+    <div class="container py-5 my-3">
+      <div class="row justify-content-center text-center">
+        <div class="col-lg-8">
+          <div class="divider-vertical"></div>
+          
+          <h3 class="display-6 fw-bold mb-5 px-md-5 text-veo" style="letter-spacing: -0.5px; line-height: 1.3;">
+            "Lo físico es el lienzo. Lo digital es el mensaje."
+          </h3>
+          
+          <p class="fw-normal text-muted mb-0" style="font-size: 1.1rem; line-height: 1.8; max-width: 750px; margin: 0 auto;">
+            En un mundo estático, <strong class="text-veo">VEO</strong> crea movimiento. No diseñamos ropa para cubrirte, sino interfaces para expresarte. Somos el puente entre la textura de la calle y el código de la red. Sin límites, sin definiciones, solo realidad expandida.
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container-fluid px-2 px-md-4 pb-0">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div [routerLink]="['/catalogo']" class="card border-0 text-white hover-zoom-container cursor-pointer shadow-none h-100" style="min-height: 1100px;"> 
+          <div class="position-absolute top-0 start-0 bg-image-zoom" style="background-image: url('assets/Dulce_conojo.jpg');"></div>
+          <div class="position-absolute top-0 start-0 w-100 h-100 gallery-overlay-gradient"></div>
+          <div class="card-body p-5 d-flex flex-column justify-content-end position-relative z-1 h-100 text-center pb-5">
+            <h3 class="fw-normal display-6 mb-3">Colección 2025</h3>
+            <p class="small opacity-75 mb-4 mx-auto" style="max-width: 300px; font-weight: 300;">Diseños que cuentan historias. Explora el arte original.</p>
+            <div><span class="btn-link-white">Comprar Ahora</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div [routerLink]="['/catalogo']" class="card border-0 text-white hover-zoom-container cursor-pointer shadow-none h-100" style="min-height: 1100px;"> 
+          <div class="position-absolute top-0 start-0 bg-image-zoom" style="background-image: url('assets/boca.jpg');"></div>
+          <div class="position-absolute top-0 start-0 w-100 h-100 gallery-overlay-gradient"></div>
+          <div class="card-body p-5 d-flex flex-column justify-content-end position-relative z-1 h-100 text-center pb-5">
+            <h3 class="fw-normal display-6 mb-3">VEO Lens</h3>
+            <p class="small opacity-75 mb-4 mx-auto" style="max-width: 300px; font-weight: 300;">Descubre la capa oculta. Escanea tu prenda.</p>
+            <div><span class="btn-link-white">Activar Scanner</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container-fluid px-0 my-4"> 
+    <div class="row g-0"> 
+        <div class="col-md-3 promo-box bg-veo-1">
+            ¿Nuevo aquí?<br>15% OFF primer drop.
+        </div>
+        <div class="col-md-3 promo-box bg-veo-2">
+            App VEO<br>Acceso anticipado & AR.
+        </div>
+        <div class="col-md-3 promo-box bg-veo-3">
+            VEO Premier<br>Envíos Express 1 año.
+        </div>
+        <div class="col-md-3 promo-box bg-veo-4">
+            Devoluciones fáciles<br>Estilo libre.
+        </div>
+    </div>
+  </section>
+
+  <section class="container-fluid px-2 px-md-4 pb-5 mb-5 mt-5">
+    <div class="py-4 text-center">
+      <h4 class="text-uppercase text-tracking-widest h6 m-0 text-veo">
+        VEO LIFESTYLE • DESTACADOS
+      </h4>
+    </div>
+
+    <div class="row g-3" style="min-height: 1000px;"> 
+      
+      <div class="col-lg-6">
+        <div [routerLink]="['/catalogo']" class="card border-0 text-white hover-zoom-container h-100 cursor-pointer" style="min-height: 950px;">
+           <div class="bg-image-zoom" style="background-image: url('assets/veo2.jpg');"></div>
+           <div class="position-absolute top-0 start-0 w-100 h-100 gallery-overlay-gradient"></div>
+           <div class="card-img-overlay card-gallery-text d-flex flex-column justify-content-end">
+             <h3 class="gallery-title display-6">Streetwear Avanzado</h3>
+             <p class="gallery-subtitle">Donde la calle se encuentra con el código.</p>
+             <div><span class="btn-link-white">Ver Lookbook</span></div>
+           </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 d-flex flex-column gap-3">
+        
+        <div [routerLink]="['/catalogo']" class="card border-0 text-white hover-zoom-container flex-grow-1 cursor-pointer" style="min-height: 550px;">
+           <div class="bg-image-zoom" style="background-image: url('assets/alanespalda.jpg');"></div>
+           <div class="position-absolute top-0 start-0 w-100 h-100 gallery-overlay-gradient"></div>
+           <div class="card-img-overlay card-gallery-text d-flex flex-column justify-content-end">
+             <h4 class="gallery-title">Edición Limitada AR</h4>
+             <p class="gallery-subtitle">Piezas exclusivas con contenido oculto.</p>
+             <div><span class="btn-link-white">Comprar Drop</span></div>
+           </div>
+        </div>
+
+        <div class="row g-3 flex-grow-1">
+           <div class="col-md-6">
+             <div [routerLink]="['/catalogo']" class="card border-0 text-white hover-zoom-container h-100 cursor-pointer" style="min-height: 380px;">
+                <div class="bg-image-zoom" style="background-image: url('assets/veo.jpg');"></div>
+                <div class="position-absolute top-0 start-0 w-100 h-100 gallery-overlay-gradient"></div>
+                <div class="card-img-overlay card-gallery-text d-flex flex-column justify-content-end">
+                  <h5 class="gallery-title">Accesorios</h5>
+                  <div><span class="btn-link-white fs-6">Explorar</span></div>
+                </div>
+             </div>
+           </div>
+           <div class="col-md-6">
+             <div [routerLink]="['/catalogo']" class="card border-0 text-white hover-zoom-container h-100 cursor-pointer" style="min-height: 380px;">
+                <div class="bg-image-zoom" style="background-image: url('assets/juntos.jpg');"></div>
+                <div class="position-absolute top-0 start-0 w-100 h-100 gallery-overlay-gradient"></div>
+                <div class="card-img-overlay card-gallery-text d-flex flex-column justify-content-end">
+                  <h5 class="gallery-title">Comunidad</h5>
+                  <div><span class="btn-link-white fs-6">Unirse</span></div>
+                </div>
+             </div>
+           </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+</div>
