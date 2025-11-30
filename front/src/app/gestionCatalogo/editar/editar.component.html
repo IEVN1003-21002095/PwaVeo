@@ -1,159 +1,129 @@
-<style>
-    /* Estilos para el botón de Guardar Cambios (Confirmar): #00325E */
-    .btn-confirm {
-        background-color: #00325E !important;
-        color: #ffffff !important; 
-        border-color: #00325E !important;
+<div *ngIf="visible" class="modal-overlay font-sans">
+
+  <style>
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      z-index: 2000;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(3px); padding: 1rem;
     }
 
-    .btn-confirm:hover {
-        background-color: #001f3f !important;
-        border-color: #001f3f !important;
+    .modal-card {
+      background-color: #ffffff;
+      width: 100%; max-width: 800px;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      display: flex; flex-direction: column; max-height: 90vh;
+      animation: zoomIn 0.2s ease-out;
     }
 
-    /* Estilos para el botón de Cancelar: #CAD8E5 */
-    .btn-cancel-light {
-        background-color: #CAD8E5 !important;
-        color: #333333 !important; 
-        border-color: #CAD8E5 !important;
-    }
-</style>
+    @keyframes zoomIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
 
-<div class="container-fluid py-5" style="background-color: #f7f8fa;" *ngIf="producto">
-  <div class="row justify-content-center mt-4">
-    <div class="col-lg-8 col-md-10">
-      <div class="card shadow-sm border-0 bg-white">
-        <div class="card-body p-4">
+    .modal-header { padding: 1.25rem 2rem; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; background: #fff; border-radius: 12px 12px 0 0; }
+    .modal-title { font-weight: 700; color: #111; font-size: 1.2rem; margin: 0; }
+    .btn-close { background: none; border: none; font-size: 1.5rem; line-height: 1; color: #999; cursor: pointer; text-decoration: none; }
+    .btn-close:hover { color: #333; }
 
-          <h4 class="mb-3">Editar Producto: {{ producto.nombre }}</h4>
-          <p class="text-muted mb-4">Modifica la información del artículo seleccionado.</p>
+    .modal-body { padding: 2rem; overflow-y: auto; }
+    .modal-footer { padding: 1.25rem 2rem; background-color: #f8f9fa; border-top: 1px solid #e9ecef; display: flex; justify-content: flex-end; gap: 10px; border-radius: 0 0 12px 12px; }
 
-          <form (ngSubmit)="guardarCambios()">
+    .form-label { font-weight: 600; color: #374151; font-size: 0.8rem; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.03em; }
+    .form-control, .form-select { border-radius: 6px; border: 1px solid #d1d5db; padding: 0.6rem 0.8rem; font-size: 0.9rem; }
+    .form-control:focus, .form-select:focus { border-color: #00325E; box-shadow: 0 0 0 3px rgba(0, 50, 94, 0.1); }
 
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label class="form-label">Nombre del Producto</label>
-                <input type="text" class="form-control"
-                  [(ngModel)]="producto.nombre" name="nombre" required>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Tipo / Colección</label>
-                <input type="text" class="form-control"
-                  [(ngModel)]="producto.tipo" name="tipo" required>
-              </div>
-            </div>
+    .btn-cancel { background-color: white; border: 1px solid #d1d5db; color: #374151; font-weight: 600; padding: 10px 20px; border-radius: 6px; font-size: 0.9rem; text-decoration: none; }
+    .btn-cancel:hover { background-color: #f3f4f6; color: #111; }
+    .btn-confirm { background-color: #00325E; color: white; border: none; font-weight: 600; padding: 10px 24px; border-radius: 6px; font-size: 0.9rem; }
+    .btn-confirm:hover { background-color: #002244; transform: translateY(-1px); }
+  </style>
 
-            <div class="row mb-3">
-              <div class="col-md-4">
-                <label class="form-label">SKU</label>
-                <input type="text" class="form-control"
-                  [(ngModel)]="producto.sku" name="sku" required>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Estado</label>
-                <select class="form-select" [(ngModel)]="producto.estado" name="estado" required>
-                  <option value="activo">Activo</option>
-                  <option value="inactivo">Inactivo</option>
-                </select>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Precio Base</label>
-                <div class="input-group">
-                  <span class="input-group-text">$</span>
-                  <input type="number" class="form-control"
-                    [(ngModel)]="producto.precio" name="precio" required>
-                </div>
-              </div>
-            </div>
+  <form (ngSubmit)="modificar()" #formEditar="ngForm" class="modal-card">
 
-            <h5 class="fw-bold mt-4 mb-3">Stock por Variantes</h5>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <div class="border rounded p-3">
-                  <h6 class="fw-bold mb-3">Color Blanco</h6>
-                  <div class="row">
-                    <div class="col-md-4">
-                      <label>Talla S</label>
-                      <input type="number" class="form-control"
-                        [(ngModel)]="producto.stock.blanco.S"
-                        name="stockBlancoS">
-                    </div>
-                    <div class="col-md-4">
-                      <label>Talla M</label>
-                      <input type="number" class="form-control"
-                        [(ngModel)]="producto.stock.blanco.M"
-                        name="stockBlancoM">
-                    </div>
-                    <div class="col-md-4">
-                      <label>Talla L</label>
-                      <input type="number" class="form-control"
-                        [(ngModel)]="producto.stock.blanco.L"
-                        name="stockBlancoL">
-                    </div>
-                  </div>
-                </div>
-              </div>
+    <!-- HEADER -->
+    <div class="modal-header">
+      <h3 class="modal-title">Editar Producto</h3>
+      <button type="button" class="btn-close" (click)="cerrar()">×</button>
+    </div>
 
-              <div class="col-md-6 mb-3">
-                <div class="border rounded p-3">
-                  <h6 class="fw-bold mb-3">Color Negro</h6>
-                  <div class="row">
-                    <div class="col-md-4">
-                      <label>Talla S</label>
-                      <input type="number" class="form-control"
-                        [(ngModel)]="producto.stock.negro.S"
-                        name="stockNegroS">
-                    </div>
-                    <div class="col-md-4">
-                      <label>Talla M</label>
-                      <input type="number" class="form-control"
-                        [(ngModel)]="producto.stock.negro.M"
-                        name="stockNegroM">
-                    </div>
-                    <div class="col-md-4">
-                      <label>Talla L</label>
-                      <input type="number" class="form-control"
-                        [(ngModel)]="producto.stock.negro.L"
-                        name="stockNegroL">
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="mt-4">
-              <label class="form-label">Descripción</label>
-              <textarea class="form-control" rows="3"
-                [(ngModel)]="producto.descripcion" name="descripcion"></textarea>
-            </div>
-
-            <div class="mb-3 mt-4" *ngIf="producto.imagen">
-              <label class="form-label d-block">Imagen Actual</label>
-              <img [src]="producto.imagen" class="img-thumbnail mb-2" style="max-width: 180px;">
-            </div>
-
-            <div class="mb-4">
-              <label class="form-label">Cambiar Imagen</label>
-              <input class="form-control" type="file" (change)="onFileSelected($event)">
-            </div>
-
-            <div class="text-end pt-3 d-flex justify-content-end gap-2">
-              <button type="button" class="btn btn-cancel-light px-4" (click)="cancelar()">
-                Cancelar
-              </button>
-              <button class="btn btn-confirm px-5 py-2" type="submit">
-                Guardar Cambios
-              </button>
-            </div>
-
-          </form>
-
+    <!-- BODY -->
+    <div class="modal-body">
+      <!-- PRODUCTO -->
+      <div class="row mb-3">
+        <div class="col-md-8">
+          <label class="form-label">Nombre del Producto</label>
+          <input type="text" class="form-control" name="nombre" [(ngModel)]="regProducto.nombre" required />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Categoría</label>
+          <select class="form-select" name="categoria" [(ngModel)]="regProducto.categoria" required>
+            <option *ngFor="let cat of categorias" [value]="cat">{{ cat }}</option>
+          </select>
         </div>
       </div>
-    </div>
-  </div>
-</div>
 
-<div class="container-fluid py-5" style="background-color: #f7f8fa;" *ngIf="!producto">
-  <div class="alert alert-warning text-center">Cargando producto o el ID no es válido...</div>
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label class="form-label">Costo ($)</label>
+          <input type="number" class="form-control" name="costo" [(ngModel)]="regProducto.costo" required />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Precio Venta ($)</label>
+          <input type="number" class="form-control" name="precio" [(ngModel)]="regProducto.precio" required />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Estado</label>
+          <select class="form-select" name="activo" [(ngModel)]="regProducto.activo" required>
+            <option [ngValue]="1">Activo</option>
+            <option [ngValue]="0">Inactivo</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Descripción</label>
+        <textarea class="form-control" rows="3" name="descripcion" [(ngModel)]="regProducto.descripcion"></textarea>
+      </div>
+
+      <!-- VARIANTES -->
+      <div class="mt-4">
+        <h5 class="mb-2">Variantes del producto</h5>
+        <button type="button" class="btn-confirm mb-3" (click)="agregarVariante()">Agregar Variante</button>
+
+        <table class="table table-bordered w-100">
+          <thead>
+            <tr>
+              <th>Color</th>
+              <th>Talla</th>
+              <th>Cantidad</th>
+              <th>Ubicación</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let v of variantes; let i = index">
+              <td><input class="form-control" [(ngModel)]="v.color" name="color-{{i}}" /></td>
+              <td><input class="form-control" [(ngModel)]="v.talla" name="talla-{{i}}" /></td>
+              <td><input type="number" class="form-control" [(ngModel)]="v.cantidad" name="cantidad-{{i}}" /></td>
+              <td><input class="form-control" [(ngModel)]="v.ubicacion" name="ubicacion-{{i}}" /></td>
+              <td>
+                <button type="button" class="btn-cancel btn-sm me-1" (click)="editarVariante(v)">Editar</button>
+                <button type="button" class="btn-confirm btn-sm" (click)="eliminarVariante(v)">Eliminar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="modal-footer">
+      <button type="button" class="btn-cancel" (click)="cerrar()">Cancelar</button>
+      <button type="submit" class="btn-confirm" [disabled]="!formEditar.form.valid">Guardar Cambios</button>
+    </div>
+
+  </form>
 </div>

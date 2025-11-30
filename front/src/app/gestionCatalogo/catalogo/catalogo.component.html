@@ -1,141 +1,223 @@
-<div class="container-fluid py-5" style="background-color: #f7f8fa;">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<div class="container-fluid py-5" style="background-color: #ffffff; min-height: 100vh; font-family: 'Inter', sans-serif;">
+  
   <style>
-    /* Botón Agregar Producto */
-    .btn-agregar {
-      background-color: #CAD8E5;
-      color: #00325E;
-      border: none;
-    }
+    /* === ESTILOS BASE === */
+    .form-control, .form-select, .btn, .input-group-text { border-radius: 6px !important; }
+    .form-control:focus, .form-select:focus { border-color: #00325E; box-shadow: 0 0 0 2px rgba(0, 50, 94, 0.1); }
 
-    /* Mensaje de alerta cuando no hay productos */
-    .alert-filtro {
-      background-color: #CAD8E5;
-      color: #00325E;
-    }
+    .page-title { font-weight: 700; color: #1a1a1a; font-size: 1.5rem; letter-spacing: -0.5px; }
+    .page-subtitle { color: #6c757d; font-size: 0.9rem; }
 
-    /* Encabezado de tabla (opcional, si quieres azul oscuro) */
-    table thead {
-      background-color: #00325E;
-      color: #ffffff;
+    /* Botón Acción Principal */
+    .btn-action-primary {
+        background-color: #00325E; color: white; border: none; border-radius: 6px; padding: 10px 24px;
+        font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+        box-shadow: 0 4px 6px rgba(0, 50, 94, 0.3); display: inline-flex; align-items: center; gap: 8px;
+        transition: all 0.2s ease-in-out; text-decoration: none;
     }
+    .btn-action-primary:hover { background-color: #002244; transform: translateY(-1px); box-shadow: 0 6px 10px rgba(0, 50, 94, 0.4); color: white; }
+    .btn-action-primary i { font-size: 1.1rem; font-weight: bold; }
+
+    /* Tabs de Filtro */
+    .segment-group { display: inline-flex; background-color: #f1f3f5; padding: 4px; border-radius: 8px !important; border: 1px solid #e9ecef; }
+    .segment-btn { border: none; background: transparent; color: #6c757d; font-size: 0.85rem; font-weight: 500; padding: 6px 16px; border-radius: 6px; transition: all 0.2s ease; cursor: pointer; }
+    .segment-btn:hover { color: #00325E; }
+    .segment-btn.active { background-color: white; color: #00325E; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+    /* Buscador y Botón Filtro */
+    .search-bar .input-group-text { background-color: white; border: 1px solid #ced4da; border-right: none; color: #999; }
+    .search-bar .form-control { border: 1px solid #ced4da; border-left: none; padding-left: 0; }
+    .search-bar:focus-within .input-group-text, .search-bar:focus-within .form-control { border-color: #00325E; }
+
+    .btn-icon-square { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border: 1px solid #ced4da; background: white; color: #6c757d; transition: 0.2s; border-radius: 6px; }
+    .btn-icon-square:hover, .btn-icon-square[aria-expanded="true"] { border-color: #00325E; color: #00325E; background-color: #f0f4f8; }
+
+    /* Tabla */
+    .table-clean { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .table-clean thead th { background-color: #f8f9fc !important; color: #4a5568; font-weight: 600; font-size: 0.85rem; padding: 12px 16px; border: none; border-bottom: 1px solid #edf2f7; white-space: nowrap; }
+    .table-clean tbody td { background-color: white; border-bottom: 1px solid #f0f0f0; padding: 16px; vertical-align: middle; font-size: 0.9rem; color: #2d3748; }
+    .table-clean tbody tr:hover td { background-color: #fafbfc; }
+
+    /* Imágenes */
+    .product-img-container { width: 45px; height: 45px; border-radius: 6px; overflow: hidden; background-color: #f8f9fa; border: 1px solid #e9ecef; display: flex; align-items: center; justify-content: center; color: #ccc; }
+
+    /* Status Pill */
+    .status-pill { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; border: 1px solid; background: white; }
+    .status-pill::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; }
+    .status-pill.activo { border-color: #c3e6cb; color: #155724; } .status-pill.activo::before { background-color: #28a745; }
+    .status-pill.inactivo { border-color: #e2e3e5; color: #6c757d; } .status-pill.inactivo::before { background-color: #6c757d; }
+
+    /* Acciones */
+    .btn-action-subtle { color: #a0aec0; transition: 0.2s; font-size: 1.1rem; border: none; background: transparent; padding: 4px; }
+    .btn-action-subtle:hover { color: #00325E; transform: scale(1.1); }
+    .btn-action-subtle.danger:hover { color: #dc3545; }
+    
+    .link-reset { color: #dc3545; font-size: 0.8rem; text-decoration: none; font-weight: 600; }
+    .link-reset:hover { text-decoration: underline; }
   </style>
 
-  <div class="row justify-content-center mt-4">
+  <div class="row justify-content-center">
     <div class="col-lg-11 col-md-12">
-      <h2 class="mb-4">Gestión de Catálogo</h2>
+      
+      <div class="mb-5 mt-4 border-bottom pb-3">
+        <h1 class="page-title mb-1">Gestión de Catálogo</h1>
+        <p class="page-subtitle m-0">Administración de productos visibles para el cliente</p>
+      </div>
 
-      <div class="card shadow-sm border-0 bg-white">
-        <div class="card-body p-4">
+      <!-- BARRA DE HERRAMIENTAS -->
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+          
+          <!-- IZQUIERDA: Buscador + Filtro + Tabs -->
+          <div class="d-flex align-items-center gap-2 flex-grow-1">
+              
+              <!-- 1. Buscador -->
+              <div class="input-group search-bar" style="max-width: 320px;">
+                  <span class="input-group-text"><i class="bi bi-search"></i></span>
+                  <input
+                    [(ngModel)]="filtros.texto"
+                    name="filterText"
+                    placeholder="BUSCAR PRODUCTO..."
+                    class="form-control"
+                    type="text"
+                  />
+              </div>
 
-          <div class="row mb-4 align-items-center">
-            <div class="col-md-3 mb-2">
-              <input
-                [(ngModel)]="filtros.texto"
-                name="filterTexto"
-                placeholder="Buscar por nombre o SKU…"
-                class="form-control"
-                type="text"
-              />
-            </div>
+              <!-- 2. Botón Filtros (Cuadrado) -->
+              <button class="btn btn-icon-square" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosCollapse" aria-expanded="false" title="Más filtros">
+                <i class="bi bi-sliders2"></i>
+              </button>
 
-            <div class="col-md-2 mb-2">
-              <select [(ngModel)]="filtros.estado" name="filterEstado" class="form-select">
-                <option value="">Estado</option>
-                <option value="activo">Activo</option>
-                <option value="inactivo">Inactivo</option>
-              </select>
-            </div>
-
-            <div class="col-md-auto ms-auto mb-2">
-              <button class="btn btn-agregar" (click)="irAgregar()">Agregar Producto</button>
-            </div>
+              <!-- 3. TABS DE ESTADO (Mapeo a 1/0 de BD) -->
+              <div class="segment-group ms-2">
+                  <button class="segment-btn" [class.active]="isActive(null)" (click)="setFiltroEstado(null)">Todos</button>
+                  <button class="segment-btn" [class.active]="isActive(1)" (click)="setFiltroEstado(1)">Activos</button>
+                  <button class="segment-btn" [class.active]="isActive(0)" (click)="setFiltroEstado(0)">Inactivos</button>
+              </div>
           </div>
 
-          <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle text-center" *ngIf="productosFiltrados.length">
-              <thead class="table-dark">
-                <tr>
-                  <th>Foto</th>
-                  <th>Producto</th>
-                  <th>Descripción</th>
-                  <th>Tipo / Colección</th>
-                  <th>Precio Base</th>
-                  <th>Stock Detallado</th>
-                  <th>Estado</th>
-                  <th colspan="2">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let p of productosFiltrados">
-                  <td>
-                    <img [src]="p.imagen" alt="foto" class="rounded" style="width:50px;height:50px;object-fit:cover;">
-                  </td>
-
-                  <td class="fw-semibold">
-                    {{ p.nombre }}<br>
-                    <small class="text-muted">SKU: {{ p.sku }}</small>
-                  </td>
-
-                  <td>{{ p.descripcion }}</td>
-
-                  <td>{{ p.tipo }}</td>
-                  <td class="fw-semibold">${{ p.precio }}</td>
-
-                  <td class="p-0">
-                    <table class="table table-bordered mb-0" style="font-size:0.85rem;">
-                      <thead class="table-light">
-                        <tr>
-                          <th>Color</th>
-                          <th>S</th>
-                          <th>M</th>
-                          <th>L</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td class="fw-bold text-capitalize">Blanco</td>
-                          <td>{{ p.stock.blanco.S || 0 }}</td>
-                          <td>{{ p.stock.blanco.M || 0 }}</td>
-                          <td>{{ p.stock.blanco.L || 0 }}</td>
-                        </tr>
-                        <tr>
-                          <td class="fw-bold text-capitalize">Negro</td>
-                          <td>{{ p.stock.negro.S || 0 }}</td>
-                          <td>{{ p.stock.negro.M || 0 }}</td>
-                          <td>{{ p.stock.negro.L || 0 }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </td>
-
-                  <td>
-                    <span class="badge px-3 py-2"
-                          [ngClass]="{
-                            'bg-success': p.estado === 'activo',
-                            'bg-danger': p.estado === 'inactivo'
-                          }">
-                      {{ p.estado === 'activo' ? 'Activo' : 'Inactivo' }}
-                    </span>
-                  </td>
-
-                  <td>
-                    <button class="btn btn-sm btn-success" (click)="irEditar(p.id)">Editar</button>
-                  </td>
-
-                  <td>
-                    <button class="btn btn-sm btn-danger" (click)="irEliminar(p.id)">Eliminar</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <!-- DERECHA: Botón Nuevo -->
+          <div class="d-flex align-items-center">
+              <!-- RouterLink apunta a la ruta hija -->
+              <button class="btn-action-primary" [routerLink]="['./agregar']">
+                  <i class="bi bi-plus-lg"></i> NUEVO PRODUCTO
+              </button>
           </div>
+      </div>
 
-          <div *ngIf="!productosFiltrados.length" class="alert alert-filtro text-center mt-4">
-            No hay productos que coincidan con los filtros.
-          </div>
-
+      <!-- PANEL DE FILTROS AVANZADOS -->
+      <div class="collapse mb-4" id="filtrosCollapse">
+        <div class="p-4 border rounded bg-white shadow-sm">
+            <h6 class="text-uppercase text-muted small fw-bold mb-3 ls-1">Filtros por categoría</h6>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="small text-muted mb-1">Categoría</label>
+                    <select [(ngModel)]="filtros.categoria" class="form-select form-select-sm">
+                        <option value="">Todas</option>
+                        <option *ngFor="let c of categoriasDisponibles" [value]="c">{{ c }}</option>
+                    </select>
+                </div>
+                <!-- Aquí irían más filtros si los tuvieras (ej. Rango de Precios) -->
+            </div>
+            <div class="d-flex justify-content-end mt-3 border-top pt-2">
+                <button class="btn link-reset" type="button" (click)="limpiarFiltros()">
+                    <i class="bi bi-x-circle me-1"></i> Limpiar Filtros
+                </button>
+            </div>
         </div>
       </div>
+
+      <!-- TABLA DE PRODUCTOS -->
+      <div class="table-responsive">
+        <table class="table table-clean mb-0" *ngIf="productosFiltrados.length">
+          <thead>
+            <tr>
+              <th class="ps-3">ID</th>
+              <th class="ps-3">Visual</th>
+              <th>Nombre Producto</th>
+              <th>Categoría</th>
+              <th style="width: 30%;">Descripción</th>
+              <th class="text-end">$$ Costo</th>
+              <th class="text-end">$$ Venta</th>
+              <th class="text-center">Estado</th>
+              <th class="text-end pe-3">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of productosFiltrados">
+              
+              <td class="ps-3 text-muted small">{{ p.id }}</td>
+
+              <!-- Imagen -->
+              <td class="ps-3">
+                  <div class="product-img-container">
+                    <!-- Placeholder si no hay imagen -->
+                    <i class="bi bi-image fs-5"></i>
+                  </div>
+              </td>
+              
+              <!-- Nombre -->
+              <td class="fw-bold text-dark">{{ p.nombre }}</td>
+              
+              <!-- Categoría -->
+              <td><span class="badge bg-light text-dark border fw-normal">{{ p.categoria }}</span></td>
+              
+              <!-- Descripción -->
+              <td class="small text-muted text-truncate" style="max-width: 250px;">{{ p.descripcion }}</td>
+              
+              <!-- Costo -->
+              <td class="text-end font-monospace text-muted">{{ p.costo | currency:'MXN':'symbol-narrow':'1.2-2' }}</td>
+              
+              <!-- Precio Venta -->
+              <td class="text-end font-monospace fw-bold text-dark">{{ p.precio | currency:'MXN':'symbol-narrow':'1.2-2' }}</td>
+              
+              <!-- Estado (Mapeo de 1/0 a Activo/Inactivo) -->
+              <td class="text-center">
+                <span class="status-pill" 
+                      [ngClass]="{
+                        'activo': p.activo === 1,
+                        'inactivo': p.activo === 0
+                      }">
+                  {{ p.activo === 1 ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+
+              <!-- Acciones -->
+              <td class="pe-3 text-end">
+                <div class="d-flex justify-content-end gap-2">
+                    <button class="btn-action-subtle" [routerLink]="['./editar', p.id]" title="Editar">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button class="btn-action-subtle danger" [routerLink]="['./eliminar', p.id]" title="Eliminar">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!productosFiltrados.length && !cargando" class="text-center py-5 mt-4 border rounded bg-light">
+        <h5 class="text-muted fw-normal">No se encontraron productos</h5>
+        <p class="small text-muted">Intenta ajustar los filtros o buscar otro nombre.</p>
+        <button class="btn btn-sm btn-outline-dark mt-2" (click)="limpiarFiltros()">Ver Todo</button>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="cargando" class="text-center py-5 mt-4">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="small text-muted mt-2">Cargando catálogo...</p>
+      </div>
+
     </div>
   </div>
 </div>
+
+<!-- Router Outlet para los Modales Hijos -->
+<router-outlet></router-outlet>

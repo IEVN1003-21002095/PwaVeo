@@ -1,105 +1,154 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agregar Producto</title>
-    <style>
-        /* Estilos para el botón de Confirmar/Guardar: #00325E */
-        .btn-confirm {
-            background-color: #00325E;
-            color: #ffffff; /* Texto blanco para alto contraste */
-            border-color: #00325E;
-        }
+<!-- Fondo Oscuro (Overlay) que cubre toda la pantalla -->
+<div class="modal-overlay font-sans">
+  
+  <style>
+    /* === ESTRUCTURA DE MODAL === */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(2px); /* Efecto borroso elegante */
+      padding: 1rem;
+    }
 
-        .btn-confirm:hover {
-            background-color: #001f3f; /* Tono más oscuro al pasar el ratón */
-            border-color: #001f3f;
-        }
+    .modal-card {
+      background-color: #ffffff;
+      width: 100%;
+      max-width: 800px; /* Ancho máximo del modal similar a la imagen */
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      animation: slideIn 0.3s ease-out;
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh; /* Para que no se salga de pantallas pequeñas */
+    }
 
-        /* Estilos para el botón de Cancelar: #CAD8E5 (No es necesario, se maneja con style inline o una clase simple) */
-        /* Lo manejaré directamente en la etiqueta del botón para mantener el color exacto */
-    </style>
-</head>
-<body>
+    /* Animación de entrada suave */
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-lg-8 col-md-10">
-      <h2 class="mb-4">Agregar Nuevo Producto</h2>
+    /* === HEADER & FOOTER === */
+    .modal-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-      <div class="card shadow-sm border-0 bg-white">
-        <div class="card-body p-4">
+    .modal-body {
+      padding: 2rem;
+      overflow-y: auto; /* Scroll interno si es muy alto */
+    }
 
-          <div class="mb-3">
-            <label class="form-label">SKU Base *</label>
-            <input [(ngModel)]="nuevoProducto.sku_base" class="form-control" type="text" placeholder="SKU del producto"/>
-          </div>
+    .modal-footer {
+      padding: 1.2rem 2rem;
+      background-color: #f9fafb;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
 
-          <div class="mb-3">
-            <label class="form-label">Descripción *</label>
-            <input [(ngModel)]="nuevoProducto.descripcion_generica" class="form-control" type="text" placeholder="Descripción del producto"/>
-          </div>
+    /* === ESTILOS INTERNOS === */
+    .modal-title { font-weight: 700; color: #1a1a1a; font-size: 1.25rem; margin: 0; }
+    .btn-close-x { background: none; border: none; font-size: 1.5rem; color: #999; cursor: pointer; }
+    .btn-close-x:hover { color: #333; }
 
-          <div class="row g-3 mb-3">
-            <div class="col-md-6">
-              <label class="form-label">Color</label>
-              <select [(ngModel)]="nuevoProducto.color" class="form-select">
-                <option value="Blanco">Blanco</option>
-                <option value="Negro">Negro</option>
-                <option value="Azul">Azul</option>
-                <option value="Rojo">Rojo</option>
-              </select>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Talla</label>
-              <select [(ngModel)]="nuevoProducto.talla" class="form-select">
-                <option value="S">S</option>
-                <option value="M">M</option>
-                <option value="L">L</option>
-                <option value="XL">XL</option>
-              </select>
-            </div>
-          </div>
+    .form-label { font-weight: 600; color: #374151; font-size: 0.85rem; margin-bottom: 0.4rem; }
+    .form-control, .form-select { border-radius: 6px; border: 1px solid #d1d5db; padding: 0.6rem 0.8rem; font-size: 0.9rem; }
+    .form-control:focus, .form-select:focus { border-color: #00325E; box-shadow: 0 0 0 3px rgba(0, 50, 94, 0.1); }
 
-          <div class="row g-3 mb-3">
-            <div class="col-md-6">
-              <label class="form-label">Gramaje</label>
-              <input [(ngModel)]="nuevoProducto.gramaje" class="form-control" type="number" placeholder="Gramaje"/>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Costo Unitario</label>
-              <input [(ngModel)]="nuevoProducto.costo_adquisicion" class="form-control" type="number" placeholder="Costo"/>
-            </div>
-          </div>
+    /* Botones */
+    .btn-confirm { background-color: #00325E; color: white; border: none; font-weight: 600; padding: 10px 24px; border-radius: 6px; font-size: 0.9rem; transition: 0.2s; }
+    .btn-confirm:hover { background-color: #002244; transform: translateY(-1px); }
+    
+    .btn-cancel { background-color: white; border: 1px solid #d1d5db; color: #374151; font-weight: 600; padding: 10px 24px; border-radius: 6px; font-size: 0.9rem; text-decoration: none; transition: 0.2s; }
+    .btn-cancel:hover { background-color: #f3f4f6; color: #111; border-color: #9ca3af; }
+  </style>
 
-          <div class="row g-3 mb-3">
-            <div class="col-md-6">
-              <label class="form-label">Stock Mínimo</label>
-              <input [(ngModel)]="nuevoProducto.stock_minimo" class="form-control" type="number" placeholder="Stock mínimo"/>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Cantidad Actual</label>
-              <input [(ngModel)]="nuevoProducto.cantidad_actual" class="form-control" type="number" placeholder="Cantidad actual"/>
-            </div>
-          </div>
+  <form (ngSubmit)="guardar()" #formAgregar="ngForm" class="modal-card">
+    
+    <!-- HEADER -->
+    <div class="modal-header">
+      <h2 class="modal-title">Agregar Nuevo Insumo</h2>
+      <!-- Botón X para cerrar rápido -->
+      <a [routerLink]="['/gestionStock']" class="btn-close-x" title="Cerrar">&times;</a>
+    </div>
 
-          <div class="mb-3">
-            <label class="form-label">Proveedor Principal</label>
-            <input [(ngModel)]="nuevoProducto.proveedor_principal" class="form-control" type="text" placeholder="Proveedor"/>
-          </div>
+    <!-- BODY (Inputs) -->
+    <div class="modal-body">
+      
+      <div class="mb-4">
+        <label class="form-label">Nombre del Insumo</label>
+        <input type="text" class="form-control" name="nombre_insumo" 
+               [(ngModel)]="regInventario.nombre_insumo" placeholder="Ej. Tela Algodón Premium" required />
+      </div>
 
-          <div class="d-flex justify-content-end gap-2">
-            <button class="btn" style="background-color: #CAD8E5; color: #333333; border-color: #CAD8E5;" (click)="cancelar()">Cancelar</button>
-            
-            <button class="btn btn-confirm" (click)="guardar()">Guardar Producto</button>
-          </div>
-
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Color</label>
+          <select class="form-select" name="color_id" [(ngModel)]="regInventario.color_id" required>
+            <option [ngValue]="0" disabled selected>Seleccionar...</option>
+            <option *ngFor="let c of coloresOptions" [ngValue]="c.id">{{ c.nombre }}</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Talla</label>
+          <select class="form-select" name="talla_id" [(ngModel)]="regInventario.talla_id" required>
+            <option [ngValue]="0" disabled selected>Seleccionar...</option>
+            <option *ngFor="let t of tallasOptions" [ngValue]="t.id">{{ t.nombre }}</option>
+          </select>
         </div>
       </div>
-    </div>
-  </div>
-</div>
 
-</body>
-</html>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Cantidad Inicial</label>
+          <input type="number" class="form-control" name="cantidad" 
+                 [(ngModel)]="regInventario.cantidad" placeholder="0" required />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Unidad de Medida</label>
+          <input type="text" class="form-control" name="unidad" 
+                 [(ngModel)]="regInventario.unidad" placeholder="Ej. pza, kg, m" required />
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Precio Unitario ($)</label>
+          <input type="number" step="0.01" class="form-control" name="precio" 
+                 [(ngModel)]="regInventario.precio" placeholder="0.00" required />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Estado</label>
+          <select class="form-select" name="estado" [(ngModel)]="regInventario.estado" required>
+            <option value="Activo">Activo</option>
+            <option value="Inactivo">Inactivo</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FOOTER (Botones) -->
+    <div class="modal-footer">
+      <a [routerLink]="['/gestionStock']" class="btn-cancel">Cancelar</a>
+      <button type="submit" class="btn-confirm" [disabled]="!formAgregar.form.valid">
+        Guardar Insumo
+      </button>
+    </div>
+
+  </form>
+</div>

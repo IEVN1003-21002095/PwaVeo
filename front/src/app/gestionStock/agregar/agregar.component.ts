@@ -1,49 +1,75 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { InventarioService, Inventario } from '../services/inventario.services';
+import { Router, RouterLink } from '@angular/router';
+
+import { Insumo } from '../models/insumo.model';
+import { InventarioService } from '../services/inventario.services';
 
 @Component({
-  selector: 'app-agregar-stock',
-  templateUrl: './agregar.component.html',
+  selector: 'app-agregar',
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [FormsModule, ReactiveFormsModule, CommonModule, RouterLink],
+  templateUrl: './agregar.component.html'
 })
-export class AgregarComponent {
+export class AgregarComponent implements OnInit {
+  
+  formGroup!: FormGroup;
 
-  nuevoProducto: Inventario = {
+  regInventario: Insumo = {
     id: 0,
-    sku_base: '',
-    descripcion_generica: '',
-    color: 'Blanco', 
-    talla: 'M',      
-    gramaje: 0,
-    costo_adquisicion: 0,
-    stock_minimo: 0,
-    cantidad_actual: 0,
-    proveedor_principal: ''
+    nombre_insumo: '',
+    color_id: 0,
+    talla_id: 0,
+    cantidad: 0,
+    unidad: '',
+    precio: 0,
+    estado: 'Activo'
   };
 
+  coloresOptions = [
+    { id: 1, nombre: 'Negro' },
+    { id: 2, nombre: 'Blanco' }
+  ];
+
+  tallasOptions = [
+    { id: 1, nombre: 'S' },
+    { id: 2, nombre: 'M' },
+    { id: 3, nombre: 'L' },
+    { id: 4, nombre: 'XL' }
+  ];
+
   constructor(
+    private fb: FormBuilder,
     private inventarioService: InventarioService,
     private router: Router
   ) {}
 
-  guardar() {
-    if (!this.nuevoProducto.sku_base.trim() || !this.nuevoProducto.descripcion_generica.trim()) {
-      alert('Por favor completa los campos obligatorios: SKU y descripción.');
-      return;
-    }
-
-    this.inventarioService.agregar(this.nuevoProducto);
-
-    alert(`Producto "${this.nuevoProducto.descripcion_generica}" agregado exitosamente.`);
-
-    this.router.navigate(['/gestionStock']);
+  ngOnInit(): void {
+    this.formGroup = this.initForm();
   }
 
-  cancelar() {
-    this.router.navigate(['/gestionStock']);
+  initForm(): FormGroup {
+    return this.fb.group({
+      nombre_insumo: [''],
+      color_id: [null],
+      talla_id: [null],
+      cantidad: [0],
+      unidad: [''],
+      precio: [0],
+      estado: ['Activo']
+    });
+  }
+
+  guardar(): void {
+    this.inventarioService.agregar(this.regInventario).subscribe({
+      next: (resp) => {
+        console.log("Insumo agregado:", this.regInventario);
+        this.router.navigate(['/gestionStock']);
+      },
+      error: (err) => {
+        console.error("Error al agregar:", err);
+      }
+    });
   }
 }

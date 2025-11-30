@@ -1,0 +1,33 @@
+<div *ngIf="visible" class="modal-overlay font-sans">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 class="modal-title">Agregar Variante</h3>
+      <button type="button" class="btn-close" (click)="cerrar()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="mb-3">
+        <label class="form-label">Color</label>
+        <input class="form-control" formControlName="color" placeholder="Ej. Rojo" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Talla</label>
+        <input class="form-control" formControlName="talla" placeholder="Ej. M" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Cantidad</label>
+        <input type="number" class="form-control" formControlName="cantidad" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Ubicación</label>
+        <input class="form-control" formControlName="ubicacion" placeholder="Ej. Almacén A" />
+      </div>
+      <div *ngIf="errorMsg" class="text-red-600 mt-2">{{ errorMsg }}</div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" type="button" (click)="cerrar()">Cancelar</button>
+      <button class="btn-confirm" type="button" (click)="agregar()" [disabled]="formGroup.invalid">Agregar</button>
+    </div>
+  </div>
+</div>

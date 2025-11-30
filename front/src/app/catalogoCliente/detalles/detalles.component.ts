@@ -1,70 +1,74 @@
-import { Component, Input, OnInit, Output, EventEmitter, signal } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProductoCliente, ACTIVE_PRODUCTS } from '../catalogo-c/catalogo-c.component';
+import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
+
+interface Producto {
+  id: number;
+  nombre: string;
+  precio: number;
+  descripcion: string;
+  imagen: string;
+}
 
 @Component({
   selector: 'app-detalles',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './detalles.component.html',
-  styleUrls: [],
 })
 export class DetallesComponent implements OnInit {
-  @Input() productId: number | null = null;
-  @Output() goBack = new EventEmitter<void>();
+  producto = signal<Producto | null>(null);
 
-  producto: ProductoCliente | undefined;
-  
-  cantidad = signal(1);
-  tallaSeleccionada = signal('L'); 
-  colorSeleccionado = signal('Negro'); 
-  activeTab = signal<'detalles' | 'reviews'>('detalles'); 
+  colorSeleccionadoSignal = signal<string>('Blanco');
+  tallaSeleccionadaSignal = signal<string>('S');
+  cantidadSignal = signal<number>(1);
   favorito = false;
 
+  colores = ['Blanco', 'Negro'];
   tallas = ['S', 'M', 'L', 'XL'];
-  colores: { name: string, hex: string }[] = [
-    { name: 'Negro', hex: '#000000' },
-    { name: 'Gris', hex: '#808080' }, 
-  ];
 
-  ngOnInit(): void {
-    this.loadProductDetails();
+  constructor(private http: HttpClient, private route: ActivatedRoute, private router: Router) {}
+
+  ngOnInit() {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    if (id) this.cargarProducto(id);
   }
 
-  loadProductDetails(): void {
-    if (this.productId !== null) {
-      this.producto = ACTIVE_PRODUCTS.find(p => p.id === this.productId);
-      if (!this.producto) {
-        console.error(`Producto con ID ${this.productId} no encontrado.`);
-      }
-    }
+  cargarProducto(id: number) {
+    this.http.get<{ data: Producto[] }>(`http://localhost:5000/api/product/list`)
+      .subscribe({
+        next: res => {
+          const prod = res.data.find(p => p.id === id) || null;
+          this.producto.set(prod);
+        },
+        error: err => {
+          console.error('Error cargando producto', err);
+          this.producto.set(null);
+        }
+      });
   }
 
-  ajustarCantidad(delta: number): void {
-    this.cantidad.update(c => Math.max(1, c + delta));
-  }
-  
-  seleccionarTalla(talla: string): void {
-    this.tallaSeleccionada.set(talla);
+  volverAlCatalogo() {
+    this.router.navigate(['/catalogo']);
   }
 
-  seleccionarColor(color: string): void {
-    this.colorSeleccionado.set(color);
+  seleccionarColor(color: string) {
+    this.colorSeleccionadoSignal.set(color);
   }
 
-  changeTab(tab: 'detalles' | 'reviews'): void {
-    this.activeTab.set(tab);
+  seleccionarTalla(talla: string) {
+    this.tallaSeleccionadaSignal.set(talla);
   }
 
-  agregarAlCarrito(): void {
-    console.log(`Agregando al carrito: ${this.producto?.nombre} (ID: ${this.productId}), Talla: ${this.tallaSeleccionada()}, Color: ${this.colorSeleccionado()}, Cantidad: ${this.cantidad()}`);
+  ajustarCantidad(valor: number) {
+    const nueva = this.cantidadSignal() + valor;
+    if (nueva > 0) this.cantidadSignal.set(nueva);
   }
 
-  get stockTotal(): number {
-    if (!this.producto || !this.producto.stock) return 0;
-
-    // Convertimos los valores a number para evitar errores de TS
-    const stockValues = Object.values(this.producto.stock).map(v => Number(v));
-    return stockValues.reduce((a, b) => a + b, 0);
+  agregarAlCarrito() {
+    console.log(
+      `Agregado al carrito: ${this.producto()?.nombre}, talla ${this.tallaSeleccionadaSignal()}, color ${this.colorSeleccionadoSignal()}, qty ${this.cantidadSignal()}`
+    );
   }
 }

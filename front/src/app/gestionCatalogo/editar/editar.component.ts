@@ -1,54 +1,143 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import GestionCatalogoService, { Product } from '../services/gestion_catalogo.services';
+import { ActivatedRoute, Router } from '@angular/router';
+
+import GestionCatalogoService from '../services/gestion_catalogo.services';
+import { Product } from '../models/product.model';
 
 @Component({
-  selector: 'app-editar',
+  selector: 'app-editar-producto',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './editar.component.html'
 })
-export default class EditarComponent implements OnInit {
+export class EditarComponent implements OnInit {
 
-  producto!: Product;
+  regProducto: Product = {
+    id: 0,
+    nombre: '',
+    descripcion: '',
+    categoria: '',
+    costo: 0,
+    precio: 0,
+    proveedor_id: 1,
+    activo: 1,
+    imagen: ''
+  };
+
+  categorias = ['Ropa', 'Accesorios', 'Calzado', 'Tecnología'];
+  variantes: Variante[] = []; // Lista de variantes del producto
+
+  visible: boolean = false;
 
   constructor(
-    private route: ActivatedRoute,
     private catalogoService: GestionCatalogoService,
+    private route: ActivatedRoute,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    const id = +this.route.snapshot.paramMap.get('id')!;
-    const p = this.catalogoService.obtenerProductoPorId(id);
-
-    if (!p) {
-      this.router.navigate(['/gestionCatalogo']);
-      return;
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      const id = Number(idParam);
+      this.catalogoService.getProductById(id).subscribe({
+        next: (product) => {
+          if (product) this.abrir(product);
+          else this.router.navigate(['/gestionCatalogo']);
+        },
+        error: () => this.router.navigate(['/gestionCatalogo'])
+      });
     }
-
-    this.producto = JSON.parse(JSON.stringify(p));
   }
 
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (!file) return;
+  abrir(producto: Product) {
+    this.regProducto = { ...producto };
+    this.cargarVariantes(producto.id);
+    this.visible = true;
+  }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.producto.imagen = reader.result as string;
+  cerrar() {
+    this.visible = false;
+    this.router.navigate(['/gestionCatalogo']);
+  }
+
+  modificar() {
+    if (!this.regProducto.id) return;
+
+    const payload = {
+      ...this.regProducto,
+      costo: Number(this.regProducto.costo),
+      precio: Number(this.regProducto.precio),
+      activo: Number(this.regProducto.activo),
+      variantes: this.variantes.map(v => ({
+        id: v.id || 0,
+        color: v.color || '',
+        talla: v.talla || '',
+        cantidad: Number(v.cantidad) || 0,
+        ubicacion: v.ubicacion || ''
+      }))
     };
-    reader.readAsDataURL(file);
+
+    this.catalogoService.editarProducto(payload).subscribe({
+      next: (resp) => {
+        if (resp.success) {
+          alert('Producto modificado');
+          this.cerrar();
+        } else {
+          alert("Error al guardar: " + resp.message);
+        }
+      },
+      error: (err) => {
+        console.error("Error al actualizar:", err);
+        alert("Error de servidor al actualizar");
+      }
+    });
   }
 
-  guardarCambios() {
-    this.catalogoService.actualizarProducto(this.producto);
-    this.router.navigate(['/gestionCatalogo']);
+  cargarVariantes(productId: number) {
+    this.catalogoService.getVariants(productId).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.variantes = res.data.map((v: any) => ({
+            id: v.id,
+            color: v.color,
+            talla: v.talla,
+            cantidad: v.cantidad,
+            ubicacion: v.ubicacion
+          }));
+        } else {
+          console.error("Error al cargar variantes:", res.message);
+        }
+      },
+      error: (err) => console.error("Error al obtener variantes:", err)
+    });
   }
 
-  cancelar() {
-    this.router.navigate(['/gestionCatalogo']);
+  eliminarVariante(variant: Variante) {
+    if (!confirm(`¿Deseas eliminar la variante ${variant.color} - ${variant.talla}?`)) return;
+
+    if (variant.id && variant.id !== 0) {
+      this.catalogoService.eliminarVariante(variant.id).subscribe({
+        next: (res) => {
+          if (res.success) {
+            alert("Variante eliminada");
+            this.cargarVariantes(this.regProducto.id);
+          } else {
+            alert("Error: " + res.message);
+          }
+        },
+        error: (err) => {
+          console.error(err);
+          alert("Error al eliminar variante");
+        }
+      });
+    } else {
+      this.variantes = this.variantes.filter(v => v !== variant);
+    }
+  }
+
+  onVarianteCreada(variante: Variante) {
+    this.variantes.push(variante); // Se agrega automáticamente al listado
   }
 }

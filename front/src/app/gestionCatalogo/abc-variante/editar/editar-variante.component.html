@@ -1,0 +1,32 @@
+<div *ngIf="visible" class="modal-overlay font-sans">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 class="modal-title">Editar Variante</h3>
+      <button class="btn-close" (click)="cancelar()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="mb-3">
+        <label class="form-label">Color</label>
+        <input class="form-control" type="text" [(ngModel)]="variante.color" disabled />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Talla</label>
+        <input class="form-control" type="text" [(ngModel)]="variante.talla" disabled />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Cantidad</label>
+        <input class="form-control" type="number" [(ngModel)]="variante.cantidad" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Ubicación</label>
+        <input class="form-control" type="text" [(ngModel)]="variante.ubicacion" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="cancelar()">Cancelar</button>
+      <button class="btn-confirm" (click)="guardar()">Guardar Cambios</button>
+    </div>
+  </div>
+</div>

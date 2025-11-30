@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { CatalogoClienteComponent } from './catalogoCliente/catalogo-c/catalogo-c.component';
 
 export const routes: Routes = [
 
@@ -7,11 +8,36 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./auth/auth.routes').then(m => m.AUTH_ROUTES)
   },
-
   {
-    path: 'products',
+    path: 'catalogo',
     loadChildren: () =>
-      import('./products/products.routes').then(m => m.PRODUCTS_ROUTES)
+      import('./catalogoCliente/catalogo-cliente.routes').then(
+        m => m.CATALOGO_CLIENTE_ROUTES
+      )
+  },
+
+  // Gestión de Catálogo
+  {
+    path: 'gestionCatalogo',
+    loadChildren: () =>
+      import('./gestionCatalogo/gestionCatalogo.routes')
+        .then(m => m.GESTION_CATALOGO_ROUTES)
+  },
+
+  // Gestión de Stock
+  {
+    path: 'gestionStock',
+    loadChildren: () =>
+      import('./gestionStock/inventario.routes')
+        .then(m => m.GESTION_INVENTARIO_ROUTES)
+  },
+
+  // Detalle de producto dentro del catálogo
+  {
+    path: 'catalogo/producto/:id',
+    loadComponent: () =>
+      import('./catalogoCliente/detalles/detalles.component')
+        .then(m => m.DetallesComponent)
   },
 
   {
@@ -49,13 +75,7 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./orders/orders.routes').then(m => m.ORDERS_ROUTES)
   },
-  { 
-  path: 'catalogo', 
-  loadChildren: () =>
-    import('./catalogoCliente/catalogoC.routes')
-      .then(m => m.CATALOGO_C_ROUTES)
-},
-  { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
 
+  { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
   { path: '**', redirectTo: 'auth/login' }
 ];

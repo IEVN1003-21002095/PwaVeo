@@ -1,116 +1,88 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable, Subject } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
+import { Product } from '../models/product.model';
 
-export interface Product {
-  id: number;
-  nombre: string;
-  sku: string;
-  tipo: string;
-  precio: number;
-  estado: 'activo' | 'inactivo';
-  descripcion: string;
-  imagen: string;
-  stock: {
-    blanco: { S: number; M: number; L: number };
-    negro: { S: number; M: number; L: number };
-  };
-}
+interface ApiResponse { success: boolean; data?: any; message?: string; }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export default class GestionCatalogoService {
 
-  private _productos: Product[] = [
-    { 
-      id: 1,
-      nombre: 'Playera VEO AR',
-      sku: 'VEO-PL-001',
-      tipo: 'Línea AR',
-      precio: 450,
-      estado: 'activo',
-      descripcion: 'Playera premium con tecnología AR integrada.',
-      imagen: 'assets/products/playera-veo-ar.jpg',
-      stock: {
-        blanco: { S: 10, M: 5, L: 5 },
-        negro: { S: 8, M: 6, L: 6 }
-      }
-    },
-    { 
-      id: 2,
-      nombre: 'Sudadera VEO Premium',
-      sku: 'VEO-SD-002',
-      tipo: 'Línea Premium',
-      precio: 850,
-      estado: 'activo',
-      descripcion: 'Sudadera premium con alta calidad.',
-      imagen: 'assets/products/sudadera-veo-premium.jpg',
-      stock: {
-        blanco: { S: 3, M: 4, L: 3 },
-        negro: { S: 4, M: 3, L: 3 }
-      }
-    },
-    { 
-      id: 3,
-      nombre: 'Gorra AR VEO',
-      sku: 'VEO-GR-003',
-      tipo: 'Accesorios',
-      precio: 300,
-      estado: 'inactivo',
-      descripcion: 'Gorra con integración AR.',
-      imagen: 'assets/products/gorra-ar-veo.jpg',
-      stock: {
-        blanco: { S: 0, M: 0, L: 0 },
-        negro: { S: 5, M: 5, L: 5 }
-      }
-    }
-  ];
+  private apiUrl = 'http://127.0.0.1:5000/api/product';
+  private _refresh$ = new Subject<void>();
 
-  private productos$ = new BehaviorSubject<Product[]>([...this._productos]);
+  constructor(private http: HttpClient) {}
 
-  // ----------------------------------------
-  // 🔹 Obtener productos
-  // ----------------------------------------
+  get refresh$() { return this._refresh$.asObservable(); }
 
-  getProductosObservable(): Observable<Product[]> {
-    return this.productos$.asObservable();
+  // ===================== PRODUCTOS =====================
+  getProducts(): Observable<Product[]> {
+    return this.http.get<ApiResponse>(`${this.apiUrl}/list`).pipe(
+      map(res => (res.success ? res.data : []) as Product[])
+    );
   }
 
-  obtenerProductos() {
-    return this._productos;
+  getProductById(id: number): Observable<Product | undefined> {
+    return this.getProducts().pipe(
+      map(products => products.find(p => p.id === id))
+    );
   }
 
-  obtenerProductoPorId(id: number): Product | undefined {
-    return this._productos.find(p => p.id === id);
+  agregarProducto(producto: Product): Observable<ApiResponse> {
+    const payload = {
+      nombre: producto.nombre,
+      descripcion: producto.descripcion,
+      categoria: producto.categoria,
+      costo: Number(producto.costo),
+      precio: Number(producto.precio),
+      activo: Number(producto.activo),
+      imagen: producto.imagen ?? "",
+      proveedor_id: Number(producto.proveedor_id) || 1
+    };
+    return this.http.post<ApiResponse>(`${this.apiUrl}/create`, payload)
+      .pipe(tap(() => this._refresh$.next()));
   }
 
-  // ----------------------------------------
-  // 🔹 Generar ID autoincremental seguro
-  // ----------------------------------------
-  getNextId(): number {
-    if (this._productos.length === 0) return 1;
-    return Math.max(...this._productos.map(p => p.id)) + 1;
+  editarProducto(producto: Product): Observable<ApiResponse> {
+    const payload = {
+      nombre: producto.nombre,
+      descripcion: producto.descripcion,
+      categoria: producto.categoria,
+      costo: Number(producto.costo),
+      precio: Number(producto.precio),
+      activo: Number(producto.activo),
+      imagen: producto.imagen ?? "",
+      proveedor_id: Number(producto.proveedor_id) || 1
+    };
+    return this.http.put<ApiResponse>(
+      `${this.apiUrl}/${producto.id}/update`,
+      payload
+    ).pipe(tap(() => this._refresh$.next()));
   }
 
-  // ----------------------------------------
-  // 🔹 CRUD
-  // ----------------------------------------
-
-  agregarProducto(p: Product) {
-    this._productos.push(p);
-    this.productos$.next([...this._productos]);
+  eliminarProducto(id: number): Observable<ApiResponse> {
+    return this.http.delete<ApiResponse>(`${this.apiUrl}/${id}/delete`)
+      .pipe(tap(() => this._refresh$.next()));
   }
 
-  actualizarProducto(productoActualizado: Product) {
-    const index = this._productos.findIndex(p => p.id === productoActualizado.id);
-    if (index !== -1) {
-      this._productos[index] = productoActualizado;
-      this.productos$.next([...this._productos]);
-    }
+  // ===================== VARIANTES =====================
+  getVariants(productId: number): Observable<ApiResponse> {
+    return this.http.get<ApiResponse>(`${this.apiUrl}/${productId}/inventory`);
   }
 
-  eliminarProducto(id: number) {
-    this._productos = this._productos.filter(p => p.id !== id);
-    this.productos$.next([...this._productos]);
+  agregarVariante(data: any): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(`${this.apiUrl}/inventory/add`, data)
+      .pipe(tap(() => this._refresh$.next()));
+  }
+
+  editarVariante(inventoryId: number, data: any): Observable<ApiResponse> {
+    return this.http.put<ApiResponse>(`${this.apiUrl}/inventory/${inventoryId}/update`, data)
+      .pipe(tap(() => this._refresh$.next()));
+  }
+
+  eliminarVariante(inventoryId: number): Observable<ApiResponse> {
+    return this.http.delete<ApiResponse>(`${this.apiUrl}/inventory/${inventoryId}/delete`)
+      .pipe(tap(() => this._refresh$.next()));
   }
 }

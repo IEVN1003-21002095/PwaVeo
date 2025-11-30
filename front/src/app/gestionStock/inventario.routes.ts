@@ -1,11 +1,25 @@
 import { Routes } from '@angular/router';
-import { AgregarComponent } from './agregar/agregar.component';
-import { EditarComponent } from './editar/editar.component';
-import { EliminarComponent } from './eliminar/eliminar.component';
-import { InventarioComponent } from './inventario/inventario.component';
-export const INVENTARIO_ROUTES: Routes = [
-  { path: '', component: InventarioComponent },
-  { path: 'agregar', component: AgregarComponent },
-  { path: 'editar/:id', component: EditarComponent },
-  { path: 'eliminar/:id', component: EliminarComponent }
+
+export const GESTION_INVENTARIO_ROUTES: Routes = [
+  {
+    path: '',
+    // El componente PADRE (La lista de inventario)
+    loadComponent: () => import('./inventario/inventario.component').then(c => c.InventarioComponent),
+    
+    // SUS HIJOS (Los modales que se mostrarán encima)
+    children: [
+      {
+        path: 'agregar',
+        loadComponent: () => import('./agregar/agregar.component').then(m => m.AgregarComponent)
+      },
+      {
+        path: 'editar/:id',
+        loadComponent: () => import('./editar/editar.component').then(m => m.EditarComponent)
+      },
+      {
+        path: 'eliminar/:id',
+        loadComponent: () => import('./eliminar/eliminar.component').then(m => m.EliminarComponent)
+      }
+    ]
+  }
 ];

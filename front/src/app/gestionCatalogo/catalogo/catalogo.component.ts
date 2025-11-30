@@ -1,71 +1,91 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
-import GestionCatalogoService, { Product } from '../services/gestion_catalogo.services';
+import { RouterModule } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
+import GestionCatalogoService from '../services/gestion_catalogo.services';
+// Importamos el componente que manejará la sub-tabla de inventario
+
+// Definición de la interfaz Producto según tu BD
+export interface Producto {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  costo: number;
+  categoria: string;
+  activo: number; // 1 = Activo, 0 = Inactivo
+}
 
 @Component({
   selector: 'app-catalogo',
   standalone: true,
-  templateUrl: './catalogo.component.html',
-  imports: [CommonModule, FormsModule, RouterModule]
+  // Agregamos InventarioProductoComponent a los imports
+  imports: [CommonModule, FormsModule, RouterModule, HttpClientModule], 
+  templateUrl: './catalogo.component.html'
 })
-export default class CatalogoComponent implements OnInit, OnDestroy {
+export class CatalogoComponent implements OnInit {
+
+  productos: Producto[] = [];
+  cargando: boolean = false;
 
   filtros = {
     texto: '',
-    estado: ''
+    categoria: '',
+    activo: null as number | null 
   };
 
-  datoSource: Product[] = [];
-  private sub!: Subscription;
+  categoriasDisponibles: string[] = ['Ropa', 'Accesorios', 'Calzado'];
 
-  constructor(private catalogoService: GestionCatalogoService, private router: Router) {}
+  constructor(private catalogoService: GestionCatalogoService) {}
 
   ngOnInit(): void {
-    this.sub = this.catalogoService.getProductosObservable()
-      .subscribe(list => this.datoSource = list);
+    this.cargarDatos();
+    
+    // Suscribirse al refresh$ del servicio para actualizar la lista de productos
+    this.catalogoService.refresh$.subscribe(() => this.cargarDatos());
   }
 
-  ngOnDestroy(): void {
-    this.sub?.unsubscribe();
-  }
-
-  getStockTotal(p: Product): number {
-    const blanco = p.stock?.blanco || { S: 0, M: 0, L: 0 };
-    const negro  = p.stock?.negro  || { S: 0, M: 0, L: 0 };
-    return blanco.S + blanco.M + blanco.L + negro.S + negro.M + negro.L;
-  }
-
-  get productosFiltrados(): Product[] {
-    const texto = this.filtros.texto.toLowerCase().trim();
-    const estado = this.filtros.estado.toLowerCase().trim();
-
-    return this.datoSource.filter(p => {
-      const matchesTexto =
-        p.nombre.toLowerCase().includes(texto) ||
-        p.descripcion?.toLowerCase().includes(texto) ||
-        p.sku.toLowerCase().includes(texto) ||
-        p.tipo.toLowerCase().includes(texto) ||
-        String(p.precio).includes(texto) ||
-        String(this.getStockTotal(p)).includes(texto);
-
-      const matchesEstado = !estado || p.estado.toLowerCase() === estado;
-
-      return matchesTexto && matchesEstado;
+  cargarDatos(): void {
+    this.cargando = true;
+    this.catalogoService.getProducts().subscribe({
+      next: (data: Producto[]) => { 
+        this.productos = data;
+        this.cargando = false;
+      },
+      error: (err) => {
+        console.error('Error cargando productos:', err);
+        this.cargando = false;
+      }
     });
   }
 
-  irAgregar() {
-    this.router.navigate(['/gestionCatalogo/agregar']);
+  // === CONTROL DE TABS (ESTADO) ===
+  setFiltroEstado(estado: number | null): void {
+    this.filtros.activo = estado;
   }
 
-  irEditar(id: number) {
-    this.router.navigate(['/gestionCatalogo/editar', id]);
+  isActive(estado: number | null): boolean {
+    return this.filtros.activo === estado;
   }
 
-  irEliminar(id: number) {
-    this.router.navigate(['/gestionCatalogo/eliminar', id]);
+  // === FILTRADO ===
+  get productosFiltrados(): Producto[] {
+    return this.productos.filter(p => {
+      
+      const textoMatch = !this.filtros.texto || 
+        p.nombre.toLowerCase().includes(this.filtros.texto.toLowerCase()) ||
+        p.descripcion.toLowerCase().includes(this.filtros.texto.toLowerCase());
+
+      const catMatch = !this.filtros.categoria || p.categoria === this.filtros.categoria;
+
+      const estadoMatch = this.filtros.activo === null || p.activo === this.filtros.activo;
+
+      return textoMatch && catMatch && estadoMatch;
+    });
+  }
+
+  limpiarFiltros(): void {
+    this.filtros = { texto: '', categoria: '', activo: null };
   }
 }

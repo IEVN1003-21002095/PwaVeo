@@ -1,0 +1,22 @@
+<div class="modal-overlay font-sans">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 class="modal-title text-danger">Eliminar Variante</h3>
+    </div>
+
+    <div class="modal-body">
+      <p>¿Estás seguro que deseas eliminar esta variante?</p>
+      <ul>
+        <li><strong>Color:</strong> {{ variante.color }}</li>
+        <li><strong>Talla:</strong> {{ variante.talla }}</li>
+        <li><strong>Cantidad:</strong> {{ variante.cantidad }}</li>
+        <li><strong>Ubicación:</strong> {{ variante.ubicacion }}</li>
+      </ul>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" type="button">Cancelar</button>
+      <button class="btn-danger-confirm" type="button" (click)="eliminar()">Sí, eliminar</button>
+    </div>
+  </div>
+</div>

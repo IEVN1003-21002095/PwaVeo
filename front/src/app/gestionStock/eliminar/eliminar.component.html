@@ -1,90 +1,72 @@
-<style>
-    /* Estilos para el botón de Cancelar: #CAD8E5 */
-    /* Se usa !important para asegurar que sobreescribe btn-secondary de Bootstrap */
-    .btn-cancel-light {
-        background-color: #CAD8E5 !important;
-        color: #333333 !important; 
-        border-color: #CAD8E5 !important;
+<div class="modal-overlay font-sans">
+  
+  <style>
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.5); z-index: 1000;
+      display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px);
     }
-</style>
+    .modal-card {
+      background-color: #ffffff; width: 100%; max-width: 500px;
+      border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); overflow: hidden;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 
-<div class="container mt-4" *ngIf="producto">
-  <div class="card border-red-500 shadow-sm">
-    <div class="card-header text-red-600 font-bold text-lg">
-      Confirmar Eliminación
+    .modal-header { padding: 1.2rem 1.5rem; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+    .modal-body { padding: 1.5rem; }
+    .modal-footer { padding: 1rem 1.5rem; background-color: #f9fafb; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 10px; }
+
+    .modal-title { font-weight: 700; color: #dc3545;  font-size: 1.2rem; margin: 0; }
+    
+    .info-label { font-size: 0.8rem; color: #6b7280; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; display: block; }
+    .info-value { font-size: 1rem; color: #111; font-weight: 500; margin-bottom: 12px; padding: 8px; background: #f3f4f6; border-radius: 6px; }
+
+    .btn-danger-confirm { background-color: #dc3545; color: white; border: none; font-weight: 700; padding: 10px 20px; border-radius: 6px; transition: 0.2s; }
+    .btn-danger-confirm:hover { background-color: #bb2d3b; transform: translateY(-1px); }
+    .btn-cancel { background-color: white; border: 1px solid #d1d5db; color: #374151; font-weight: 600; padding: 10px 20px; border-radius: 6px; text-decoration: none; }
+    .btn-cancel:hover { background-color: #f3f4f6; }
+  </style>
+
+  <form (ngSubmit)="eliminar()" class="modal-card">
+    
+    <div class="modal-header">
+      <h2 class="modal-title">Eliminar Insumo</h2>
+      <a [routerLink]="['/gestionStock']" style="font-size: 1.5rem; color: #999; text-decoration: none;">&times;</a>
     </div>
 
-    <div class="card-body">
+    <div class="modal-body">
+      
+      <div class="d-flex align-items-center mb-4 text-danger bg-danger-subtle p-3 rounded-2">
+        <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+        <div style="font-size: 0.9rem; line-height: 1.4;">
+          <strong>¡Cuidado!</strong> Esta acción es irreversible. ¿Seguro que deseas eliminar este insumo?
+        </div>
+      </div>
 
-      <p class="mb-3">¿Seguro que deseas eliminar este producto del inventario?</p>
-
-      <ul class="list-group mb-4">
-
-        <li class="list-group-item">
-          <b>ID:</b> {{ producto.id }}
-        </li>
-
-        <li class="list-group-item">
-          <b>SKU Base:</b> {{ producto.sku_base }}
-        </li>
-
-        <li class="list-group-item">
-          <b>Descripción:</b> {{ producto.descripcion_generica }}
-        </li>
-
-        <li class="list-group-item">
-          <b>Color:</b> {{ producto.color }}
-        </li>
-
-        <li class="list-group-item">
-          <b>Talla:</b> {{ producto.talla }}
-        </li>
-
-        <li class="list-group-item">
-          <b>Gramaje:</b> {{ producto.gramaje }} gr
-        </li>
-
-        <li class="list-group-item">
-          <b>Costo Adquisición:</b> ${{ producto.costo_adquisicion }}
-        </li>
-
-        <li class="list-group-item">
-          <b>Stock Mínimo:</b> {{ producto.stock_minimo }}
-        </li>
-
-        <li class="list-group-item">
-          <b>Cantidad Actual:</b> {{ producto.cantidad_actual }}
-        </li>
-
-        <li class="list-group-item">
-          <b>Proveedor Principal:</b> {{ producto.proveedor_principal }}
-        </li>
-
-      </ul>
-
-      <div class="d-flex justify-content-end gap-2">
-        <button
-          type="button"
-          class="btn btn-cancel-light px-4"
-          (click)="cancelar()"
-        >
-          Cancelar
-        </button>
-
-        <button
-          class="btn btn-danger px-4"
-          (click)="confirmarEliminacion()"
-        >
-          Eliminar
-        </button>
+      <div class="row">
+        <div class="col-12">
+          <span class="info-label">Nombre del Insumo</span>
+          <div class="info-value">{{ regInventario.nombre_insumo }}</div>
+        </div>
+        <div class="col-6">
+          <span class="info-label">Color</span>
+          <div class="info-value">{{ getNombreColor(regInventario.color_id) }}</div>
+        </div>
+        <div class="col-6">
+          <span class="info-label">Talla</span>
+          <div class="info-value">{{ getNombreTalla(regInventario.talla_id) }}</div>
+        </div>
       </div>
 
     </div>
-  </div>
-</div>
 
-<div class="container mt-4" *ngIf="!producto && id">
-  <div class="alert alert-warning text-center">
-    Producto no encontrado en inventario.
-  </div>
+    <div class="modal-footer">
+      <a [routerLink]="['/gestionStock']" class="btn-cancel">Cancelar</a>
+      <button type="submit" class="btn-danger-confirm">
+        Sí, Eliminar
+      </button>
+    </div>
+
+  </form>
 </div>
