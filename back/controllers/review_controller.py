@@ -1,80 +1,172 @@
-from database import get_db_connection 
+from flask import jsonify, request
+from database import get_connection
 
-class ReviewController:
-    
-    def get_reviews_by_product(self, producto_id):
-        conn = get_db_connection()
-        try:
-            cursor = conn.cursor(dictionary=True)
-            # Obtener reseñas aprobadas y datos del usuario
-            query = """
-                SELECT r.id, r.calificacion, r.comentario, r.fecha_creacion, u.nombre, u.apellido
-                FROM reseñas r
-                JOIN clientes c ON r.cliente_id = c.id
-                JOIN usuarios u ON c.usuario_id = u.id
-                WHERE r.producto_id = %s
-                ORDER BY r.fecha_creacion DESC
-            """
-            cursor.execute(query, (producto_id,))
-            reviews = cursor.fetchall()
-            
-            # Calcular promedio
-            promedio = 0
-            if reviews:
-                # Calculamos promedio en Python para evitar otra consulta compleja o nulls
-                total_stars = sum(r['calificacion'] for r in reviews)
-                promedio = total_stars / len(reviews)
-                
-            return {'success': True, 'data': {'promedio': round(promedio, 1), 'reviews': reviews}}
-        except Exception as e:
-            return {'success': False, 'error': str(e)}
-        finally:
-            if conn.is_connected(): conn.close()
 
-    def create_review(self, data):
-        """
-        data espera: { 'usuario_id': int, 'producto_id': int, 'calificacion': int, 'comentario': str }
-        """
-        conn = get_db_connection()
-        try:
-            cursor = conn.cursor(dictionary=True)
-            
-            # 1. Obtener ID de Cliente desde Usuario
-            cursor.execute("SELECT id FROM clientes WHERE usuario_id = %s", (data['usuario_id'],))
-            cliente = cursor.fetchone()
-            if not cliente:
-                return {'success': False, 'message': 'Usuario no es cliente', 'status': 404}
-            
-            cliente_id = cliente['id']
+# ------------------------------
+# Crear reseña
+# ------------------------------
+def create_review():
+    data = request.get_json()
 
-            # 2. VALIDACIÓN DE NEGOCIO: ¿Compró el producto?
-            # Buscamos en ventas completadas/enviadas
-            check_query = """
-                SELECT count(*) as total
-                FROM ventas v
-                JOIN venta_detalle vd ON v.id = vd.venta_id
-                JOIN inventario i ON vd.inventario_id = i.id
-                WHERE v.cliente_id = %s 
-                AND i.producto_id = %s
-                AND v.estado IN ('completada', 'enviado', 'entregado')
-            """
-            cursor.execute(check_query, (cliente_id, data['producto_id']))
-            compra = cursor.fetchone()
+    if not data:
+        return jsonify({"error": "Content-Type debe ser application/json"}), 415
 
-            if compra['total'] == 0:
-                return {'success': False, 'message': 'Debes comprar el producto para poder reseñarlo.', 'status': 403}
+    producto_id = data.get("producto_id")
+    cliente_id = data.get("cliente_id")
+    calificacion = data.get("calificacion")
+    comentario = data.get("comentario")
 
-            # 3. Crear Reseña
-            insert_query = """
-                INSERT INTO reseñas (producto_id, cliente_id, calificacion, comentario, fecha_creacion)
-                VALUES (%s, %s, %s, %s, NOW())
-            """
-            cursor.execute(insert_query, (data['producto_id'], cliente_id, data['calificacion'], data['comentario']))
-            conn.commit()
-            
-            return {'success': True, 'message': 'Reseña publicada correctamente'}
-        except Exception as e:
-            conn.rollback()
-            return {'success': False, 'error': str(e)}
-        finally:
-            if conn.is_connected(): conn.close()
+    # Validaciones básicas
+    if not all([producto_id, cliente_id, calificacion]):
+        return jsonify({"error": "Faltan campos obligatorios"}), 400
+
+    if not (1 <= calificacion <= 5):
+        return jsonify({"error": "La calificación debe ser entre 1 y 5"}), 400
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # INSERTAR DIRECTAMENTE (Sin verificar compra ni duplicados)
+    try:
+        cursor.execute("""
+            INSERT INTO reseñas (producto_id, cliente_id, calificacion, comentario, estado, fecha)
+            VALUES (%s, %s, %s, %s, 'pendiente', NOW())
+        """, (producto_id, cliente_id, calificacion, comentario))
+        
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        cursor.close()
+        conn.close()
+        return jsonify({"error": str(e)}), 500
+
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "Reseña enviada correctamente"}), 201
+
+
+
+# ------------------------------
+# Reseñas aprobadas por producto
+# ------------------------------
+def get_reviews_by_product(producto_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT r.id, r.calificacion, r.comentario, r.fecha,
+               u.nombre, u.apellido
+        FROM reseñas r
+        INNER JOIN clientes c ON r.cliente_id = c.id
+        INNER JOIN usuarios u ON c.usuario_id = u.id
+        WHERE r.producto_id = %s AND r.estado = 'aprobado'
+        ORDER BY r.fecha DESC
+    """, (producto_id,))
+
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    reviews = []
+    for row in rows:
+        reviews.append({
+            "id": row["id"],
+            "calificacion": row["calificacion"],
+            "comentario": row["comentario"],
+            "fecha": row["fecha"],
+            "nombre_completo": f"{row['nombre']} {row['apellido']}"
+        })
+
+    return jsonify(reviews)
+
+
+
+# ------------------------------
+# Todas las reseñas (ADMIN)
+# ------------------------------
+def get_all_reviews():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT r.id, r.producto_id, r.cliente_id, r.calificacion,
+               r.comentario, r.estado, r.fecha,
+               p.nombre AS producto_nombre,
+               u.nombre, u.apellido
+    FROM reseñas r
+    INNER JOIN productos p ON r.producto_id = p.id
+    INNER JOIN clientes c ON r.cliente_id = c.id
+    INNER JOIN usuarios u ON c.usuario_id = u.id
+    ORDER BY r.fecha DESC
+    """)
+
+    rows = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    reviews = []
+
+    for row in rows:
+        reviews.append({
+            "id": row["id"],
+            "producto_id": row["producto_id"],
+            "cliente_id": row["cliente_id"],
+            "calificacion": row["calificacion"],
+            "comentario": row["comentario"],
+            "estado": row["estado"],
+            "fecha": row["fecha"],
+            "producto_nombre": row["producto_nombre"],
+            "nombre_completo": f"{row['nombre']} {row['apellido']}"
+        })
+
+    return jsonify(reviews)
+
+
+
+# ------------------------------
+# Aprobar reseña
+# ------------------------------
+def approve_review(review_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE reseñas SET estado='aprobado' WHERE id=%s", (review_id,))
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "Reseña aprobada"})
+
+
+# ------------------------------
+# Rechazar reseña
+# ------------------------------
+def reject_review(review_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE reseñas SET estado='rechazado' WHERE id=%s", (review_id,))
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "Reseña rechazada"})
+
+
+# ------------------------------
+# Eliminar reseña
+# ------------------------------
+def delete_review(review_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM reseñas WHERE id=%s", (review_id,))
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "Reseña eliminada"})
