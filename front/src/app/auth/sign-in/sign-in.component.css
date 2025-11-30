@@ -1,0 +1,27 @@
+/* sign-in.component.css */
+.panel-bg {
+    background-color: #8c94a0;
+}
+
+.btn-primary {
+    background-color: #0d2a58;
+}
+
+.btn-primary:hover {
+    background-color: #0a2145;
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

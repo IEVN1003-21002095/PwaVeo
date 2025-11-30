@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
+from flask_jwt_extended import JWTManager
 
 # cargar .env
 load_dotenv()
@@ -10,6 +11,9 @@ from routes.auth_routes import auth_bp
 
 def create_app():
     app = Flask(__name__)
+
+    app.config["JWT_SECRET_KEY"] = "super-secreta-cachonda-key-2025"  
+    jwt = JWTManager(app)
 
     # habilitar CORS
     CORS(app)
