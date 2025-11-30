@@ -3,6 +3,7 @@ from flask_cors import CORS  # Requiere: pip install flask-cors
 
 # Importación de Blueprints activos
 from routes.review_routes import review_bp
+from routes.dashboard_routes import dashboard_bp
 
 # Importación de Blueprints pendientes (comentados para uso futuro)
 # from routes.auth_routes import auth_bp
@@ -27,6 +28,7 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:4200"}})
 
 # Rutas activas
 app.register_blueprint(review_bp)
+app.register_blueprint(dashboard_bp)
 
 # Rutas pendientes
 # app.register_blueprint(auth_bp)

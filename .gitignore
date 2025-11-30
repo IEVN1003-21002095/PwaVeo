@@ -1,0 +1,10 @@
+# Ignorar dependencias de Node
+node_modules/
+
+# Ignorar archivos compilados de Python
+__pycache__/
+*.pyc
+
+# Otros archivos de sistema (opcional)
+.DS_Store
+Thumbs.db

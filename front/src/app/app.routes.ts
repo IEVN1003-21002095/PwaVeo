@@ -27,8 +27,17 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./reviews/reviews.routes').then(m => m.REVIEWS_ROUTES)
   },
-  { path: 'reviewAdmin', loadChildren: () => import('./reviewAdmin/reviewAdmin.routes').then(m => m.REVIEW_ROUTES) 
+  { 
+    path: 'reviewAdmin',
+    loadChildren: () => 
+      import('./reviewAdmin/reviewAdmin.routes').then(m => m.REVIEW_ROUTES) 
 
+  },
+
+  { 
+  path: 'dashboard', 
+  loadChildren: () => 
+  import('./dashboard/dashboard-home.routes').then(m => m.DASHBOARD_ROUTES) 
   },
   {
     path: 'cart',
