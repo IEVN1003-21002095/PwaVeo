@@ -4,13 +4,13 @@ from flask_cors import CORS  # Requiere: pip install flask-cors
 # Importación de Blueprints activos
 from routes.review_routes import review_bp
 from routes.dashboard_routes import dashboard_bp
+from routes.orders_routes import orders_bp
 
 # Importación de Blueprints pendientes (comentados para uso futuro)
 # from routes.auth_routes import auth_bp
 # from routes.customer_routes import customer_bp
 # from routes.product_routes import product_bp
 # from routes.checkout_routes import checkout_bp
-# from routes.orders_routes import orders_bp
 # from routes.sales_routes import sales_bp
 # from routes.stock_routes import stock_bp
 
@@ -29,13 +29,13 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:4200"}})
 # Rutas activas
 app.register_blueprint(review_bp)
 app.register_blueprint(dashboard_bp)
+app.register_blueprint(orders_bp)
 
 # Rutas pendientes
 # app.register_blueprint(auth_bp)
 # app.register_blueprint(customer_bp)
 # app.register_blueprint(product_bp)
 # app.register_blueprint(checkout_bp)
-# app.register_blueprint(orders_bp)
 # app.register_blueprint(sales_bp)
 # app.register_blueprint(stock_bp)
 

@@ -1,8 +1,11 @@
+// src/app/orders/orders.routes.ts
+
 import { Routes } from '@angular/router';
-import { OrderListComponent } from './order-list/order-list.component';
-import { OrderDetailComponent } from './order-detail/order-detail.component';
+import { OrderDetailComponent } from './order-detail.component'; 
 
 export const ORDERS_ROUTES: Routes = [
-  { path: '', component: OrderListComponent },
-  { path: ':id', component: OrderDetailComponent }
+  {
+    path: '', 
+    component: OrderDetailComponent 
+  }
 ];

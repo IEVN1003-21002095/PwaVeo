@@ -1,9 +1,16 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+// src/app/app.config.ts
 
-import { routes } from './app.routes';
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
+import { ApplicationConfig } from '@angular/core';
+import { provideRouter } from '@angular/router';
+// 1. Importa el proveedor de HttpClient
+import { provideHttpClient } from '@angular/common/http'; 
+
+import { routes } from './app.routes'; 
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), provideClientHydration(withEventReplay())]
+  providers: [
+    provideRouter(routes),
+    // 2. ¡CRÍTICO! Registra el proveedor de HttpClient aquí.
+    provideHttpClient() 
+  ]
 };

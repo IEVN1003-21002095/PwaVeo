@@ -56,8 +56,7 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./sales/sales.routes').then(m => m.SALES_ROUTES)
   },
-
-  {
+{
     path: 'orders',
     loadChildren: () =>
       import('./orders/orders.routes').then(m => m.ORDERS_ROUTES)
