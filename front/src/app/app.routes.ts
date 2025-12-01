@@ -21,6 +21,12 @@ export const routes: Routes = [
   },
 
   {
+    path: 'admin/clientes',
+    loadChildren: () =>
+      import('./gestionClientes/gestionclientes.routes').then(m => m.CLIENTES_ROUTES)
+  },
+
+  {
     path: 'reviews',
     loadChildren: () =>
       import('./reviews/reviews.routes').then(m => m.REVIEWS_ROUTES)
@@ -49,12 +55,14 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./orders/orders.routes').then(m => m.ORDERS_ROUTES)
   },
+  
   { 
-  path: 'catalogo', 
-  loadChildren: () =>
-    import('./catalogoCliente/catalogoC.routes')
-      .then(m => m.CATALOGO_C_ROUTES)
-},
+    path: 'catalogo', 
+    loadChildren: () =>
+      import('./catalogoCliente/catalogoC.routes').then(m => m.CATALOGO_C_ROUTES)
+  },
+
+  // Redirecciones
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
 
   { path: '**', redirectTo: 'auth/login' }

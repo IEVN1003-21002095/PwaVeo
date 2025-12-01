@@ -1,127 +1,206 @@
-<div class="bg-white border border-gray-200 rounded-lg shadow-md p-6">
-    <script src="https://cdn.tailwindcss.com"></script>
+<div class="container-fluid p-4">
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
 
-  <!-- Header -->
-  <div class="flex flex-col md:flex-row justify-between items-center mb-6">
-    
-    <!-- Botones de Exportación -->
-    <div class="flex items-center gap-3">
-      <!-- Exportar PDF -->
-      <button
-        type="button"
-        class="flex items-center gap-2 text-white bg-red-700 hover:bg-red-800
-               focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm
-               px-5 py-2.5">
-        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M7 21h10M12 17V3m0 0-4 4m4-4 4 4" />
-        </svg>
-        PDF
-      </button>
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+                <div>
+                    <h4 class="fw-bold text-dark mb-1">Gestión de Clientes</h4>
+                    <p class="text-muted small mb-0">Administración de usuarios y base de datos</p>
+                </div>
 
-      <!-- Exportar CSV -->
-      <button
-        type="button"
-        class="flex items-center gap-2 text-white bg-green-700 hover:bg-green-800
-               focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm
-               px-5 py-2.5">
-        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 20 20">
-          <path stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M3 4h14M3 10h14M3 16h14" />
-        </svg>
-        CSV
-      </button>
-    
+                <div class="d-flex gap-2">
+                    <button (click)="exportarCSV()" class="btn btn-success d-flex align-items-center gap-2 px-3 fw-medium text-white">
+                        <i class="bi bi-file-earmark-spreadsheet"></i> Exportar CSV
+                    </button>
+                    <button (click)="exportarPDF()" class="btn btn-danger d-flex align-items-center gap-2 px-3 fw-medium text-white">
+                        <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+                    </button>
+                </div>
+            </div>
 
-  <!-- Barra de Búsqueda -->
-  <div class="mb-5">
-    <div class="flex items-center gap-4">
-      <span class="font-medium">Buscar:</span>
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 p-3 bg-light rounded-3 bg-opacity-25 gap-3">
+                <div class="fw-bold text-secondary">
+                    Total Registrados: <span class="text-primary fs-5">{{ totalClientes }}</span>
+                </div>
+                <div class="input-group" style="max-width: 400px;">
+                    <span class="input-group-text bg-white border-end-0 text-muted">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" class="form-control border-start-0 ps-0 shadow-none" 
+                        placeholder="Buscar por nombre o correo..."
+                        [ngModel]="searchTerm" (ngModelChange)="onSearch($event)">
+                </div>
+            </div>
 
-      <input
-        [(ngModel)]="clientFilter"
-        type="text"
-        name="filter"
-        placeholder="Nombre o correo"
-        class="block w-full md:w-1/2 text-sm border border-gray-300 rounded-lg
-               p-2.5 focus:ring-blue-500 focus:border-blue-500" />
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" *ngIf="clientes.length; else noData">
+                    <thead class="bg-light">
+                        <tr class="text-muted small text-uppercase">
+                            <th scope="col" class="py-3 ps-4 border-0 rounded-start">ID</th>
+                            <th scope="col" class="py-3 border-0">Nombre</th>
+                            <th scope="col" class="py-3 border-0">Email</th>
+                            <th scope="col" class="py-3 border-0">Fecha Registro</th>
+                            <th scope="col" class="py-3 text-end pe-4 border-0 rounded-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let cliente of clientes">
+                            <td class="ps-4 fw-bold text-muted">#{{ cliente.id }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold" 
+                                         style="width: 35px; height: 35px;">
+                                        {{ cliente.nombre_completo.charAt(0).toUpperCase() }}
+                                    </div>
+                                    <span class="fw-medium text-dark">{{ cliente.nombre_completo }}</span>
+                                </div>
+                            </td>
+                            <td class="text-muted">{{ cliente.correo }}</td>
+                            <td class="text-muted">{{ cliente.fecha_registro }}</td>
+                            
+                            <td class="text-end pe-4">
+                                <div class="d-flex justify-content-end gap-2">
+                                    
+                                    <button (click)="abrirModalEditar(cliente)" 
+                                            class="btn btn-sm btn-info text-white d-flex align-items-center justify-content-center" 
+                                            style="width: 32px; height: 32px;" 
+                                            title="Ver Historial de Pedidos">
+                                        <i class="bi bi-receipt"></i>
+                                    </button>
+
+                                    <button (click)="abrirModalEditar(cliente)" 
+                                            class="btn btn-sm btn-warning text-white d-flex align-items-center justify-content-center" 
+                                            style="width: 32px; height: 32px;" 
+                                            title="Editar Información">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    
+                                    <button (click)="eliminarCliente(cliente.id)"
+                                            class="btn btn-sm btn-danger text-white d-flex align-items-center justify-content-center" 
+                                            style="width: 32px; height: 32px;" 
+                                            title="Eliminar Cliente">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <ng-template #noData>
+                <div class="text-center py-5">
+                    <div class="mb-3 text-muted opacity-50">
+                        <i class="bi bi-inbox fs-1"></i>
+                    </div>
+                    <h6 class="text-muted fw-normal">No se encontraron resultados.</h6>
+                </div>
+            </ng-template>
+
+            <div class="d-flex justify-content-between align-items-center mt-4 border-top pt-3" *ngIf="totalPaginas > 1">
+                <span class="text-muted small">
+                    Mostrando página <span class="fw-bold text-dark">{{ paginaActual }}</span> de {{ totalPaginas }}
+                </span>
+                <nav aria-label="Navegación de clientes">
+                    <ul class="pagination mb-0 gap-1">
+                        <li class="page-item" [class.disabled]="paginaActual === 1">
+                            <button class="page-link border-0 rounded" (click)="prevPage()">Anterior</button>
+                        </li>
+                        <li class="page-item active">
+                            <span class="page-link border-0 rounded bg-primary">{{ paginaActual }}</span>
+                        </li>
+                        <li class="page-item" [class.disabled]="paginaActual === totalPaginas">
+                            <button class="page-link border-0 rounded" (click)="nextPage()">Siguiente</button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
     </div>
+</div>
 
-    <p class="mt-3 text-md font-medium">
-      Total de clientes: {{ totalClientes }}
-    </p>
-  </div>
+<div class="modal fade show d-block" tabindex="-1" *ngIf="mostrarModal" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-primary text-white border-0 py-3">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-person-gear me-2"></i> Detalle y Edición
+                </h5>
+                <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()"></button>
+            </div>
 
-  <!-- Tabla -->
-  <div class="overflow-x-auto shadow-sm sm:rounded-lg">
-    <table *ngIf="clientes.length"
-           class="w-full text-sm text-left text-gray-700">
-      
-      <thead class="text-xs uppercase bg-gray-800 text-white">
-        <tr>
-          <th class="px-4 py-3 cursor-pointer">Nombre Completo</th>
-          <th class="px-4 py-3 cursor-pointer">Correo Electrónico</th>
-          <th class="px-4 py-3 cursor-pointer">Fecha de Registro</th>
-          <th class="px-4 py-3">Pedidos</th>
-        </tr>
-      </thead>
+            <div class="modal-body p-0">
+                <div class="row g-0 h-100">
+                    <div class="col-lg-5 bg-white p-4 border-end">
+                        <h6 class="text-primary fw-bold mb-3">Información de Contacto</h6>
+                        <form *ngIf="clienteSeleccionado" (ngSubmit)="guardarCambiosCliente()">
+                            <div class="mb-3">
+                                <label class="fw-bold small text-muted">Cliente</label>
+                                <input type="text" class="form-control bg-light" [value]="clienteSeleccionado.nombre_completo" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="fw-bold small text-muted">Correo</label>
+                                <input type="text" class="form-control bg-light" [value]="clienteSeleccionado.correo" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="fw-bold small text-muted">Teléfono</label>
+                                <input type="text" class="form-control" [(ngModel)]="clienteSeleccionado.telefono" name="telefono">
+                            </div>
+                            <div class="mb-4">
+                                <label class="fw-bold small text-muted">Dirección de Envío</label>
+                                <textarea class="form-control" [(ngModel)]="clienteSeleccionado.direccion" name="direccion" rows="3"></textarea>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary fw-bold">
+                                    <i class="bi bi-save me-2"></i> Guardar Cambios
+                                </button>
+                                <button type="button" class="btn btn-light" (click)="cerrarModal()">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
 
-      <tbody>
-        <tr
-          class="bg-white border-b hover:bg-gray-50"
-          *ngFor="let cliente of clientesFiltrados | clientFilter : clientFilter">
-          
-          <td class="px-4 py-3">
-            {{ cliente.nombre }} {{ cliente.apellidos }}
-          </td>
-
-          <td class="px-4 py-3">
-            {{ cliente.correo }}
-          </td>
-
-          <td class="px-4 py-3">
-            {{ cliente.fechaRegistro }}
-          </td>
-
-          <!-- Ver pedidos -->
-          <td class="px-4 py-3">
-            <button
-              [routerLink]="['/admin/cliente', cliente.id]"
-              class="flex items-center gap-2 text-white bg-blue-700 hover:bg-blue-800
-                     focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm
-                     px-4 py-2.5">
-              <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24">
-                <path stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M15 12H9m12 0A9 9 0 1 1 3 12a9 9 0 0 1 18 0Z" />
-              </svg>
-              Ver Pedidos
-            </button>
-          </td>
-
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Paginación -->
-  <div class="flex justify-center items-center mt-6 gap-3">
-    <button
-      (click)="prevPage()"
-      class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-900 text-sm">
-      Anterior
-    </button>
-
-    <span class="text-sm font-medium">
-      Página {{ paginaActual }} de {{ totalPaginas }}
-    </span>
-
-    <button
-      (click)="nextPage()"
-      class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-900 text-sm">
-      Siguiente
-    </button>
-  </div>
+                    <div class="col-lg-7 bg-light p-4">
+                        <h6 class="text-success fw-bold mb-3">Historial de Pedidos (Base de Datos)</h6>
+                        <div class="card border-0 shadow-sm rounded-3">
+                            <div class="table-responsive" style="max-height: 400px;">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-white sticky-top">
+                                        <tr class="text-muted small text-uppercase">
+                                            <th class="ps-4 border-bottom">ID Venta</th>
+                                            <th class="border-bottom">Total</th>
+                                            <th class="border-bottom">Método Pago</th>
+                                            <th class="pe-4 text-end border-bottom">Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let p of pedidos">
+                                            <td class="ps-4 fw-bold">#{{ p.id }}</td>
+                                            <td class="fw-bold text-dark">${{ p.total }}</td>
+                                            <td class="text-muted small">{{ p.metodo_pago }}</td>
+                                            <td class="pe-4 text-end">
+                                                <span class="badge rounded-pill px-3"
+                                                    [ngClass]="{
+                                                        'bg-success': p.estado === 'completada' || p.estado === 'entregado',
+                                                        'bg-warning text-dark': p.estado === 'pendiente',
+                                                        'bg-danger': p.estado === 'cancelada'
+                                                    }">
+                                                    {{ p.estado | titlecase }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr *ngIf="pedidos.length === 0">
+                                            <td colspan="4" class="text-center py-4 text-muted">
+                                                Este cliente no tiene pedidos registrados.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
