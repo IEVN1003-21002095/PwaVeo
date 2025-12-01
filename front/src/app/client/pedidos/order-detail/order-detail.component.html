@@ -81,6 +81,7 @@
           <table class="table table-hover">
             <thead class="table-light">
               <tr>
+                <th style="width: 80px;"></th>
                 <th>Producto</th>
                 <th class="text-center">Cantidad</th>
                 <th class="text-end">Precio Unitario</th>
@@ -89,21 +90,33 @@
             </thead>
             <tbody>
               <tr *ngFor="let item of orderDetail.items">
-                <td>{{ item.nombre_producto_venta }}</td>
-                <td class="text-center">{{ item.cantidad }}</td>
-                <td class="text-end">MXN {{ item.precio_unitario_venta | number:'1.2-2' }}</td>
-                <td class="text-end fw-bold">
+                <td>
+                  <div style="width: 60px; height: 60px; background: #f0f0f0; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                    <img *ngIf="item.imagen; else noImage" 
+                         [src]="item.imagen" 
+                         [alt]="item.nombre_producto_venta"
+                         (error)="onImageError($event)"
+                         style="width: 100%; height: 100%; object-fit: cover;">
+                    <ng-template #noImage>
+                      <i class="bi bi-image text-muted" style="font-size: 24px;"></i>
+                    </ng-template>
+                  </div>
+                </td>
+                <td class="align-middle">{{ item.nombre_producto_venta }}</td>
+                <td class="text-center align-middle">{{ item.cantidad }}</td>
+                <td class="text-end align-middle">MXN {{ item.precio_unitario_venta | number:'1.2-2' }}</td>
+                <td class="text-end fw-bold align-middle">
                   MXN {{ (item.cantidad * item.precio_unitario_venta) | number:'1.2-2' }}
                 </td>
               </tr>
             </tbody>
             <tfoot>
               <tr class="table-light">
-                <td colspan="3" class="text-end fw-bold">Subtotal:</td>
+                <td colspan="4" class="text-end fw-bold">Subtotal:</td>
                 <td class="text-end fw-bold">MXN {{ calculateSubtotal() | number:'1.2-2' }}</td>
               </tr>
               <tr class="table-success">
-                <td colspan="3" class="text-end fw-bold fs-5">Total:</td>
+                <td colspan="4" class="text-end fw-bold fs-5">Total:</td>
                 <td class="text-end fw-bold fs-5 text-success">
                   MXN {{ orderDetail.pedido.total | number:'1.2-2' }}
                 </td>

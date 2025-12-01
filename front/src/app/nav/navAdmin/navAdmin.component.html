@@ -27,6 +27,19 @@
         <i class="bi bi-star"></i>
         <span>Reseñas</span>
       </li>
+      
+      <!-- Separador -->
+      <li class="navbar-separator"></li>
+      
+      <!-- Vista de Cliente -->
+      <li class="navbar-item navbar-client-section" routerLink="/client/catalogo" routerLinkActive="active">
+        <i class="bi bi-shop"></i>
+        <span>Vista Tienda</span>
+      </li>
+      <li class="navbar-item navbar-client-section" routerLink="/client/carrito" routerLinkActive="active">
+        <i class="bi bi-cart3"></i>
+        <span>Carrito</span>
+      </li>
     </ul>
 
     <div class="navbar-user" (click)="toggleUserMenu()">

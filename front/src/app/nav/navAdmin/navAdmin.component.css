@@ -78,6 +78,29 @@
     color: var(--text-primary);
 }
 
+/* Separador */
+.navbar-separator {
+    width: 1px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.15);
+    margin: 0 0.5rem;
+}
+
+/* Sección de Cliente */
+.navbar-client-section {
+    color: #a3c9f1;
+}
+
+.navbar-client-section:hover {
+    background: rgba(163, 201, 241, 0.1);
+    color: #d4e6f8;
+}
+
+.navbar-client-section.active {
+    background: rgba(163, 201, 241, 0.2);
+    color: #d4e6f8;
+}
+
 /* User Section */
 .navbar-user {
     display: flex;
@@ -171,6 +194,10 @@
 
     .navbar-item i {
         font-size: 1.25rem;
+    }
+
+    .navbar-separator {
+        display: none;
     }
 
     .navbar-user span {

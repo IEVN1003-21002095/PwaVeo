@@ -87,3 +87,53 @@ def delete_variant(inventory_id):
         return jsonify(controller.delete_variant(inventory_id)), 200
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
+
+# =========================================================
+# GESTIÓN DE IMÁGENES
+# =========================================================
+@product_bp.route('/<int:product_id>/images', methods=['GET'])
+def get_product_images(product_id):
+    """Obtener todas las imágenes de un producto"""
+    try:
+        return jsonify(controller.get_product_images(product_id)), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@product_bp.route('/images/add', methods=['POST'])
+def add_product_image():
+    """Agregar una imagen a un producto"""
+    data = request.get_json(silent=True) or {}
+    try:
+        return jsonify(controller.add_product_image(data)), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@product_bp.route('/images/<int:image_id>/update', methods=['PUT'])
+def update_product_image(image_id):
+    """Actualizar una imagen (cambiar imagen o color)"""
+    data = request.get_json(silent=True) or {}
+    try:
+        return jsonify(controller.update_product_image(image_id, data)), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@product_bp.route('/images/<int:image_id>/delete', methods=['DELETE'])
+def delete_product_image(image_id):
+    """Eliminar una imagen"""
+    try:
+        return jsonify(controller.delete_product_image(image_id)), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@product_bp.route('/images/<int:image_id>/set-principal', methods=['PUT'])
+def set_principal_image(image_id):
+    """Marcar una imagen como principal"""
+    try:
+        return jsonify(controller.set_principal_image(image_id)), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+

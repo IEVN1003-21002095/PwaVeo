@@ -12,6 +12,8 @@ interface Producto {
   precio: number;
   descripcion: string;
   imagen: string;
+  imagenes?: any[];
+  imagen_principal?: string;
 }
 
 interface Variante {
@@ -91,7 +93,32 @@ export class DetallesComponent implements OnInit {
       .subscribe({
         next: res => {
           const prod = res.data.find(p => p.id === id) || null;
-          this.producto.set(prod);
+          if (prod) {
+            // Cargar imágenes del producto
+            this.http.get<{ success: boolean; data: any[] }>(
+              `http://localhost:5000/api/product/${id}/images`
+            ).subscribe({
+              next: (imgRes) => {
+                if (imgRes.success && imgRes.data && imgRes.data.length > 0) {
+                  prod.imagenes = imgRes.data;
+                  // Buscar imagen principal, o tomar la primera
+                  const principal = imgRes.data.find(img => img.es_principal === 1);
+                  prod.imagen_principal = principal ? principal.imagen_data : imgRes.data[0].imagen_data;
+                } else {
+                  prod.imagenes = [];
+                  prod.imagen_principal = prod.imagen || 'https://placehold.co/800x1000/f4f4f4/cccccc?text=VEO';
+                }
+                this.producto.set(prod);
+              },
+              error: () => {
+                prod.imagenes = [];
+                prod.imagen_principal = prod.imagen || 'https://placehold.co/800x1000/f4f4f4/cccccc?text=VEO';
+                this.producto.set(prod);
+              }
+            });
+          } else {
+            this.producto.set(null);
+          }
         },
         error: err => {
           console.error('Error cargando producto', err);
@@ -111,7 +138,9 @@ export class DetallesComponent implements OnInit {
   }
 
   volverAlCatalogo() {
-    this.router.navigate(['/client', 'catalogo']);
+    this.router.navigate(['/client/catalogo']).then(() => {
+      window.scrollTo(0, 0);
+    });
   }
 
   seleccionarColor(color: string) {
@@ -156,7 +185,7 @@ export class DetallesComponent implements OnInit {
       productoId: prod.id,
       nombre: prod.nombre,
       precio: prod.precio,
-      imagen: prod.imagen,
+      imagen: prod.imagen_principal || prod.imagen,
       color: colorSel,
       talla: tallaSel,
       cantidad: cantidadSel

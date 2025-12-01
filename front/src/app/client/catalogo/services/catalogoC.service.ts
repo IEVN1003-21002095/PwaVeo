@@ -17,7 +17,10 @@ export class CatalogoCService {
     return this.http.get<{ success: boolean; data: any[] }>(`${this.apiUrl}/list`).pipe(
       map(res => {
         if (res.success && res.data) {
-          return res.data.filter(p => p.activo === 1);
+          return res.data.filter(p => p.activo === 1).map(p => ({
+            ...p,
+            imagen_principal: null // Se cargará después
+          }));
         }
         return [];
       }),
@@ -25,6 +28,41 @@ export class CatalogoCService {
         console.error('Error cargando productos:', err);
         return of([]);
       })
+    );
+  }
+
+  getProductosConImagenes(): Observable<Producto[]> {
+    return this.getProductos().pipe(
+      map(productos => {
+        // Para cada producto, cargar su imagen principal
+        productos.forEach(producto => {
+          this.getImagenPrincipal(producto.id).subscribe(imagen => {
+            producto.imagen_principal = imagen;
+          });
+        });
+        return productos;
+      })
+    );
+  }
+
+  getImagenPrincipal(productId: number): Observable<string | null> {
+    return this.http.get<{ success: boolean; data: any[] }>(`${this.apiUrl}/${productId}/images`).pipe(
+      map(res => {
+        if (res.success && res.data && res.data.length > 0) {
+          // Buscar imagen principal, o tomar la primera
+          const principal = res.data.find(img => img.es_principal === 1);
+          return principal ? principal.imagen_data : res.data[0].imagen_data;
+        }
+        return null;
+      }),
+      catchError(() => of(null))
+    );
+  }
+
+  getImagenesProducto(productId: number): Observable<any[]> {
+    return this.http.get<{ success: boolean; data: any[] }>(`${this.apiUrl}/${productId}/images`).pipe(
+      map(res => (res.success && res.data ? res.data : [])),
+      catchError(() => of([]))
     );
   }
 

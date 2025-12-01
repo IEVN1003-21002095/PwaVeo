@@ -23,16 +23,16 @@ export class EliminarVarianteComponent implements OnInit {
   ngOnInit(): void {
     this.id = Number(this.route.snapshot.paramMap.get('id'));
     if (!this.id) {
-      this.router.navigate(['/gestionCatalogo']);
+      this.router.navigate(['/admin/catalogo']);
       return;
     }
 
     this.inventarioService.getInventory(this.id).subscribe({
       next: (v) => {
         if (v) this.regVariante = v;
-        else this.router.navigate(['/gestionCatalogo']);
+        else this.router.navigate(['/admin/catalogo']);
       },
-      error: () => this.router.navigate(['/gestionCatalogo'])
+      error: () => this.router.navigate(['/admin/catalogo'])
     });
   }
 
@@ -45,9 +45,9 @@ export class EliminarVarianteComponent implements OnInit {
         this.inventarioService.triggerRefresh();
 
         if (this.regVariante?.producto_id) {
-          this.router.navigate(['/gestionCatalogo/inventario', this.regVariante.producto_id]);
+          this.router.navigate(['/admin/catalogo/inventario', this.regVariante.producto_id]);
         } else {
-          this.router.navigate(['/gestionCatalogo']);
+          this.router.navigate(['/admin/catalogo']);
         }
       },
       error: (err) => {

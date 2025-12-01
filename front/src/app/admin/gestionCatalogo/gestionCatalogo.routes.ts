@@ -18,6 +18,10 @@ export const GESTION_CATALOGO_ROUTES: Routes = [
         loadComponent: () => import('./eliminar/eliminar.component').then(m => m.EliminarComponent)
       },
       {
+        path: 'imagenes/:id',
+        loadComponent: () => import('./gestion-imagenes/gestion-imagenes.component').then(m => m.GestionImagenesComponent)
+      },
+      {
         path: 'inventario/:id',
         loadComponent: () => import('./abc-variante/inventario-producto/inventario-producto.component').then(m => m.InventarioProductoComponent),
         children: [

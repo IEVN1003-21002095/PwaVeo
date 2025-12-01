@@ -124,14 +124,37 @@ def get_order_details(order_id):
             if pedido['estado_display'] != 'enviado':
                 pedido['numero_guia'] = 'N/A'
 
-            # Obtener los ítems
+            # Obtener los ítems con imágenes
             cursor.execute("""
                 SELECT
-                    nombre_producto_venta, cantidad, precio_unitario_venta
-                FROM venta_detalle
-                WHERE venta_id = %s;
+                    vd.nombre_producto_venta, 
+                    vd.cantidad, 
+                    vd.precio_unitario_venta,
+                    COALESCE(
+                        (SELECT img.imagen_data 
+                         FROM imagenes_producto img 
+                         WHERE img.producto_id = inv.producto_id 
+                         AND img.es_principal = 1 
+                         LIMIT 1),
+                        (SELECT img.imagen_data 
+                         FROM imagenes_producto img 
+                         WHERE img.producto_id = inv.producto_id 
+                         LIMIT 1)
+                    ) as imagen
+                FROM venta_detalle vd
+                LEFT JOIN inventario inv ON vd.inventario_id = inv.id
+                WHERE vd.venta_id = %s;
             """, (order_id,))
-            items = cursor.fetchall()
+            items_raw = cursor.fetchall()
+            
+            # Convertir imagen de bytes a string si es necesario
+            items = []
+            for item in items_raw:
+                item_dict = dict(item)
+                if item_dict.get('imagen'):
+                    if isinstance(item_dict['imagen'], bytes):
+                        item_dict['imagen'] = item_dict['imagen'].decode('utf-8')
+                items.append(item_dict)
 
             # Obtener la dirección de envío
             direccion_id = pedido.pop('direccion_envio_id', None)

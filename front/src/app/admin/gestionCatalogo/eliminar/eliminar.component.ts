@@ -31,7 +31,7 @@ export class EliminarComponent implements OnInit {
           if (p) {
             this.producto = p;
           } else {
-            this.router.navigate(['/gestionCatalogo']);
+            this.router.navigate(['/admin/catalogo']);
           }
         },
         error: (err) => console.error("Error cargando producto:", err)
@@ -45,7 +45,7 @@ export class EliminarComponent implements OnInit {
     this.catalogoService.eliminarProducto(this.id).subscribe({
       next: () => {
         console.log("Producto eliminado");
-        this.router.navigate(['/gestionCatalogo']);
+        this.router.navigate(['/admin/catalogo']);
       },
       error: (err) => {
         console.error("Error al eliminar:", err);

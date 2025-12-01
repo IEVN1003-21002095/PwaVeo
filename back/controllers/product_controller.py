@@ -205,3 +205,182 @@ class ProductController:
             return {"success": True, "message": "Variante eliminada correctamente"}
         except Exception as e:
             return {"success": False, "message": str(e)}
+
+    # ==================== GESTIÓN DE IMÁGENES ====================
+    
+    def get_product_images(self, product_id):
+        """Obtener todas las imágenes de un producto"""
+        connection = None
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            sql = """
+                SELECT img.id, img.producto_id, img.es_principal, 
+                       img.color_id, c.color as color_nombre,
+                       img.imagen_data, img.creado_en
+                FROM imagenes_producto img
+                LEFT JOIN colores c ON img.color_id = c.id
+                WHERE img.producto_id = %s
+                ORDER BY img.es_principal DESC, img.creado_en ASC
+            """
+            cursor.execute(sql, (product_id,))
+            images = cursor.fetchall()
+            
+            # Convertir imagen_data de bytes a string si es necesario
+            for img in images:
+                if isinstance(img.get('imagen_data'), bytes):
+                    img['imagen_data'] = img['imagen_data'].decode('utf-8')
+            
+            cursor.close()
+            connection.close()
+            return {"success": True, "data": images if images else []}
+        except Exception as e:
+            print(f"Error en get_product_images para producto {product_id}: {e}")
+            import traceback
+            traceback.print_exc()
+            if connection:
+                connection.close()
+            return {"success": False, "message": str(e)}
+    
+    def add_product_image(self, data):
+        """Agregar una imagen a un producto"""
+        try:
+            producto_id = data.get("producto_id")
+            imagen_data = data.get("imagen_data")  # Base64
+            es_principal = data.get("es_principal", 0)
+            color_id = data.get("color_id")  # Opcional
+            
+            if not producto_id or not imagen_data:
+                return {"success": False, "message": "producto_id e imagen_data son obligatorios"}
+            
+            connection = get_connection()
+            cursor = connection.cursor()
+            
+            # Si se marca como principal, desmarcar las demás
+            if es_principal:
+                cursor.execute(
+                    "UPDATE imagenes_producto SET es_principal = 0 WHERE producto_id = %s",
+                    (producto_id,)
+                )
+            
+            # Insertar nueva imagen
+            cursor.execute(
+                """INSERT INTO imagenes_producto 
+                   (producto_id, es_principal, color_id, imagen_data, creado_en)
+                   VALUES (%s, %s, %s, %s, NOW())""",
+                (producto_id, es_principal, color_id, imagen_data)
+            )
+            
+            image_id = cursor.lastrowid
+            connection.commit()
+            cursor.close()
+            
+            return {"success": True, "message": "Imagen agregada correctamente", "image_id": image_id}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+    
+    def update_product_image(self, image_id, data):
+        """Actualizar una imagen (principalmente para marcar como principal)"""
+        try:
+            es_principal = data.get("es_principal")
+            color_id = data.get("color_id")
+            imagen_data = data.get("imagen_data")
+            
+            connection = get_connection()
+            cursor = connection.cursor()
+            
+            # Obtener el producto_id de la imagen
+            cursor.execute("SELECT producto_id FROM imagenes_producto WHERE id = %s", (image_id,))
+            result = cursor.fetchone()
+            
+            if not result:
+                cursor.close()
+                return {"success": False, "message": "Imagen no encontrada"}
+            
+            producto_id = result['producto_id']
+            
+            # Si se marca como principal, desmarcar las demás
+            if es_principal:
+                cursor.execute(
+                    "UPDATE imagenes_producto SET es_principal = 0 WHERE producto_id = %s",
+                    (producto_id,)
+                )
+            
+            # Actualizar la imagen
+            updates = []
+            params = []
+            
+            if es_principal is not None:
+                updates.append("es_principal = %s")
+                params.append(es_principal)
+            
+            if color_id is not None:
+                updates.append("color_id = %s")
+                params.append(color_id)
+            
+            if imagen_data is not None:
+                updates.append("imagen_data = %s")
+                params.append(imagen_data)
+            
+            if updates:
+                params.append(image_id)
+                sql = f"UPDATE imagenes_producto SET {', '.join(updates)} WHERE id = %s"
+                cursor.execute(sql, params)
+                connection.commit()
+            
+            cursor.close()
+            return {"success": True, "message": "Imagen actualizada correctamente"}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+    
+    def delete_product_image(self, image_id):
+        """Eliminar una imagen de un producto"""
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            cursor.execute("DELETE FROM imagenes_producto WHERE id = %s", (image_id,))
+            connection.commit()
+            cursor.close()
+            
+            if cursor.rowcount == 0:
+                return {"success": False, "message": "Imagen no encontrada"}
+            
+            return {"success": True, "message": "Imagen eliminada correctamente"}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+    
+    def set_principal_image(self, image_id):
+        """Marcar una imagen como principal"""
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            
+            # Obtener el producto_id
+            cursor.execute("SELECT producto_id FROM imagenes_producto WHERE id = %s", (image_id,))
+            result = cursor.fetchone()
+            
+            if not result:
+                cursor.close()
+                return {"success": False, "message": "Imagen no encontrada"}
+            
+            producto_id = result['producto_id']
+            
+            # Desmarcar todas las imágenes del producto
+            cursor.execute(
+                "UPDATE imagenes_producto SET es_principal = 0 WHERE producto_id = %s",
+                (producto_id,)
+            )
+            
+            # Marcar la imagen seleccionada como principal
+            cursor.execute(
+                "UPDATE imagenes_producto SET es_principal = 1 WHERE id = %s",
+                (image_id,)
+            )
+            
+            connection.commit()
+            cursor.close()
+            
+            return {"success": True, "message": "Imagen principal actualizada"}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+

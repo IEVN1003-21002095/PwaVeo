@@ -43,9 +43,9 @@ export class EditarComponent implements OnInit {
       this.catalogoService.getProductById(id).subscribe({
         next: (product) => {
           if (product) this.abrir(product);
-          else this.router.navigate(['/gestionCatalogo']);
+          else this.router.navigate(['/admin/catalogo']);
         },
-        error: () => this.router.navigate(['/gestionCatalogo'])
+        error: () => this.router.navigate(['/admin/catalogo'])
       });
     }
 
@@ -87,7 +87,7 @@ export class EditarComponent implements OnInit {
 
     this.catalogoService.editarProducto(payload).subscribe({
       next: (resp) => {
-        if (resp.success) this.router.navigate(['/gestionCatalogo']);
+        if (resp.success) this.router.navigate(['/admin/catalogo']);
         else console.error(resp.message);
       },
       error: (err) => console.error(err)

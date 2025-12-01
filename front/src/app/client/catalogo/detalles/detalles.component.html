@@ -37,6 +37,25 @@
     .qty-btn:disabled { color: #ccc; cursor: default; }
     .qty-display { width: 45px; height: 45px; border-left: 1px solid var(--veo-border); border-right: 1px solid var(--veo-border); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 600; }
 
+    .thumbnail-img { 
+        width: 80px; 
+        height: 80px; 
+        object-fit: cover; 
+        cursor: pointer; 
+        border-radius: 8px; 
+        border: 2px solid transparent; 
+        transition: all 0.3s; 
+    }
+    .thumbnail-img:hover { 
+        border-color: var(--veo-navy); 
+        transform: scale(1.05); 
+        box-shadow: 0 2px 8px rgba(0, 50, 94, 0.2); 
+    }
+    .thumbnail-img.active { 
+        border-color: var(--veo-navy); 
+        box-shadow: 0 0 0 2px rgba(0, 50, 94, 0.2); 
+    }
+
     .btn-add-cart { 
         background-color: var(--veo-navy); 
         color: #fff; 
@@ -83,8 +102,18 @@
     <div class="row g-5 align-items-center" style="min-height: 70vh;">
       <div class="col-lg-7 d-flex flex-column justify-content-center">
         <div class="product-image-container mb-4">
-          <img [src]="producto()?.imagen || 'https://placehold.co/800x1000/f4f4f4/cccccc?text=VEO'" 
+          <img [src]="producto()?.imagen_principal || producto()?.imagen || 'https://placehold.co/800x1000/f4f4f4/cccccc?text=VEO'" 
                [alt]="producto()?.nombre" class="product-detail-img">
+        </div>
+
+        <!-- Galería de miniaturas -->
+        <div *ngIf="producto()?.imagenes && producto()?.imagenes!.length > 1" class="d-flex gap-2 mt-3 flex-wrap">
+          <img *ngFor="let img of producto()?.imagenes" 
+               [src]="img.imagen_data" 
+               [alt]="producto()?.nombre"
+               (click)="producto()!.imagen_principal = img.imagen_data"
+               class="thumbnail-img"
+               [class.active]="producto()?.imagen_principal === img.imagen_data">
         </div>
 
         <div class="pe-3 mt-3">

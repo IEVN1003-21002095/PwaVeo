@@ -55,7 +55,7 @@ export class AgregarComponent implements OnInit {
     this.catalogoService.agregarProducto(this.regProducto).subscribe({
       next: (resp) => {
         console.log("Producto agregado:", this.regProducto);
-        this.router.navigate(['/gestionCatalogo']);
+        this.router.navigate(['/admin/catalogo']);
       },
       error: (err) => {
         console.error("Error al agregar:", err);

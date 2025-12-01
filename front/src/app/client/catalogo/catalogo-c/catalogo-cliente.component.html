@@ -16,9 +16,10 @@
 
           <div class="position-relative overflow-hidden w-100 product-img-wrapper mb-3">
             <img 
-              [src]="p.imagen" 
+              [src]="p.imagen_principal || p.imagen || 'https://placehold.co/400x533/f4f4f4/cccccc?text=VEO'" 
               class="w-100 h-100 object-fit-cover product-img" 
-              [alt]="p.nombre">
+              [alt]="p.nombre"
+              loading="lazy">
             <div class="hover-overlay"></div>
           </div>
 

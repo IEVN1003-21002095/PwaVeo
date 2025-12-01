@@ -138,7 +138,13 @@
 
               <td class="ps-3">
                   <div class="product-img-container">
-                    <i class="bi bi-image fs-5"></i>
+                    <img *ngIf="p.imagen_principal; else placeholderIcon" 
+                         [src]="p.imagen_principal" 
+                         [alt]="p.nombre"
+                         style="width: 100%; height: 100%; object-fit: cover;">
+                    <ng-template #placeholderIcon>
+                      <i class="bi bi-image fs-5"></i>
+                    </ng-template>
                   </div>
               </td>
               
@@ -161,6 +167,9 @@
 
               <td class="pe-3 text-end">
                 <div class="d-flex justify-content-end gap-2">
+                    <button class="btn-action-subtle" [routerLink]="['./imagenes', p.id]" title="Gestión de Imágenes">
+                        <i class="bi bi-images"></i>
+                    </button>
                     <button class="btn-action-subtle" [routerLink]="['./editar', p.id]" title="Editar">
                         <i class="bi bi-pencil-square"></i>
                     </button>

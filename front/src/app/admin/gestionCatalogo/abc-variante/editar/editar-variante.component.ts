@@ -64,7 +64,7 @@ export class EditarVarianteComponent implements OnInit {
     this.inventarioService.updateVariant(this.inventoryId, this.regVariante).subscribe({
       next: () => {
         this.inventarioService.triggerRefresh();
-        this.router.navigate(['/gestionCatalogo/inventario', this.regVariante.producto_id]);
+        this.router.navigate(['/admin/catalogo/inventario', this.regVariante.producto_id]);
       },
       error: (err) => {
         console.error('Error actualizando variante:', err);

@@ -13,6 +13,7 @@ export interface Producto {
   costo: number;
   categoria: string;
   activo: number; 
+  imagen_principal?: string;
 }
 
 @Component({
@@ -48,6 +49,19 @@ export class CatalogoComponent implements OnInit {
       next: (data: Producto[]) => { 
         this.productos = data;
         this.cargando = false;
+        
+        // Cargar imagen principal de cada producto
+        this.productos.forEach(producto => {
+          this.catalogoService.getProductImages(producto.id).subscribe({
+            next: (imagenes: any[]) => {
+              if (imagenes && imagenes.length > 0) {
+                const principal = imagenes.find(img => img.es_principal === 1);
+                producto.imagen_principal = principal ? principal.imagen_data : imagenes[0].imagen_data;
+              }
+            },
+            error: (err) => console.error(`Error cargando imágenes del producto ${producto.id}:`, err)
+          });
+        });
       },
       error: (err) => {
         console.error('Error cargando productos:', err);

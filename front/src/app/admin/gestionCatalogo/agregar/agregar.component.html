@@ -67,7 +67,7 @@
 
     <div class="modal-header">
       <h3 class="modal-title">Nuevo Producto</h3>
-      <a [routerLink]="['/gestionCatalogo']" class="btn-close">&times;</a>
+      <a [routerLink]="['/admin/catalogo']" class="btn-close">&times;</a>
     </div>
 
     <div class="modal-body">
@@ -121,7 +121,7 @@
     </div>
 
     <div class="modal-footer">
-      <a [routerLink]="['/gestionCatalogo']" class="btn-cancel">Cancelar</a>
+      <a [routerLink]="['/admin/catalogo']" class="btn-cancel">Cancelar</a>
       <button class="btn-confirm" type="submit" [disabled]="formGroup.invalid">
         Crear Producto
       </button>

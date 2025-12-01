@@ -7,6 +7,7 @@ export interface OrderItem {
   nombre_producto_venta: string;
   cantidad: number;
   precio_unitario_venta: number;
+  imagen?: string;
 }
 
 export interface ShippingAddress {

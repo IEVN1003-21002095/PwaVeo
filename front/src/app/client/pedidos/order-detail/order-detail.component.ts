@@ -72,4 +72,9 @@ export class OrderDetailComponent implements OnInit {
     }
     return 'status-default';
   }
+
+  onImageError(event: any): void {
+    console.error('Error cargando imagen del producto');
+    event.target.style.display = 'none';
+  }
 }
