@@ -4,12 +4,15 @@
     <!-- Encabezado -->
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div>
-        <h2 class="text-primary fw-bold mb-0">Gestión de Reseñas</h2>
-        <small class="text-muted">Panel de Administración</small>
+    <h2 class="fw-bold mb-0" style="color: #083b66;">Gestión de Reseñas</h2>
+      <small style="color: #083b66;">Panel de Administración</small>
       </div>
-      <button class="btn btn-primary" (click)="loadReviews()">
-        <i class="bi bi-arrow-clockwise"></i> Refrescar
-      </button>
+<button 
+  class="btn" 
+  (click)="loadReviews()" 
+  style="background-color: #083b66; border-color: #083b66; color: white;">
+       <i class="bi bi-arrow-clockwise"></i> Refrescar
+       </button>
     </div>
 
     <!-- Alerta de Error -->
@@ -49,7 +52,7 @@
                   <div class="fw-bold text-dark">{{ review.nombre_completo }}</div>
                   <div class="small text-muted">ID: {{ review.cliente_id }}</div>
                 </td>
-                <td class="text-primary fw-medium">{{ review.producto_nombre }}</td>
+                <td class="fw-medium" style="color: #083b66;">{{ review.producto_nombre }}</td>
                 <td>
                   <span class="text-warning fs-5">{{ review.calificacion | stars }}</span>
                   <span class="ms-1 small text-muted">({{ review.calificacion }})</span>

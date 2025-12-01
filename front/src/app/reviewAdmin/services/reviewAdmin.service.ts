@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+// Interfaz de Reseña completa (Admin)
 export interface Review {
   id: number;
   producto_id: number;
@@ -14,28 +15,63 @@ export interface Review {
   nombre_completo: string;
 }
 
+// Interfaz para enviar datos (Usuario)
+export interface ReviewPayload {
+  producto_id: number;
+  cliente_id: number;
+  calificacion: number;
+  comentario: string;
+}
+
+// Interfaces para los selectores
+export interface ProductSimple {
+  id: number;
+  nombre: string;
+}
+
+export interface ClientSimple {
+  id: number;
+  nombre_completo: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class ReviewAdminService {
-  // CORRECCIÓN: 'reviews' en plural
-  private apiUrl = 'http://localhost:5000/reviews'; 
+  // Ajustamos la URL base a la raíz de la API
+  private baseUrl = 'http://localhost:5000'; 
 
   constructor(private http: HttpClient) { }
 
+  // --- MÉTODOS DE ADMIN ---
   getAllReviews(): Observable<Review[]> {
-    return this.http.get<Review[]>(`${this.apiUrl}/all`);
+    return this.http.get<Review[]>(`${this.baseUrl}/reviews/all`);
   }
 
   approveReview(id: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}/approve`, {});
+    return this.http.put(`${this.baseUrl}/reviews/${id}/approve`, {});
   }
 
   rejectReview(id: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}/reject`, {});
+    return this.http.put(`${this.baseUrl}/reviews/${id}/reject`, {});
   }
 
   deleteReview(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    return this.http.delete(`${this.baseUrl}/reviews/${id}`);
+  }
+
+  // --- MÉTODOS DE USUARIO ---
+  createReview(review: ReviewPayload): Observable<any> {
+    return this.http.post(`${this.baseUrl}/reviews`, review);
+  }
+
+  // Obtener productos para el selector
+  getProducts(): Observable<ProductSimple[]> {
+    return this.http.get<ProductSimple[]>(`${this.baseUrl}/products-list`);
+  }
+
+  // Obtener clientes para el selector
+  getClients(): Observable<ClientSimple[]> {
+    return this.http.get<ClientSimple[]>(`${this.baseUrl}/clients-list`);
   }
 }

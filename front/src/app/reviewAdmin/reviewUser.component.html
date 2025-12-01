@@ -1,0 +1,94 @@
+<div class="container py-5 bg-light min-vh-100">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      
+      <div class="card shadow border-0">
+        <div class="card-header bg-dark text-white p-4">
+          <h4 class="mb-0 fw-bold">Nueva Reseña</h4>
+          <p class="mb-0 small text-white-50">Tu opinión nos ayuda a mejorar</p>
+        </div>
+        
+        <div class="card-body p-4">
+          
+          <div *ngIf="successMsg" class="alert alert-success shadow-sm">
+             {{ successMsg }}
+          </div>
+          
+          <div *ngIf="errorMsg" class="alert alert-danger shadow-sm">
+             {{ errorMsg }}
+          </div>
+
+          <form (ngSubmit)="submitReview()">
+            
+            <div class="row mb-3">
+              <div class="col-md-12 mb-3">
+                <label class="form-label fw-bold text-secondary">¿Quién escribe?</label>
+                <select class="form-select" 
+                        [(ngModel)]="reviewData.cliente_id" 
+                        name="cliente_id"
+                        required>
+                  <option [value]="0" disabled selected>-- Selecciona tu usuario --</option>
+                  <option *ngFor="let client of clients" [value]="client.id">
+                    {{ client.nombre_completo }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="col-md-12">
+                <label class="form-label fw-bold text-secondary">¿Qué compraste?</label>
+                <select class="form-select" 
+                        [(ngModel)]="reviewData.producto_id" 
+                        name="producto_id"
+                        required>
+                  <option [value]="0" disabled selected>-- Selecciona un producto --</option>
+                  <option *ngFor="let product of products" [value]="product.id">
+                    {{ product.nombre }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="mb-4 text-center">
+              <label class="form-label d-block fw-bold mb-2">Calificación</label>
+              <div>
+                <span *ngFor="let star of stars"
+                      class="star-rating mx-1"
+                      [class.star-filled]="star <= reviewData.calificacion"
+                      (click)="setRating(star)"
+                      title="{{star}} estrellas">
+                  {{ star <= reviewData.calificacion ? '★' : '☆' }}
+                </span>
+              </div>
+              <div class="small text-muted mt-2">
+                {{ reviewData.calificacion }} de 5 estrellas
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-bold">Tu opinión</label>
+              <textarea 
+                class="form-control" 
+                rows="4" 
+                [(ngModel)]="reviewData.comentario" 
+                name="comentario"
+                placeholder="Escribe aquí tu experiencia con el producto..."
+                required></textarea>
+            </div>
+
+            <button type="submit" 
+                     class="btn w-100 py-2 fw-bold" 
+                    [disabled]="isSubmitting"
+                    style="background-color: #083b66; border-color: #083b66; color: white;">
+<span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+        {{ isSubmitting ? 'Enviando...' : 'Enviar Reseña' }}
+                </button>
+
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,9 +1,8 @@
 from flask import jsonify, request
 from database import get_connection
 
-
 # ------------------------------
-# Crear reseña
+# Crear reseña (Usuario)
 # ------------------------------
 def create_review():
     data = request.get_json()
@@ -26,7 +25,6 @@ def create_review():
     conn = get_connection()
     cursor = conn.cursor()
 
-    # INSERTAR DIRECTAMENTE (Sin verificar compra ni duplicados)
     try:
         cursor.execute("""
             INSERT INTO reseñas (producto_id, cliente_id, calificacion, comentario, estado, fecha)
@@ -44,8 +42,6 @@ def create_review():
     conn.close()
 
     return jsonify({"message": "Reseña enviada correctamente"}), 201
-
-
 
 # ------------------------------
 # Reseñas aprobadas por producto
@@ -80,8 +76,6 @@ def get_reviews_by_product(producto_id):
 
     return jsonify(reviews)
 
-
-
 # ------------------------------
 # Todas las reseñas (ADMIN)
 # ------------------------------
@@ -94,11 +88,11 @@ def get_all_reviews():
                r.comentario, r.estado, r.fecha,
                p.nombre AS producto_nombre,
                u.nombre, u.apellido
-    FROM reseñas r
-    INNER JOIN productos p ON r.producto_id = p.id
-    INNER JOIN clientes c ON r.cliente_id = c.id
-    INNER JOIN usuarios u ON c.usuario_id = u.id
-    ORDER BY r.fecha DESC
+        FROM reseñas r
+        INNER JOIN productos p ON r.producto_id = p.id
+        INNER JOIN clientes c ON r.cliente_id = c.id
+        INNER JOIN usuarios u ON c.usuario_id = u.id
+        ORDER BY r.fecha DESC
     """)
 
     rows = cursor.fetchall()
@@ -106,7 +100,6 @@ def get_all_reviews():
     conn.close()
 
     reviews = []
-
     for row in rows:
         reviews.append({
             "id": row["id"],
@@ -122,23 +115,17 @@ def get_all_reviews():
 
     return jsonify(reviews)
 
-
-
 # ------------------------------
 # Aprobar reseña
 # ------------------------------
 def approve_review(review_id):
     conn = get_connection()
     cursor = conn.cursor()
-
     cursor.execute("UPDATE reseñas SET estado='aprobado' WHERE id=%s", (review_id,))
     conn.commit()
-
     cursor.close()
     conn.close()
-
     return jsonify({"message": "Reseña aprobada"})
-
 
 # ------------------------------
 # Rechazar reseña
@@ -146,15 +133,11 @@ def approve_review(review_id):
 def reject_review(review_id):
     conn = get_connection()
     cursor = conn.cursor()
-
     cursor.execute("UPDATE reseñas SET estado='rechazado' WHERE id=%s", (review_id,))
     conn.commit()
-
     cursor.close()
     conn.close()
-
     return jsonify({"message": "Reseña rechazada"})
-
 
 # ------------------------------
 # Eliminar reseña
@@ -162,11 +145,55 @@ def reject_review(review_id):
 def delete_review(review_id):
     conn = get_connection()
     cursor = conn.cursor()
-
     cursor.execute("DELETE FROM reseñas WHERE id=%s", (review_id,))
     conn.commit()
-
     cursor.close()
     conn.close()
-
     return jsonify({"message": "Reseña eliminada"})
+
+# ------------------------------
+# Obtener lista de productos (SELECTOR)
+# ------------------------------
+def get_products_list():
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    # Solo necesitamos ID y Nombre para el selector
+    cursor.execute("SELECT id, nombre FROM productos")
+    rows = cursor.fetchall()
+    
+    cursor.close()
+    conn.close()
+    
+    products = []
+    for row in rows:
+        products.append({"id": row["id"], "nombre": row["nombre"]})
+        
+    return jsonify(products)
+
+# ------------------------------
+# Obtener lista de clientes (SELECTOR)
+# ------------------------------
+def get_clients_list():
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    # Join para obtener el nombre real del usuario asociado al cliente
+    cursor.execute("""
+        SELECT c.id, u.nombre, u.apellido 
+        FROM clientes c
+        INNER JOIN usuarios u ON c.usuario_id = u.id
+    """)
+    rows = cursor.fetchall()
+    
+    cursor.close()
+    conn.close()
+    
+    clients = []
+    for row in rows:
+        clients.append({
+            "id": row["id"],
+            "nombre_completo": f"{row['nombre']} {row['apellido']}"
+        })
+        
+    return jsonify(clients)
