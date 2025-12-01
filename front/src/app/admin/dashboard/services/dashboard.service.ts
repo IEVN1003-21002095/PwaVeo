@@ -23,6 +23,19 @@ export interface ChartData {
   total: number;
 }
 
+export interface ChartResponse {
+  success: boolean;
+  data: ChartData[];
+  stats?: {
+    promedio_diario: number;
+    total_semana: number;
+    mejor_dia: {
+      fecha: string;
+      total: number;
+    };
+  };
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -39,7 +52,7 @@ export class DashboardService {
     return this.http.get<RecentOrder[]>(`${this.apiUrl}/recent-orders`);
   }
 
-  getChartData(): Observable<ChartData[]> {
-    return this.http.get<ChartData[]>(`${this.apiUrl}/chart-data`);
+  getChartData(): Observable<ChartResponse> {
+    return this.http.get<ChartResponse>(`${this.apiUrl}/chart-data`);
   }
 }

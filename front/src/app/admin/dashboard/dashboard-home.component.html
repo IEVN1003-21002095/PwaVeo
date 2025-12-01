@@ -216,17 +216,41 @@
     <div class="panel">
       <h3>Ventas (Últimos 7 días)</h3>
       
-      <div class="chart-container" *ngIf="chartData.length > 0; else noData">
-        <div class="bar-group" *ngFor="let item of chartData">
-          <div class="bar" 
-               [style.height.%]="getBarHeight(item.total)" 
-               [title]="'$' + item.total">
+      <!-- Estadísticas de Pandas -->
+      <div *ngIf="chartStats.total_semana > 0" style="margin-bottom: 1rem; padding: 10px; background: #f8f9fc; border-radius: 8px;">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center;">
+          <div>
+            <div style="font-size: 11px; color: #888; text-transform: uppercase;">Total Semana</div>
+            <div style="font-size: 18px; font-weight: bold; color: #4e73df;">
+              {{ chartStats.total_semana | currency:'USD':'symbol':'1.0-0' }}
+            </div>
           </div>
-          <div class="bar-label">{{ item.dia | date:'dd MMM' }}</div>
+          <div>
+            <div style="font-size: 11px; color: #888; text-transform: uppercase;">Promedio Diario</div>
+            <div style="font-size: 18px; font-weight: bold; color: #1cc88a;">
+              {{ chartStats.promedio_diario | currency:'USD':'symbol':'1.0-0' }}
+            </div>
+          </div>
+          <div>
+            <div style="font-size: 11px; color: #888; text-transform: uppercase;">Mejor Día</div>
+            <div style="font-size: 18px; font-weight: bold; color: #f6c23e;">
+              {{ chartStats.mejor_dia.total | currency:'USD':'symbol':'1.0-0' }}
+            </div>
+          </div>
         </div>
       </div>
+
+      <!-- Gráfico de Chart.js -->
+      <div style="height: 300px; position: relative;" *ngIf="chartData.length > 0; else noData">
+        <canvas baseChart
+          [data]="lineChartData"
+          [options]="lineChartOptions"
+          [type]="'line'">
+        </canvas>
+      </div>
+      
       <ng-template #noData>
-        <p style="text-align:center; color:#999;">No hay datos de ventas recientes.</p>
+        <p style="text-align:center; color:#999; padding: 2rem;">No hay datos de ventas recientes.</p>
       </ng-template>
     </div>
 

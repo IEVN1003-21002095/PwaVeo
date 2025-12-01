@@ -1,5 +1,8 @@
 from database import get_connection
 import pymysql
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
 
 class DashboardController:
     
@@ -101,6 +104,9 @@ class DashboardController:
             
     @staticmethod
     def get_sales_chart_data():
+        """
+        Obtiene datos de ventas de los últimos 7 días usando Pandas para análisis
+        """
         connection = None
         try:
             connection = get_connection()
@@ -111,22 +117,77 @@ class DashboardController:
                     WHERE estado IN ('completada', 'pendiente')
                       AND fecha >= DATE_SUB(NOW(), INTERVAL 7 DAY)
                     GROUP BY DATE(fecha)
-                    ORDER BY dia DESC
-                    LIMIT 7;
+                    ORDER BY dia ASC;
                 """
                 cursor.execute(query)
                 data = cursor.fetchall()
                 
-                formatted_data = []
-                for item in data:
-                    formatted_data.append({
-                        "dia": str(item['dia']),
-                        "total": float(item['total'])
-                    })
+                # Convertir a DataFrame de pandas
+                if data:
+                    df = pd.DataFrame(data)
+                    df['dia'] = pd.to_datetime(df['dia'])
+                    df['total'] = df['total'].astype(float)
+                    
+                    # Crear rango completo de fechas (últimos 7 días)
+                    end_date = datetime.now().date()
+                    start_date = end_date - timedelta(days=6)
+                    date_range = pd.date_range(start=start_date, end=end_date, freq='D')
+                    
+                    # Reindexar para incluir días sin ventas (con 0)
+                    df = df.set_index('dia').reindex(date_range, fill_value=0).reset_index()
+                    df.columns = ['dia', 'total']
+                    
+                    # Calcular estadísticas adicionales
+                    promedio = float(df['total'].mean())
+                    total_semana = float(df['total'].sum())
+                    dia_max = df.loc[df['total'].idxmax()]
+                    
+                    formatted_data = []
+                    for _, row in df.iterrows():
+                        formatted_data.append({
+                            "dia": row['dia'].strftime('%Y-%m-%d'),
+                            "total": float(row['total'])
+                        })
+                    
+                    return {
+                        "success": True, 
+                        "data": formatted_data,
+                        "stats": {
+                            "promedio_diario": round(promedio, 2),
+                            "total_semana": round(total_semana, 2),
+                            "mejor_dia": {
+                                "fecha": dia_max['dia'].strftime('%Y-%m-%d'),
+                                "total": float(dia_max['total'])
+                            }
+                        }
+                    }
+                else:
+                    # Si no hay datos, devolver 7 días con 0
+                    end_date = datetime.now().date()
+                    start_date = end_date - timedelta(days=6)
+                    date_range = pd.date_range(start=start_date, end=end_date, freq='D')
+                    
+                    formatted_data = []
+                    for date in date_range:
+                        formatted_data.append({
+                            "dia": date.strftime('%Y-%m-%d'),
+                            "total": 0.0
+                        })
+                    
+                    return {
+                        "success": True, 
+                        "data": formatted_data,
+                        "stats": {
+                            "promedio_diario": 0.0,
+                            "total_semana": 0.0,
+                            "mejor_dia": {"fecha": None, "total": 0.0}
+                        }
+                    }
 
-            return {"success": True, "data": formatted_data}
         except Exception as e:
             print(f"Error en DashboardController.get_sales_chart_data: {e}")
+            import traceback
+            traceback.print_exc()
             return {"success": False, "error": str(e)}
         finally:
             if connection and hasattr(connection, 'open') and connection.open:

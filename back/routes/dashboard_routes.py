@@ -5,15 +5,27 @@ dashboard_bp = Blueprint('dashboard_bp', __name__)
 
 @dashboard_bp.route('/api/dashboard/summary', methods=['GET'])
 def dashboard_summary():
-    return _handle_response(DashboardController.get_summary_metrics())
+    result = DashboardController.get_summary_metrics()
+    if result['success']:
+        return jsonify(result), 200
+    else:
+        return jsonify(result), 500
 
 @dashboard_bp.route('/api/dashboard/recent-orders', methods=['GET'])
 def recent_orders():
-    return _handle_response(DashboardController.get_recent_orders())
+    result = DashboardController.get_recent_orders()
+    if result['success']:
+        return jsonify(result), 200
+    else:
+        return jsonify(result), 500
 
 @dashboard_bp.route('/api/dashboard/chart-data', methods=['GET'])
 def chart_data():
-    return _handle_response(DashboardController.get_sales_chart_data())
+    result = DashboardController.get_sales_chart_data()
+    if result['success']:
+        return jsonify(result), 200
+    else:
+        return jsonify(result), 500
 
 def _handle_response(result):
     if result['success']:
