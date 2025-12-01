@@ -1,87 +1,117 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-    <!-- NOMBRE -->
-    <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre Completo</label>
-        <input type="text" formControlName="nombre"
-            placeholder="Ej. Ana García"
-            class="form-input w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none">
-        
-        <p class="text-red-500 text-xs mt-1" *ngIf="form.get('nombre')?.touched && form.get('nombre')?.invalid">
-            El nombre es obligatorio.
-        </p>
+    .font-inter {
+        font-family: 'Inter', sans-serif;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* Colores Slate */
+    .bg-slate-900 { background-color: #0F172A !important; }
+    .text-slate-900 { color: #0F172A !important; }
+    .bg-slate-400 { background-color: #94a3b8 !important; }
+
+    /* Animación */
+    .animate-fade-in-up {
+        animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        opacity: 0;
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Inputs Premium */
+    .form-control {
+        border-color: #dee2e6;
+        padding: 0.8rem 1rem;
+    }
+    .form-control:focus {
+        border-color: #0F172A;
+        box-shadow: 0 0 0 0.25rem rgba(15, 23, 42, 0.1);
+    }
+    
+    .login-container {
+        min-height: 600px;
+    }
+</style>
+
+<div class="d-flex justify-content-center align-items-center min-vh-100 bg-light px-3 font-inter">
+
+    <div class="card shadow-lg border-0 rounded-4 overflow-hidden animate-fade-in-up login-container" style="max-width: 1024px; width: 100%;">
+        <div class="row g-0 h-100">
+
+            <div class="col-md-6 p-5 d-flex flex-column justify-content-center bg-white">
+
+                <div class="text-muted small fw-medium mb-3">Home > Registro</div>
+
+                <h1 class="display-5 fw-bold text-slate-900 mb-2">Crear cuenta</h1>
+                <p class="text-muted mb-4">Ingresa tus datos para comenzar.</p>
+
+                <form [formGroup]="formGroup" (ngSubmit)="onSubmit()">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark small">Nombre completo</label>
+                        <input type="text" formControlName="nombre" class="form-control bg-white" placeholder="Tu nombre">
+                        <div *ngIf="formGroup.get('nombre')?.invalid && formGroup.get('nombre')?.touched" class="text-danger small mt-1 fw-medium">
+                            El nombre es requerido.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark small">Email</label>
+                        <input type="email" formControlName="correo" class="form-control bg-white" placeholder="nombre@correo.com">
+                        <div *ngIf="formGroup.get('correo')?.invalid && formGroup.get('correo')?.touched" class="text-danger small mt-1 fw-medium">
+                            Ingresa un correo válido.
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold text-dark small">Contraseña</label>
+                            <input type="password" formControlName="password" class="form-control bg-white" placeholder="••••••••">
+                            <div *ngIf="formGroup.get('password')?.hasError('minlength') && formGroup.get('password')?.touched" class="text-danger small mt-1 fw-medium">
+                                Mínimo 8 caracteres.
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold text-dark small">Confirmar</label>
+                            <input type="password" formControlName="confirmPassword" class="form-control bg-white" placeholder="••••••••">
+                        </div>
+                    </div>
+
+                    <div class="mb-4 form-check">
+                        <input type="checkbox" formControlName="politica" class="form-check-input" id="politica" style="cursor: pointer; border-color: #adb5bd;">
+                        <label class="form-check-label text-muted small fw-medium" for="politica" style="cursor: pointer;">
+                            Acepto la 
+                            <a routerLink="/privacidad" class="text-primary text-decoration-none fw-bold">Política de Privacidad y Términos</a>.
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn bg-slate-900 text-white w-100 py-3 fw-bold shadow-sm">
+                        Registrarse
+                    </button>
+
+                    <div class="text-center mt-4">
+                        <span class="text-muted small">¿Ya tienes una cuenta?</span>
+                        <a (click)="irAlLogin()" class="text-primary text-decoration-none small fw-bold ms-1" style="cursor: pointer;">
+                            Inicia sesión aquí
+                        </a>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="col-md-6 d-none d-md-flex justify-content-center align-items-center bg-slate-400 position-relative">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="white" class="opacity-25" style="width: 12rem; height: 12rem;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+                </svg>
+
+            </div>
+
+        </div>
     </div>
 
-    <!-- CORREO -->
-    <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
-        <input type="email" formControlName="correo"
-            placeholder="nombre@correo.com"
-            class="form-input w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none">
-        
-        <p class="text-red-500 text-xs mt-1" *ngIf="form.get('correo')?.touched && form.get('correo')?.hasError('required')">
-            El correo es obligatorio.
-        </p>
-
-        <p class="text-red-500 text-xs mt-1" *ngIf="form.get('correo')?.touched && form.get('correo')?.hasError('email')">
-            Ingresa un formato válido.
-        </p>
-    </div>
-
-    <!-- CONTRASEÑA -->
-    <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1">Contraseña</label>
-        <input type="password" formControlName="contrasena"
-            placeholder="••••••••"
-            class="form-input w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none">
-
-        <p class="text-red-500 text-xs mt-1" *ngIf="form.get('contrasena')?.touched && form.get('contrasena')?.hasError('required')">
-            La contraseña es obligatoria.
-        </p>
-        <p class="text-red-500 text-xs mt-1" *ngIf="form.get('contrasena')?.touched && form.get('contrasena')?.hasError('minlength')">
-            Mínimo 8 caracteres.
-        </p>
-    </div>
-
-    <!-- CONFIRMAR CONTRASEÑA -->
-    <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1">Confirmar Contraseña</label>
-        <input type="password" formControlName="confirmContrasena"
-            placeholder="••••••••"
-            class="form-input w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none">
-
-        <p class="text-red-500 text-xs mt-1" *ngIf="form.errors?.['mismatch'] && form.get('confirmContrasena')?.touched">
-            Las contraseñas no coinciden.
-        </p>
-    </div>
-
-    <!-- POLÍTICA -->
-    <div class="flex items-start">
-        <input type="checkbox" class="w-4 h-4" formControlName="aceptaTerminos">
-        <label class="ml-3 text-sm">
-            Acepto la <a href="#" class="text-blue-600 hover:underline">Política de Privacidad</a> y los Términos.
-        </label>
-    </div>
-
-    <p class="text-red-500 text-xs" *ngIf="form.get('aceptaTerminos')?.touched && form.get('aceptaTerminos')?.invalid">
-        Debes aceptar la política para continuar.
-    </p>
-
-    <!-- MENSAJES -->
-    <div *ngIf="errorMsg" class="text-red-600 text-sm font-semibold">
-        {{ errorMsg }}
-    </div>
-
-    <div *ngIf="successMsg" class="text-green-600 text-sm font-semibold">
-        {{ successMsg }}
-    </div>
-
-    <button type="submit"
-        class="w-full bg-[#0d2a58] hover:bg-[#0a2145] text-white font-bold py-3 px-4 rounded-lg"
-        [disabled]="loading">
-
-        <span *ngIf="!loading">Registrarse</span>
-        <span *ngIf="loading">Procesando...</span>
-    </button>
-
-</form>
+</div>

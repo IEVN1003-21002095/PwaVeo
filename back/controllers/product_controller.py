@@ -1,267 +1,207 @@
-from flask import jsonify, request
-from database import get_connection, leer_producto_bd, leer_inventario_bd
+import pymysql
+import os
+import ssl
+from dotenv import load_dotenv
+from database import get_connection
+load_dotenv()
 
+class ProductController:
 
-# ============================================================
-#   OBTENER TODOS LOS PRODUCTOS
-# ============================================================
+    def __init__(self):
+        self.connection = None
 
-def obtener_productos():
-    try:
+    def get_cursor(self):
         connection = get_connection()
-        cursor = connection.cursor()
+        return connection.cursor()
 
-        sql = """
-            SELECT id, nombre, descripcion, precio, costo, categoria, estado
-            FROM productos
-        """
-        cursor.execute(sql)
-        productos = cursor.fetchall()
+    # ==================== PRODUCTOS ====================
+    def list_products(self):
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            cursor.execute("SELECT * FROM productos")
+            data = cursor.fetchall()
+            cursor.close()
+            return {"success": True, "data": data}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
 
-        return jsonify({
-            "mensaje": "Productos consultados correctamente.",
-            "exito": True,
-            "data": productos
-        }), 200
+    def create(self, data):
+        try:
+            fields = ["nombre", "precio", "categoria", "costo", "descripcion", "proveedor_id", "activo"]
+            values = [data.get(f) for f in fields]
 
-    except Exception as ex:
-        return jsonify({
-            "mensaje": f"Error al consultar productos: {ex}",
-            "exito": False
-        }), 500
+            if not values[0]:
+                return {"success": False, "message": "El nombre es obligatorio."}
 
-    finally:
-        if connection:
-            connection.close()
-
-
-# ============================================================
-#   OBTENER PRODUCTO POR ID
-# ============================================================
-
-def obtener_producto_por_id(producto_id):
-    try:
-        producto = leer_producto_bd(producto_id)
-
-        if not producto:
-            return jsonify({
-                "mensaje": "Producto no encontrado.",
-                "exito": False
-            }), 404
-
-        return jsonify({
-            "mensaje": "Producto encontrado.",
-            "exito": True,
-            "data": producto
-        }), 200
-
-    except Exception as ex:
-        return jsonify({
-            "mensaje": f"Error al obtener producto: {ex}",
-            "exito": False
-        }), 500
-
-
-# ============================================================
-#   REGISTRAR PRODUCTO
-# ============================================================
-
-def registrar_producto():
-    try:
-        data = request.json
-
-        required = ["nombre", "descripcion", "precio", "costo", "proveedor_id", "categoria"]
-        if not all(k in data for k in required):
-            return jsonify({
-                "mensaje": "Faltan campos obligatorios.",
-                "exito": False
-            }), 400
-
-        connection = get_connection()
-        cursor = connection.cursor()
-
-        sql = """
-            INSERT INTO productos (nombre, descripcion, precio, costo, proveedor_id, categoria, estado)
-            VALUES (%s, %s, %s, %s, %s, %s, 'Activo')
-        """
-        cursor.execute(sql, (
-            data["nombre"],
-            data["descripcion"],
-            data["precio"],
-            data["costo"],
-            data["proveedor_id"],
-            data["categoria"]
-        ))
-
-        producto_id = cursor.lastrowid
-        connection.commit()
-
-        return jsonify({
-            "mensaje": "Producto registrado correctamente.",
-            "exito": True,
-            "producto_id": producto_id
-        }), 201
-
-    except Exception as ex:
-        return jsonify({
-            "mensaje": f"Error al registrar producto: {ex}",
-            "exito": False
-        }), 500
-
-    finally:
-        if connection:
-            connection.close()
-
-
-# ============================================================
-#   ACTUALIZAR PRODUCTO
-# ============================================================
-
-def actualizar_producto(producto_id):
-    try:
-        existente = leer_producto_bd(producto_id)
-
-        if not existente:
-            return jsonify({
-                "mensaje": "Producto no encontrado.",
-                "exito": False
-            }), 404
-
-        data = request.json
-        connection = get_connection()
-        cursor = connection.cursor()
-
-        sql = """
-            UPDATE productos
-            SET nombre = %s,
-                descripcion = %s,
-                precio = %s,
-                costo = %s,
-                estado = %s,
-                categoria = %s
-            WHERE id = %s
-        """
-
-        cursor.execute(sql, (
-            data.get("nombre", existente["nombre"]),
-            data.get("descripcion", existente["descripcion"]),
-            data.get("precio", existente["precio"]),
-            data.get("costo", existente["costo"]),
-            data.get("estado", existente["estado"]),
-            data.get("categoria", existente["categoria"]),
-            producto_id
-        ))
-
-        connection.commit()
-
-        return jsonify({
-            "mensaje": "Producto actualizado correctamente.",
-            "exito": True
-        }), 200
-
-    except Exception as ex:
-        return jsonify({
-            "mensaje": f"Error al actualizar producto: {ex}",
-            "exito": False
-        }), 500
-
-    finally:
-        if connection:
-            connection.close()
-
-
-# ============================================================
-#   ELIMINAR PRODUCTO (SOFT DELETE)
-# ============================================================
-
-def eliminar_producto(producto_id):
-    try:
-        existente = leer_producto_bd(producto_id)
-
-        if not existente:
-            return jsonify({
-                "mensaje": "Producto no encontrado.",
-                "exito": False
-            }), 404
-
-        connection = get_connection()
-        cursor = connection.cursor()
-
-        sql = "UPDATE productos SET estado = 'Inactivo' WHERE id = %s"
-        cursor.execute(sql, (producto_id,))
-        connection.commit()
-
-        return jsonify({
-            "mensaje": "Producto desactivado correctamente.",
-            "exito": True
-        }), 200
-
-    except Exception as ex:
-        return jsonify({
-            "mensaje": f"Error al desactivar producto: {ex}",
-            "exito": False
-        }), 500
-
-    finally:
-        if connection:
-            connection.close()
-
-
-# ============================================================
-#   ACTUALIZAR STOCK DE VARIANTE
-# ============================================================
-
-def actualizar_stock_variante(inventario_id):
-    try:
-        variante = leer_inventario_bd(inventario_id)
-
-        if not variante:
-            return jsonify({
-                "mensaje": "Variante no encontrada.",
-                "exito": False
-            }), 404
-
-        data = request.json
-        connection = get_connection()
-        cursor = connection.cursor()
-
-        # NUEVA CANTIDAD
-        if "nueva_cantidad" in data:
-            sql = """
-                UPDATE inventario
-                SET cantidad = %s
-                WHERE id = %s
+            connection = get_connection()
+            cursor = connection.cursor()
+            fields_str = ", ".join(fields)
+            placeholders = ", ".join(['%s'] * len(fields))
+            sql = f"""
+                INSERT INTO productos 
+                ({fields_str}, creado_en)
+                VALUES ({placeholders}, NOW())
             """
-            cursor.execute(sql, (data["nueva_cantidad"], inventario_id))
+            cursor.execute(sql, values)
+            connection.commit()
+            cursor.close()
 
-        # AJUSTE (sumar/restar)
-        elif "cantidad_ajuste" in data:
+            return {"success": True, "message": "Producto creado correctamente"}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+
+    def update(self, product_id, data):
+        try:
+            nombre = data.get("nombre")
+            precio = data.get("precio")
+            categoria = data.get("categoria")
+            costo = data.get("costo")
+            descripcion = data.get("descripcion")
+            proveedor_id = data.get("proveedor_id")
+            activo = data.get("activo")
+
+            connection = get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                """
+                UPDATE productos 
+                SET nombre=%s, precio=%s, categoria=%s, costo=%s, descripcion=%s,
+                    proveedor_id=%s, activo=%s, actualizado_en=NOW()
+                WHERE id=%s
+                """,
+                (nombre, precio, categoria, costo, descripcion, proveedor_id, activo, product_id)
+            )
+            connection.commit()
+            cursor.close()
+            return {"success": True, "message": "Producto actualizado"}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+
+    def delete(self, product_id):
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            cursor.execute("DELETE FROM productos WHERE id=%s", (product_id,))
+            connection.commit()
+            cursor.close()
+            return {"success": True, "message": "Producto eliminado"}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+
+    # ==================== INVENTARIO / VARIANTES ====================
+    def get_inventory(self, product_id):
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
             sql = """
-                UPDATE inventario
-                SET cantidad = cantidad + %s
-                WHERE id = %s
+                SELECT i.id, i.producto_id,
+                       i.color_id, c.color,
+                       i.talla_id, t.talla,
+                       i.cantidad, i.ubicacion
+                FROM inventario i
+                LEFT JOIN colores c ON i.color_id = c.id
+                LEFT JOIN tallas t ON i.talla_id = t.id
+                WHERE i.producto_id = %s
             """
-            cursor.execute(sql, (data["cantidad_ajuste"], inventario_id))
+            cursor.execute(sql, (product_id,))
+            data = cursor.fetchall()
+            cursor.close()
+            return {"success": True, "data": data}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
 
-        else:
-            return jsonify({
-                "mensaje": "Debes enviar 'nueva_cantidad' o 'cantidad_ajuste'.",
-                "exito": False
-            }), 400
+    def get_variant(self, inventory_id):
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            sql = """
+                SELECT i.id, i.producto_id,
+                       i.color_id, c.color,
+                       i.talla_id, t.talla,
+                       i.cantidad, i.ubicacion
+                FROM inventario i
+                LEFT JOIN colores c ON i.color_id = c.id
+                LEFT JOIN tallas t ON i.talla_id = t.id
+                WHERE i.id = %s
+            """
+            cursor.execute(sql, (inventory_id,))
+            data = cursor.fetchone()
+            cursor.close()
+            if not data:
+                return {"success": False, "message": "Variante no encontrada"}, 404
+            return {"success": True, "data": data}
+        except Exception as e:
+            return {"success": False, "message": str(e)}, 500
 
-        connection.commit()
+    def add_variant(self, data):
+        try:
+            producto_id = data.get("producto_id")
+            color_id = data.get("color_id")
+            talla_id = data.get("talla_id")
+            cantidad = data.get("cantidad", 0)
+            ubicacion = data.get("ubicacion", "")
 
-        return jsonify({
-            "mensaje": "Stock actualizado correctamente.",
-            "exito": True
-        }), 200
+            if not all([producto_id, color_id, talla_id]):
+                return {"success": False, "message": "producto_id, color_id y talla_id son obligatorios."}
 
-    except Exception as ex:
-        return jsonify({
-            "mensaje": f"Error al actualizar stock: {ex}",
-            "exito": False
-        }), 500
+            connection = get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "SELECT id FROM inventario WHERE producto_id=%s AND color_id=%s AND talla_id=%s",
+                (producto_id, color_id, talla_id)
+            )
+            if cursor.fetchone():
+                cursor.close()
+                return {"success": False, "message": "Esa combinación de Color y Talla ya existe."}
 
-    finally:
-        if connection:
-            connection.close()
+            cursor.execute(
+                "INSERT INTO inventario (producto_id, color_id, talla_id, cantidad, ubicacion, creado_en) "
+                "VALUES (%s, %s, %s, %s, %s, NOW())",
+                (producto_id, color_id, talla_id, cantidad, ubicacion)
+            )
+            connection.commit()
+            cursor.close()
+            return {"success": True, "message": "Variante agregada correctamente"}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+
+    def update_variant(self, inventory_id, data):
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            sql = """
+                UPDATE inventario 
+                SET cantidad=%s, ubicacion=%s, actualizado_en=NOW()
+                WHERE id=%s
+            """
+            cursor.execute(sql, (
+                data.get("cantidad"),
+                data.get("ubicacion"),
+                inventory_id
+            ))
+            connection.commit()
+            cursor.close()
+            return {"success": True, "message": "Inventario actualizado"}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+
+    def delete_variant(self, inventory_id):
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            cursor.execute(
+                "DELETE FROM venta_detalle WHERE inventario_id = %s",
+                (inventory_id,)
+            )
+
+            cursor.execute(
+                "DELETE FROM inventario WHERE id = %s",
+                (inventory_id,)
+            )
+
+            connection.commit()
+            cursor.close()
+            return {"success": True, "message": "Variante eliminada correctamente"}
+        except Exception as e:
+            return {"success": False, "message": str(e)}

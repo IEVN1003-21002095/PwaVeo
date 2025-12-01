@@ -1,0 +1,15 @@
+.admin-content {
+  min-height: 100vh;
+  background: #f5f7fa;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Asegurar que todos los hijos directos tengan el ancho correcto */
+.admin-content > * {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  /* Ajustes para móvil si es necesario */
+}

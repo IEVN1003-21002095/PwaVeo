@@ -1,23 +1,54 @@
-<div class="order-summary-card">
-    <h4>Resumen del pedido</h4>
-    
-    <div class="order-item">
-        <div class="item-details">
-            <span>Producto</span>
-        </div>
-        <div class="item-price">
-            <span>MXN 75</span>
-        </div>
+<div class="container py-4">
+  <h3>Paso 3: Resumen del Pedido</h3>
+
+  <div *ngIf="purchaseComplete" class="alert alert-success">
+    <h4>¡Compra Exitosa!</h4>
+    <p>Tu pedido ha sido procesado correctamente.</p>
+    <button class="btn btn-primary" routerLink="/client/catalogo">Volver al catálogo</button>
+  </div>
+
+  <div *ngIf="!purchaseComplete">
+    <div class="card mb-3">
+      <div class="card-header"><strong>Dirección de Envío</strong></div>
+      <div class="card-body" *ngIf="addressData">
+        <p class="mb-1"><strong>{{ addressData.nombre_destinatario }}</strong></p>
+        <p class="mb-1">{{ addressData.calle }} {{ addressData.numero_ext }}<span *ngIf="addressData.numero_int">, Int. {{ addressData.numero_int }}</span></p>
+        <p class="mb-1">{{ addressData.colonia }}, CP {{ addressData.codigo_postal }}</p>
+        <p class="mb-1">{{ addressData.ciudad }}, {{ addressData.estado }}</p>
+        <p class="mb-1" *ngIf="addressData.telefono"><strong>Tel:</strong> {{ addressData.telefono }}</p>
+        <p class="mb-0" *ngIf="addressData.referencia"><strong>Ref:</strong> {{ addressData.referencia }}</p>
+      </div>
     </div>
-    
-    <div class="order-totals mt-3">
-        <div class="total-row"><span>Subtotal</span><span>MXN 122.00</span></div>
-        <div class="total-row"><span>Envío</span><span>MXN 20.30</span></div>
-        <div class="total-row"><span>Impuesto estimado</span><span>MXN 0.40</span></div>
+
+    <div class="card mb-3">
+      <div class="card-header"><strong>Método de Pago</strong></div>
+      <div class="card-body">
+        <p class="mb-0">{{ metodoNombre }}</p>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header"><strong>Productos</strong></div>
+      <div class="card-body">
+        <div *ngFor="let item of cartItems" class="d-flex justify-content-between mb-2">
+          <span>{{ item.nombre }} (x{{ item.cantidad }})</span>
+          <span>MXN {{ (item.precio * item.cantidad) | number:'1.2-2' }}</span>
+        </div>
         <hr>
-        <div class="total-row **font-weight-bold**">
-            <span>Total</span>
-            <span>**MXN 142.70**</span>
+        <div class="d-flex justify-content-between fw-bold">
+          <span>Subtotal</span>
+          <span>MXN {{ subtotal | number:'1.2-2' }}</span>
         </div>
+      </div>
     </div>
+
+    <div *ngIf="errorMsg" class="alert alert-danger">{{ errorMsg }}</div>
+
+    <div class="d-flex justify-content-between">
+      <button type="button" class="btn btn-secondary" (click)="goBack()">Volver</button>
+      <button type="button" class="btn btn-success" (click)="confirmPurchase()" [disabled]="loading">
+        {{ loading ? 'Procesando...' : 'Confirmar Compra' }}
+      </button>
+    </div>
+  </div>
 </div>

@@ -1,3 +1,8 @@
+<app-nav-admin *ngIf="role === 'admin'"></app-nav-admin>
+<app-nav-client *ngIf="role === 'client'"></app-nav-client>
+
+<router-outlet></router-outlet>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -216,12 +221,14 @@
 </div>
 
 <script>
-    // Configuración inicial de los datos del carrito
-    let cart = [
-        { id: 1, name: "Playera Oversize - Diseño Galaxia", price: 399.00, quantity: 2, imageUrl: "https://placehold.co/80x80/000000/ffffff?text=Oversize+G" },
-        { id: 2, name: "Playera Oversize - Estilo Urbano", price: 399.00, quantity: 1, imageUrl: "https://placehold.co/80x80/f0f0f0/333333?text=Oversize+U" },
-        { id: 3, name: "Playera Oversize - Logotipo Clásico", price: 399.00, quantity: 3, imageUrl: "https://placehold.co/80x80/cc5500/ffffff?text=Oversize+C" }
-    ];
+    // Configuración inicial de los datos del carrito (se sincroniza con localStorage)
+    let cart = [];
+    try {
+        cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    } catch (e) {
+        console.error('Error parseando carrito desde localStorage', e);
+        cart = [];
+    }
 
     // Constantes de costos (fijos por simplicidad)
     const SHIPPING_COST = 20.30; // Costo de envío fijo
@@ -325,6 +332,7 @@
             // La cantidad NUNCA puede ser 0 o menos.
             if (newQuantity >= 1) {
                 cart[itemIndex].quantity = newQuantity;
+                persistCart();
                 renderCart(); // Vuelve a renderizar para actualizar el DOM y los totales
             }
         }
@@ -339,6 +347,7 @@
         cart = cart.filter(item => item.id !== id);
         
         if (cart.length < initialLength) {
+            persistCart();
             renderCart(); // Vuelve a renderizar si se eliminó un elemento
             // Opcional: mostrar un mensaje de éxito
         }
@@ -351,8 +360,16 @@
         }
     }
 
+    function persistCart() {
+        try {
+            localStorage.setItem('cart', JSON.stringify(cart));
+        } catch (e) {
+            console.error('Error guardando carrito en localStorage', e);
+        }
+    }
+
     // Inicializar el carrito al cargar la página
-    document.addEventListener('DOMContentLoaded', renderCart);
+    document.addEventListener('DOMContentLoaded', function() { renderCart(); });
 
 </script>
 

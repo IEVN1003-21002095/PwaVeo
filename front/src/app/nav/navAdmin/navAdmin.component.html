@@ -1,41 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <title>Document</title>
-</head>
-<body>
-<aside class="sidebar bg-dark text-white" style="width: 260px; min-height: 100vh; background-color: #343a40;">
-    <div class="sidebar-header" style="padding: 1.5rem 1rem; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
-        <h3 style="margin: 0; color: #ffffff;">AdminPro</h3>
-    </div>
-    <nav class="sidebar-nav" style="padding-top: 1rem;">
-        <ul style="list-style: none; padding: 0; margin: 0;">
-            <li><a href="/admin/dashboard" style="display: flex; align-items: center; padding: 0.75rem 1.5rem; color: rgba(255, 255, 255, 0.7); text-decoration: none; border-left: 4px solid transparent;">
-                <i class="fas fa-tachometer-alt" style="margin-right: 1rem; width: 20px;"></i> Dashboard
-            </a></li>
-            <li><a href="/admin/catalog" style="display: flex; align-items: center; padding: 0.75rem 1.5rem; color: rgba(255, 255, 255, 0.7); text-decoration: none; border-left: 4px solid transparent;">
-                <i class="fas fa-box-open" style="margin-right: 1rem; width: 20px;"></i> Gestión de Catálogo
-            </a></li>
-            <li><a href="/admin/stock" style="display: flex; align-items: center; padding: 0.75rem 1.5rem; color: rgba(255, 255, 255, 0.7); text-decoration: none; border-left: 4px solid transparent;">
-                <i class="fas fa-warehouse" style="margin-right: 1rem; width: 20px;"></i> Gestión de Stock
-            </a></li>
-            <li class="active" style="border-left: 4px solid #0d2a58;">
-                <a href="/admin/sales" style="display: flex; align-items: center; padding: 0.75rem 1.5rem; color: #ffffff; text-decoration: none; background-color: rgba(255, 255, 255, 0.15);">
-                    <i class="fas fa-shopping-cart" style="margin-right: 1rem; width: 20px;"></i> Gestión de Ventas
-                </a>
-            </li>
-            <li><a href="/admin/clients" style="display: flex; align-items: center; padding: 0.75rem 1.5rem; color: rgba(255, 255, 255, 0.7); text-decoration: none; border-left: 4px solid transparent;">
-                <i class="fas fa-users" style="margin-right: 1rem; width: 20px;"></i> Gestión de Clientes
-            </a></li>
-            <li><a href="/admin/settings" style="display: flex; align-items: center; padding: 0.75rem 1.5rem; color: rgba(255, 255, 255, 0.7); text-decoration: none; border-left: 4px solid transparent;">
-                <i class="fas fa-cog" style="margin-right: 1rem; width: 20px;"></i> Configuración
-            </a></li>
-        </ul>
-    </nav>
-</aside>
+<nav class="navbar">
+  <div class="navbar-container">
+    <div class="navbar-brand">AdminPro</div>
     
-</body>
-</html>
+    <ul class="navbar-menu">
+      <li class="navbar-item" routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <i class="bi bi-speedometer2"></i>
+        <span>Dashboard</span>
+      </li>
+      <li class="navbar-item" routerLink="/admin/catalogo" routerLinkActive="active">
+        <i class="bi bi-grid"></i>
+        <span>Catálogo</span>
+      </li>
+      <li class="navbar-item" routerLink="/admin/inventario" routerLinkActive="active">
+        <i class="bi bi-box-seam"></i>
+        <span>Stock</span>
+      </li>
+      <li class="navbar-item" routerLink="/admin/ventas" routerLinkActive="active">
+        <i class="bi bi-cart-check"></i>
+        <span>Ventas</span>
+      </li>
+      <li class="navbar-item" routerLink="/admin/clientes" routerLinkActive="active">
+        <i class="bi bi-people"></i>
+        <span>Clientes</span>
+      </li>
+      <li class="navbar-item" routerLink="/admin/reviews" routerLinkActive="active">
+        <i class="bi bi-star"></i>
+        <span>Reseñas</span>
+      </li>
+    </ul>
+
+    <div class="navbar-user" (click)="toggleUserMenu()">
+      <i class="bi bi-person-circle"></i>
+      <span>{{ userName || 'Admin' }}</span>
+      
+      <div class="user-dropdown" [class.show]="showUserMenu">
+        <a href="javascript:void(0)" (click)="logout()" class="dropdown-item">
+          <i class="bi bi-box-arrow-right"></i>
+          Cerrar Sesión
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+

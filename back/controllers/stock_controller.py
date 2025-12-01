@@ -1,115 +1,109 @@
-from flask import jsonify, request
-from database import get_connection, leer_materia_prima_bd
+from database import get_connection
 
-def registrar_materia_prima():
-    connection = None
-    try:
-        data = request.json
-        required = ["nombre", "unidad_medida", "stock_inicial"]
+class StockController:
 
-        for r in required:
-            if r not in data:
-                return jsonify({'mensaje': f"Falta {r}", 'exito': False}), 400
+    # =========================================================
+    # LISTAR TODO
+    # =========================================================
+    def list_stock(self):
+        try:
+            conn = get_connection()
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT * FROM stock_insumos")
+                data = cursor.fetchall()
+            conn.close()
 
-        connection = get_connection()
-        with connection.cursor() as cursor:
-            sql = """
-                INSERT INTO materia_prima (nombre, unidad_medida, stock_actual)
-                VALUES (%s, %s, %s)
-            """
-            cursor.execute(sql, (
-                data["nombre"],
-                data["unidad_medida"],
-                data["stock_inicial"]
-            ))
-            connection.commit()
+            return {"success": True, "total": len(data), "data": data}
 
-        return jsonify({'mensaje': "Materia prima registrada.", 'exito': True}), 201
+        except Exception as e:
+            return {"success": False, "message": str(e)}
 
-    except Exception as ex:
-        if connection: connection.rollback()
-        return jsonify({'mensaje': f"Error: {ex}", 'exito': False}), 500
-    finally:
-        if connection: connection.close()
+    # =========================================================
+    # CREAR
+    # =========================================================
+    def create(self, data):
+        try:
+            nombre_insumo = data.get("nombre_insumo")
+            color_id = data.get("color_id")
+            talla_id = data.get("talla_id")
+            cantidad = data.get("cantidad")
+            unidad = data.get("unidad")
+            precio = data.get("precio")
+            estado = data.get("estado")
 
+            conn = get_connection()
+            with conn.cursor() as cursor:
+                sql = """
+                    INSERT INTO stock_insumos 
+                    (nombre_insumo, color_id, talla_id, cantidad, unidad, precio, estado)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """
+                cursor.execute(sql, (
+                    nombre_insumo, color_id, talla_id, cantidad, unidad, precio, estado
+                ))
+                conn.commit()
+            conn.close()
 
-def obtener_materia_prima():
-    connection = None
-    try:
-        connection = get_connection()
-        with connection.cursor() as cursor:
-            sql = "SELECT id, nombre, unidad_medida, stock_actual FROM materia_prima"
-            cursor.execute(sql)
-            materia = cursor.fetchall()
+            return {"success": True, "message": "Insumo agregado correctamente"}
 
-        return jsonify({'mensaje': "Materia consultada.", 'exito': True, 'data': materia}), 200
+        except Exception as e:
+            return {"success": False, "message": str(e)}
 
-    except Exception as ex:
-        return jsonify({'mensaje': f"Error: {ex}", 'exito': False}), 500
-    finally:
-        if connection: connection.close()
+    # =========================================================
+    # ACTUALIZAR
+    # =========================================================
+    def update(self, id, data):
+        try:
+            nombre_insumo = data.get("nombre_insumo")
+            color_id = data.get("color_id")
+            talla_id = data.get("talla_id")
+            cantidad = data.get("cantidad")
+            unidad = data.get("unidad")
+            precio = data.get("precio")
+            estado = data.get("estado")
 
+            conn = get_connection()
+            with conn.cursor() as cursor:
+                sql = """
+                    UPDATE stock_insumos SET 
+                        nombre_insumo=%s,
+                        color_id=%s,
+                        talla_id=%s,
+                        cantidad=%s,
+                        unidad=%s,
+                        precio=%s,
+                        estado=%s,
+                        fecha_registro = NOW()
+                    WHERE id=%s
+                """
 
-def actualizar_materia_prima(materia_prima_id):
-    connection = None
-    try:
-        data = request.json
-        existente = leer_materia_prima_bd(materia_prima_id)
+                cursor.execute(sql, (
+                    nombre_insumo, color_id, talla_id, cantidad,
+                    unidad, precio, estado, id
+                ))
 
-        if existente is None:
-            return jsonify({'mensaje': "No existe.", 'exito': False}), 404
+                conn.commit()
+            conn.close()
 
-        connection = get_connection()
-        fields = []
-        values = []
+            return {"success": True, "message": "Insumo actualizado correctamente"}
 
-        if "nombre" in data:
-            fields.append("nombre = %s")
-            values.append(data["nombre"])
+        except Exception as e:
+            return {"success": False, "message": str(e)}
 
-        if "unidad_medida" in data:
-            fields.append("unidad_medida = %s")
-            values.append(data["unidad_medida"])
+    # =========================================================
+    # ELIMINAR
+    # =========================================================
+    def delete(self, id):
+        try:
+            conn = get_connection()
+            with conn.cursor() as cursor:
+                sql = "DELETE FROM stock_insumos WHERE id=%s"
+                cursor.execute(sql, (id,))
+                conn.commit()
+            conn.close()
 
-        if "stock_actual" in data:
-            fields.append("stock_actual = %s")
-            values.append(data["stock_actual"])
+            return {"success": True, "message": "Insumo eliminado correctamente"}
 
-        if not fields:
-            return jsonify({'mensaje': "Nada que actualizar.", 'exito': False}), 400
-
-        sql = f"UPDATE materia_prima SET {', '.join(fields)} WHERE id = %s"
-        values.append(materia_prima_id)
-
-        with connection.cursor() as cursor:
-            cursor.execute(sql, values)
-            connection.commit()
-
-        return jsonify({'mensaje': "Materia actualizada.", 'exito': True}), 200
-
-    except Exception as ex:
-        if connection: connection.rollback()
-        return jsonify({'mensaje': f"Error: {ex}", 'exito': False}), 500
-    finally:
-        if connection: connection.close()
-
-
-def eliminar_materia_prima(materia_prima_id):
-    connection = None
-    try:
-        existente = leer_materia_prima_bd(materia_prima_id)
-        if existente is None:
-            return jsonify({'mensaje': "No existe.", 'exito': False}), 404
-
-        connection = get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute("DELETE FROM materia_prima WHERE id = %s", (materia_prima_id,))
-            connection.commit()
-
-        return jsonify({'mensaje': "Materia eliminada.", 'exito': True}), 200
-
-    except Exception as ex:
-        if connection: connection.rollback()
-        return jsonify({'mensaje': f"Error: {ex}", 'exito': False}), 500
-    finally:
-        if connection: connection.close()
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+            return {"success": False, "message": str(e)}

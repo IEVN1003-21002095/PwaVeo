@@ -1,230 +1,200 @@
-<div *ngIf="producto" class="py-5">
+<div *ngIf="producto(); else noEncontrado" class="min-vh-100 bg-white font-sans pt-5">
 
   <style>
-    /* Contenedor central */
-    .container-central {
-      max-width: 95%;
-      margin: 0 auto;
-      padding: 0 2rem;
+    :host { --veo-navy: #00325E; --veo-border: #e5e5e5; }
+
+    .font-sans { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    .btn-back { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: #666; background: transparent; border: none; padding: 0; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.3s; }
+    .btn-back:hover { color: #000; padding-left: 5px; }
+    .product-image-container { width: 100%; background-color: #f4f4f4; overflow: hidden; border-radius: 10px; }
+    .product-detail-img { width: 100%; height: auto; object-fit: cover; display: block; border-radius: 10%; }
+    .section-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem; font-weight: 700; color: #000; }
+
+    .color-option-wrapper { position: relative; display: inline-block; }
+    .color-radio { display: none; }
+    .color-option { 
+        width: 30px; 
+        height: 30px; 
+        border: 2px solid var(--veo-border); 
+        border-radius: 50%; 
+        cursor: pointer; 
+        display: inline-block; 
+        transition: transform 0.2s, border-color 0.2s; 
+        margin-right: 5px; 
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1) inset; 
+    }
+    .color-radio:checked + .color-option { border-color: currentColor; transform: scale(1.2); }
+    .color-option.white { background-color: #fff !important; border-color: var(--veo-border); }
+    .color-option.black { background-color: #000 !important; }
+    .color-radio:checked + .color-option.white { border-color: #000; }
+
+    .size-option { min-width: 45px; height: 45px; border: 1px solid var(--veo-border); background: #fff; color: #000; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 500; border-radius: 10%; margin-right: 5px; margin-bottom: 5px; transition: all 0.2s; }
+    .size-option.active { border-color: var(--veo-navy); background: var(--veo-navy); color: #fff; transform: scale(1.1); }
+
+    .qty-container { display: inline-flex; border: 1px solid var(--veo-border); border-radius: 10%; overflow: hidden; }
+    .qty-btn { width: 45px; height: 45px; border: none; background: #fff; color: #000; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; font-weight: 300; transition: background 0.2s; border-radius: 10%; }
+    .qty-btn:hover:not(:disabled) { background: #f9f9f9; }
+    .qty-btn:disabled { color: #ccc; cursor: default; }
+    .qty-display { width: 45px; height: 45px; border-left: 1px solid var(--veo-border); border-right: 1px solid var(--veo-border); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 600; }
+
+    .btn-add-cart { 
+        background-color: var(--veo-navy); 
+        color: #fff; 
+        border: 1px solid var(--veo-navy); 
+        width: 100%; 
+        padding: 1.1rem; 
+        font-size: 0.8rem; 
+        text-transform: uppercase; 
+        letter-spacing: 3px; 
+        font-weight: 600; 
+        cursor: pointer; 
+        transition: all 0.3s; 
+        border-radius: 10px; 
+    }
+    .btn-add-cart:hover:not(:disabled) { background-color: #002244; border-color: #002244; } 
+    .btn-add-cart:disabled { background-color: #ccc; border-color: #aaa; color: #666; cursor: not-allowed; }
+
+    .alerta-carrito { position: fixed; bottom: 2rem; right: 2rem; background-color: #00325E; color: #fff; padding: 1rem 1.5rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.9rem; z-index: 9999; animation: slideIn 0.5s ease, fadeOut 0.5s 2.5s forwards; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes fadeOut { to { opacity: 0; transform: translateX(100%); } }
+
+    .review-card { 
+      background-color: #f9f9f9 !important; 
+      border: 1px solid #e0e0e0 !important; 
+      transition: all 0.3s ease; 
+    }
+    .review-card:hover { 
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+      transform: translateY(-2px); 
     }
 
-    /* Botón volver al catálogo estilo "VER MÁS" */
-    .btn-volver-catalogo {
-      color: #343a40;
-      display: inline-flex;
-      align-items: center;
-      font-size: 1.1rem;
-      letter-spacing: 0.1em;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0;
-      margin-bottom: 2rem;
-    }
-    .btn-volver-catalogo svg { margin-right: 0.5rem; }
-
-    /* Contenedor principal hero */
-    .row-full {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: flex-start;
-      align-items: center;
-      gap: 5rem;
-    }
-
-    /* Imagen hero */
-    .producto-imagen {
-      width: 50vh;
-      height: 50vh;
-      object-fit: cover;
-      border-radius: 10px;
-      flex-shrink: 0;
-    }
-
-    /* Info del producto centrada verticalmente */
-    .info-producto {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      max-width: 500px;
-    }
-
-    /* Stock */
-    .badge-stock {
-      padding: 0.3rem 0.7rem;
-      border-radius: 100px;
-      font-weight: bold;
-      font-size: 0.70rem;
-      display: inline-block;
-      margin-bottom: 0.2rem;
-      opacity: 0.6;
-      border: 1px solid currentColor;
-    }
-    .stock-in { background-color: rgba(0,50,94,0.1); color: #00325E; }
-    .stock-out { background-color: rgba(220,53,69,0.1); color: #dc3545; }
-
-    /* Colores */
-    .color-circle { width: 20px; height: 20px; border-radius: 50%; border: 1px solid #6c757d; cursor: pointer; }
-    .color-circle.selected { border: 2px solid #00325E; }
-
-    /* Tallas */
-    .talla-btn { width: 35px; height: 35px; border-radius: 50%; border: 1px solid #CAD8E5; background-color: transparent; color: #00325E; font-weight: 400; font-size: 0.70rem; cursor: pointer; }
-    .talla-btn.active { background-color: #00325E; color: white; }
-
-    /* Secciones */
-    .seccion { margin-bottom: 2rem; }
-    .seccion-label { text-transform: uppercase; font-size: 0.75rem; margin-bottom: 0.5rem; font-weight: normal; }
-
-    /* Botón carrito grande */
-    .btn-carrito {
-      background-color: #00325E;
-      color: white;
-      border-radius: 10px;
-      border: none;
-      width: 100%;
-      min-width: 300px;
-      padding: 0.75rem 2rem;
-      font-weight: 600;
-      font-size: 1rem;
-    }
-    .btn-carrito:hover { background-color: #002343; }
-
-    /* Botón favorito */
-    .btn-favorito {
-      background: none;
-      border: none;
-      color: #00325E;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 50px;
-      height: 50px;
-      cursor: pointer;
-    }
-    .btn-favorito i.favorito-lleno { color: #002343; }
-
-    /* Cantidad */
-    .cantidad-container { border-radius: 10px; border: 1px solid #6c757d; overflow: hidden; }
-    .cantidad-container button { border: none; }
-
-    /* Productos similares */
-    .producto-similar { height: 320px; border-radius: 10px; }
-
-    /* Precio */
-    .precio-producto { margin-top: 0.2rem; margin-bottom: 1.5rem; }
-
-    /* Responsive */
-    @media (max-width: 1200px) {
-      .row-full { flex-direction: column; gap: 3rem; }
-      .info-producto { max-width: 100%; margin-top: 2rem; justify-content: flex-start; }
-      .producto-imagen { height: 60vh; }
-    }
-    @media (max-width: 768px) {
-      .container-central { padding: 0 1rem; }
-      .row-full { gap: 2rem; }
-      .producto-imagen { height: 50vh; }
+    @media (min-width: 992px) { 
+      .sticky-details { display: flex; flex-direction: column; justify-content: center; height: 100%; }
     }
   </style>
 
-  <div class="container-central">
-    <button class="btn-volver-catalogo" (click)="goBack.emit()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-left-short" viewBox="0 0 16 16">
-        <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5A.5.5 0 0 1 12 8z"/>
-      </svg>
-      Volver al catálogo
-    </button>
+  <div class="container px-4 px-md-5 mb-5">
+    <div class="mb-5 border-bottom pb-3">
+      <button class="btn-back" (click)="volverAlCatalogo()">
+        <i class="bi bi-arrow-left"></i> VOLVER AL CATÁLOGO
+      </button>
+    </div>
 
-    <div class="row-full">
-      <div class="d-flex justify-content-start align-items-center">
-        <img [src]="producto.imagen || 'https://placehold.co/400x700/6c757d/ffffff?text=Producto'" 
-             [alt]="producto.nombre" 
-             class="producto-imagen">
-      </div>
-
-      <div class="info-producto">
-        <h1 class="fw-bold mb-1 fs-3">{{ producto.nombre }}</h1>
-        <div class="mb-1">
-          <span [ngClass]="{'stock-in': stockTotal > 0, 'stock-out': stockTotal === 0}" class="badge-stock">
-            {{ stockTotal > 0 ? 'IN STOCK' : 'OUT OF STOCK' }}
-          </span>
+    <div class="row g-5 align-items-center" style="min-height: 70vh;">
+      <div class="col-lg-7 d-flex flex-column justify-content-center">
+        <div class="product-image-container mb-4">
+          <img [src]="producto()?.imagen || 'https://placehold.co/800x1000/f4f4f4/cccccc?text=VEO'" 
+               [alt]="producto()?.nombre" class="product-detail-img">
         </div>
-        <p class="fs-4 fw-normal precio-producto">{{ producto.precio | currency:'USD':'symbol':'1.2-2' }}</p>
 
-        <div class="seccion">
-          <p class="seccion-label">Available Colors</p>
-          <div class="d-flex gap-2">
-            <div *ngFor="let color of colores" 
-                 (click)="seleccionarColor(color.name)"
-                 class="color-circle"
-                 [class.selected]="colorSeleccionado() === color.name"
-                 [style.background-color]="color.hex">
+        <div class="pe-3 mt-3">
+          <h4 class="section-title border-bottom pb-2 mb-3">DESCRIPCIÓN</h4>
+          <p class="text-muted" style="line-height: 1.8; font-size: 0.95rem;">{{ producto()?.descripcion }}</p>
+        </div>
+
+        <div class="pe-3 mt-4">
+          <h4 class="section-title border-bottom pb-2 mb-4">RESEÑAS DEL PRODUCTO</h4>
+          
+          <!-- Loading -->
+          <div *ngIf="loadingReviews" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Cargando reseñas...</span>
             </div>
           </div>
-        </div>
 
-        <div class="seccion">
-          <p class="seccion-label">Elige una talla</p>
-          <div class="d-flex gap-2">
-            <button *ngFor="let talla of tallas"
-                    (click)="seleccionarTalla(talla)"
-                    class="talla-btn"
-                    [class.active]="tallaSeleccionada() === talla">
-              {{ talla }}
-            </button>
+          <!-- Sin reseñas -->
+          <div *ngIf="!loadingReviews && reviews.length === 0" class="text-center py-5 text-muted">
+            <p style="font-size: 0.9rem;">Este producto aún no tiene reseñas aprobadas.</p>
           </div>
-        </div>
 
-        <div class="seccion">
-          <p class="seccion-label">Cantidad</p>
-          <div class="d-inline-flex align-items-stretch cantidad-container">
-            <button class="btn btn-light px-3" (click)="ajustarCantidad(-1)" [disabled]="cantidad() <= 1">&minus;</button>
-            <span class="px-4 d-flex align-items-center justify-content-center">{{ cantidad() }}</span>
-            <button class="btn btn-light px-3" (click)="ajustarCantidad(1)">&plus;</button>
-          </div>
-        </div>
-
-        <div class="d-flex align-items-center gap-2 mt-3">
-          <button (click)="agregarAlCarrito()" class="btn btn-carrito">Añadir al carrito</button>
-          <button class="btn-favorito" (click)="favorito = !favorito">
-            <i class="bi" [ngClass]="favorito ? 'bi-heart-fill favorito-lleno' : 'bi-heart'" style="font-size: 1.2rem;"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="mt-5 pt-5 px-2">
-      <p class="text-muted">{{ producto.descripcion }}</p>
-      <ul class="list-unstyled small mt-4">
-        <li><span class="me-2 text-dark fw-bold">&bullet;</span> Premium Quality</li>
-        <li><span class="me-2 text-dark fw-bold">&bullet;</span> Versatile Wardrobe Staple</li>
-        <li><span class="me-2 text-dark fw-bold">&bullet;</span> Available in Various Sizes</li>
-        <li><span class="me-2 text-dark fw-bold">&bullet;</span> Tailored Fit</li>
-      </ul>
-    </div>
-
-    <div class="mt-5 pt-5 px-2">
-      <h3 class="fw-bold mb-1">También te podría gustar.</h3>
-      <p class="text-muted small mb-4 text-uppercase" style="font-size: 0.7rem;">PRODUCTOS SIMILARES</p>
-      <div class="row flex-nowrap overflow-x-auto g-4 pb-3">
-        <div *ngFor="let rel of [1,2,3,4]" class="col-12 col-sm-6 col-md-4 col-lg-3 flex-shrink-0">
-          <div class="text-center cursor-pointer">
-            <div class="bg-secondary bg-opacity-50 rounded producto-similar">
-              <div class="d-flex align-items-center justify-content-center h-100">
-                <i class="bi bi-image text-white fs-2"></i>
+          <!-- Lista de reseñas -->
+          <div *ngIf="!loadingReviews && reviews.length > 0" class="reviews-container">
+            <div *ngFor="let review of reviews" class="review-card mb-4 p-4 border rounded bg-light">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                  <h6 class="mb-1 fw-bold text-dark">{{ review.nombre_completo }}</h6>
+                  <small class="text-muted">{{ review.fecha | date:'dd/MM/yyyy' }}</small>
+                </div>
+                <div class="text-warning fs-5">
+                  {{ review.calificacion | stars }}
+                </div>
               </div>
+              <p class="mb-0 text-secondary fst-italic" style="line-height: 1.6; font-size: 0.95rem;">
+                "{{ review.comentario }}"
+              </p>
             </div>
-            <p class="small fw-normal mt-2 mb-0">Eve Punching Floral {{ rel }}</p>
-            <p class="small text-muted">$22.90</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5 d-flex align-items-center">
+        <div class="sticky-details ps-lg-4 w-100">
+          <div class="mb-5 text-center text-lg-start">
+            <h1 class="display-5 fw-bold text-uppercase m-0">{{ producto()?.nombre }}</h1>
+            <div class="d-flex align-items-center gap-3 mt-3 justify-content-center justify-content-lg-start">
+              <span class="fs-4 fw-normal font-monospace">$ {{ producto()?.precio }}</span>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <p class="section-title">SELECCIONAR COLOR</p>
+            <div class="d-flex gap-3">
+              <label class="color-option-wrapper" *ngFor="let color of colores">
+                <input type="radio" name="color" class="color-radio"
+                       [value]="color"
+                       [checked]="colorSeleccionadoSignal() === color"
+                       (change)="seleccionarColor(color)" />
+                <span class="color-option" 
+                      [ngClass]="{ 'white': color.toLowerCase() === 'blanco', 'black': color.toLowerCase() === 'negro' }"
+                      [style.backgroundColor]="color.toLowerCase()">
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <p class="section-title mb-2">SELECCIONAR TALLA</p>
+            <div class="d-flex flex-wrap gap-2">
+              <button *ngFor="let talla of tallas" 
+                      class="size-option" 
+                      [class.active]="tallaSeleccionadaSignal() === talla"
+                      (click)="seleccionarTalla(talla)">
+                {{ talla }}
+              </button>
+            </div>
+          </div>
+
+          <div class="mb-5">
+            <p class="section-title">CANTIDAD</p>
+            <div class="qty-container justify-content-center">
+              <button class="qty-btn" (click)="ajustarCantidad(-1)" [disabled]="cantidadSignal() <= 1">&minus;</button>
+              <div class="qty-display">{{ cantidadSignal() }}</div>
+              <button class="qty-btn" (click)="ajustarCantidad(1)">&plus;</button>
+            </div>
+          </div>
+
+          <div class="d-flex gap-3 mb-2 align-items-stretch justify-content-center justify-content-lg-start">
+            <button class="btn-add-cart flex-grow-1" 
+                    [disabled]="!varianteDisponible"
+                    (click)="agregarAlCarrito()">AÑADIR AL CARRITO</button>
+          </div>
+
+          <div *ngIf="!varianteDisponible" class="text-danger mt-2" style="font-size: 0.85rem;">
+            Lo sentimos, este producto no esta disponible en esa ta.
           </div>
         </div>
       </div>
     </div>
-
   </div>
 
+  <div *ngIf="alertaCarrito()" class="alerta-carrito">
+    <i class="bi bi-check-circle-fill"></i> {{ alertaMensaje() }}
+  </div>
 </div>
 
-<div *ngIf="!producto" class="py-5 text-center">
-  <p class="lead text-danger">Producto no encontrado o ID inválido.</p>
-  <button (click)="goBack.emit()" class="btn btn-primary">Volver al Catálogo</button>
-</div>
+<ng-template #noEncontrado>
+  <div class="min-vh-100 d-flex flex-column align-items-center justify-content-center bg-white">
+    <p class="text-uppercase fw-bold mb-4" style="letter-spacing: 2px;">PRODUCTO NO ENCONTRADO</p>
+    <button (click)="volverAlCatalogo()" class="btn-back fs-6">VOLVER</button>
+  </div>
+</ng-template>

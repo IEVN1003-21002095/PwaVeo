@@ -1,0 +1,65 @@
+/* Estilos responsivos globales para admin */
+
+/* MÓVIL - hasta 768px */
+@media (max-width: 768px) {
+  .container-fluid {
+    margin-left: 70px !important;
+    margin-right: 1rem !important;
+    padding: 1rem !important;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem;
+  }
+
+  .page-title {
+    font-size: 1.25rem !important;
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .table-responsive {
+    font-size: 0.85rem;
+  }
+
+  .btn {
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+  }
+
+  /* Ocultar columnas menos importantes en móvil */
+  .table th:nth-child(n+4),
+  .table td:nth-child(n+4) {
+    display: none;
+  }
+}
+
+/* TABLETA - 769px a 1024px */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container-fluid {
+    margin-left: 200px !important;
+    margin-right: 1.5rem !important;
+    padding: 1.5rem !important;
+  }
+
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .page-title {
+    font-size: 1.5rem !important;
+  }
+}
+
+/* DESKTOP - 1025px en adelante */
+@media (min-width: 1025px) {
+  .container-fluid {
+    margin-left: 260px !important;
+    margin-right: 2rem !important;
+    padding: 2rem !important;
+  }
+}

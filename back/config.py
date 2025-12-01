@@ -5,6 +5,7 @@ load_dotenv()
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "clave_dev_segura")
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "jwt_clave_super_secreta_2024")
 
     # Base de datos MySQL / TiDB
     DB_HOST = os.environ.get("DB_HOST")

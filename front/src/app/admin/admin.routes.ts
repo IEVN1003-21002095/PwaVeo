@@ -3,29 +3,33 @@ import { Routes } from '@angular/router';
 export const ADMIN_ROUTES: Routes = [
   {
     path: '',
-
-    loadChildren: () =>
-      import('./dashboard/dashboard-home/dashboard-home.routes').then(m => m.DASHBOARD_ROUTES)
+    loadComponent: () =>
+      import('./dashboard/dashboard-home.component')
+        .then(m => m.DashboardHomeComponent)
   },
   {
     path: 'clientes',
     loadChildren: () =>
-      import('./clientes/customers.routes').then(m => m.CUSTOMERS_ROUTES)
+      import('./gestionClientes/gestionClientes.routes').then(m => m.CLIENTES_ROUTES)
   },
   {
     path: 'catalogo',
     loadChildren: () =>
-      import('./gestion-catalogo/gestionCatalogo.routes')
+      import('./gestionCatalogo/gestionCatalogo.routes').then(m => m.GESTION_CATALOGO_ROUTES)
   },
   {
-    path: 'inventario', 
+    path: 'inventario',
     loadChildren: () =>
-      import('./gestion-stock/inventario.routes').then(m => m.INVENTARIO_ROUTES) 
+      import('./gestionStock/inventario.routes').then(m => m.GESTION_INVENTARIO_ROUTES)
   },
-  // Módulo de Ventas
   {
-    path: 'sales',
+    path: 'ventas',
     loadChildren: () =>
       import('./ventas/sales.routes').then(m => m.SALES_ROUTES)
+  },
+  {
+    path: 'reviews',
+    loadChildren: () =>
+      import('./reviewAdmin/reviewAdmin.routes').then(m => m.REVIEW_ADMIN_ROUTES)
   }
 ];

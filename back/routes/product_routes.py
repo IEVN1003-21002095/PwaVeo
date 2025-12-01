@@ -1,35 +1,89 @@
-from flask import Blueprint
-from controllers.product_controller import (
-    obtener_productos,
-    obtener_producto_por_id,
-    registrar_producto,
-    actualizar_producto,
-    eliminar_producto,
-    actualizar_stock_variante
-)
+from flask import Blueprint, request, jsonify
+from controllers.product_controller import ProductController
 
-product_bp = Blueprint("product_bp", __name__)
+product_bp = Blueprint("product", __name__, url_prefix="/api/product")
+controller = ProductController()
 
-@product_bp.route("/", methods=["GET"])
-def get_all_products():
-    return obtener_productos()
+# =========================================================
+# PRODUCTOS
+# =========================================================
+@product_bp.route('/list', methods=['GET'])
+def list_products():
+    try:
+        return jsonify(controller.list_products()), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
-@product_bp.route("/", methods=["POST"])
+
+@product_bp.route('/create', methods=['POST'])
 def create_product():
-    return registrar_producto()
+    data = request.get_json(silent=True) or {}
+    try:
+        return jsonify(controller.create(data)), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
-@product_bp.route("/<int:id>", methods=["GET"])
-def get_product(id):
-    return obtener_producto_por_id(id)
 
-@product_bp.route("/<int:id>", methods=["PUT"])
-def update_product(id):
-    return actualizar_producto(id)
+@product_bp.route('/<int:product_id>/update', methods=['PUT'])
+def update_product(product_id):
+    data = request.get_json(silent=True) or {}
+    try:
+        return jsonify(controller.update(product_id, data)), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
-@product_bp.route("/<int:id>", methods=["DELETE"])
-def delete_product(id):
-    return eliminar_producto(id)
 
-@product_bp.route("/stock/<int:inventario_id>", methods=["PUT"])
-def update_stock(inventario_id):
-    return actualizar_stock_variante(inventario_id)
+@product_bp.route('/<int:product_id>/delete', methods=['DELETE'])
+def delete_product(product_id):
+    try:
+        return jsonify(controller.delete(product_id)), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+# =========================================================
+# INVENTARIO
+# =========================================================
+@product_bp.route('/<int:product_id>/inventory', methods=['GET'])
+def get_inventory(product_id):
+    try:
+        return jsonify(controller.get_inventory(product_id)), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@product_bp.route('/inventory/<int:inventory_id>', methods=['GET'])
+def get_variant_route(inventory_id):
+    try:
+        result = controller.get_variant(inventory_id)
+        if isinstance(result, tuple):
+            data, status = result
+            return jsonify(data), status
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@product_bp.route('/inventory/add', methods=['POST'])
+def add_variant():
+    data = request.get_json(silent=True) or {}
+    try:
+        return jsonify(controller.add_variant(data)), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@product_bp.route('/inventory/<int:inventory_id>/update', methods=['PUT'])
+def update_variant(inventory_id):
+    data = request.get_json(silent=True) or {}
+    try:
+        return jsonify(controller.update_variant(inventory_id, data)), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@product_bp.route('/inventory/<int:inventory_id>/delete', methods=['DELETE'])
+def delete_variant(inventory_id):
+    try:
+        return jsonify(controller.delete_variant(inventory_id)), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500

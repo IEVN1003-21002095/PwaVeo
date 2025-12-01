@@ -1,69 +1,99 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { WelcomeDialogComponent } from '../welcome-dialog/welcome-dialog.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, WelcomeDialogComponent],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrl: './login.component.scss'
 })
 export class LoginComponent implements OnInit {
-
-  form!: FormGroup;
-  loading = false;
+  loginForm!: FormGroup;
   errorMsg = '';
+  loading = false;
+  showWelcomeDialog = false;
+  userName = '';
 
   constructor(
     private fb: FormBuilder,
-    private auth: AuthService,
+    private authService: AuthService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-
-    this.form = this.fb.group({
+    this.loginForm = this.fb.group({
       correo: ['', [Validators.required, Validators.email]],
-      contrasena: ['', Validators.required]
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
-  // ========= LOGIN =========
-  onSubmit() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+  onSubmit(): void {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      this.errorMsg = 'Por favor completa todos los campos correctamente.';
       return;
     }
 
     this.loading = true;
+    this.errorMsg = '';
 
-    const payload = {
-      correo: this.form.value.correo,
-      contrasena: this.form.value.contrasena
+    const credentials = {
+      email: this.loginForm.value.correo,
+      password: this.loginForm.value.password
     };
 
-    this.auth.login(payload).subscribe({
-      next: (resp) => {
+    this.authService.login(credentials).subscribe({
+      next: (response) => {
+        console.log('Login exitoso:', response);
         this.loading = false;
+        
+        if (response && response.success) {
+          // Guardar datos de sesión
+          localStorage.setItem('token', response.token || '');
+          localStorage.setItem('userId', response.usuario_id || '');
+          localStorage.setItem('role', response.rol || 'client');
+          localStorage.setItem('userName', response.nombre || '');
 
-        if (!resp.exito) {
-          this.errorMsg = resp.mensaje;
-          return;
+          // Mostrar diálogo de bienvenida
+          this.userName = response.nombre || 'Usuario';
+          this.showWelcomeDialog = true;
+
+          // Redirigir después de cerrar el diálogo
+          setTimeout(() => {
+            if (response.rol === 'admin') {
+              this.router.navigate(['/admin']);
+            } else {
+              this.router.navigate(['/client/catalogo']);
+            }
+          }, 2000);
+        } else {
+          this.errorMsg = response.mensaje || 'Credenciales incorrectas';
         }
-
-        // Guardar token
-        localStorage.setItem('token', resp.token);
-
-        // Redirigir
-        this.router.navigate(['/catalogo']);
       },
       error: (err) => {
+        console.error('Error en login:', err);
         this.loading = false;
-        this.errorMsg = 'Error de conexión con el servidor.';
+        this.errorMsg = err?.error?.mensaje || 'Error de conexión con el servidor';
       }
     });
+  }
+
+  irARegistro(): void {
+    this.router.navigate(['/auth/sign-in']);
+  }
+
+  onDialogClosed(): void {
+    this.showWelcomeDialog = false;
+    const role = localStorage.getItem('role');
+    if (role === 'admin') {
+      this.router.navigate(['/admin']);
+    } else {
+      this.router.navigate(['/client/catalogo']);
+    }
   }
 }

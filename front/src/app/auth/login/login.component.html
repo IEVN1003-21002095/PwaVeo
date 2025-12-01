@@ -1,46 +1,65 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
+<app-welcome-dialog 
+  [isOpen]="showWelcomeDialog" 
+  [userName]="userName"
+  (closed)="onDialogClosed()">
+</app-welcome-dialog>
 
-    <div class="mb-3">
-        <label class="form-label fw-semibold">Email</label>
-        <input type="email" class="form-control" placeholder="nombre@correo.com"
-               formControlName="correo">
-        <small class="text-danger" *ngIf="form.get('correo')?.touched && form.get('correo')?.invalid">
-            Ingresa un correo válido
-        </small>
-    </div>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-5">
+      <div class="card shadow">
+        <div class="card-body p-4">
+          <h3 class="text-center mb-4">Iniciar Sesión</h3>
+          
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label for="correo" class="form-label">Correo Electrónico</label>
+              <input 
+                type="email" 
+                class="form-control" 
+                id="correo" 
+                formControlName="correo"
+                [class.is-invalid]="loginForm.get('correo')?.invalid && loginForm.get('correo')?.touched"
+              >
+              <div class="invalid-feedback" *ngIf="loginForm.get('correo')?.errors?.['required']">
+                El correo es obligatorio
+              </div>
+              <div class="invalid-feedback" *ngIf="loginForm.get('correo')?.errors?.['email']">
+                Ingresa un correo válido
+              </div>
+            </div>
 
-    <div class="mb-3">
-        <div class="d-flex justify-content-between">
-            <label class="form-label fw-semibold">Contraseña</label>
-            <a href="#" class="small text-primary text-decoration-none">¿Olvidaste tu contraseña?</a>
+            <div class="mb-3">
+              <label for="password" class="form-label">Contraseña</label>
+              <input 
+                type="password" 
+                class="form-control" 
+                id="password" 
+                formControlName="password"
+                [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+              >
+              <div class="invalid-feedback" *ngIf="loginForm.get('password')?.errors?.['required']">
+                La contraseña es obligatoria
+              </div>
+              <div class="invalid-feedback" *ngIf="loginForm.get('password')?.errors?.['minlength']">
+                La contraseña debe tener al menos 6 caracteres
+              </div>
+            </div>
+
+            <div *ngIf="errorMsg" class="alert alert-danger">{{ errorMsg }}</div>
+
+            <div class="d-grid mb-3">
+              <button type="submit" class="btn btn-primary" [disabled]="loading || loginForm.invalid">
+                {{ loading ? 'Iniciando...' : 'Iniciar Sesión' }}
+              </button>
+            </div>
+
+            <div class="text-center">
+              <p class="mb-0">¿No tienes cuenta? <a href="javascript:void(0)" (click)="irARegistro()" class="text-primary">Regístrate aquí</a></p>
+            </div>
+          </form>
         </div>
-        <input type="password" class="form-control" placeholder="••••••••"
-               formControlName="contrasena">
-        <small class="text-danger" *ngIf="form.get('contrasena')?.touched && form.get('contrasena')?.invalid">
-            La contraseña es obligatoria
-        </small>
+      </div>
     </div>
-
-    <div class="form-check mb-3">
-        <input type="checkbox" class="form-check-input" id="remember">
-        <label for="remember" class="form-check-label">Recordarme</label>
-    </div>
-
-    <!-- MENSAJE DE ERROR BACKEND -->
-    <div *ngIf="errorMsg" class="alert alert-danger py-2">
-        {{ errorMsg }}
-    </div>
-
-    <!-- BOTÓN LOGIN -->
-    <button class="btn btn-primary w-100" type="submit" [disabled]="loading">
-        <span *ngIf="!loading">Iniciar sesión</span>
-        <span *ngIf="loading">Validando...</span>
-    </button>
-
-    <div class="text-center mt-4">
-        <p>¿No tienes cuenta? 
-            <a routerLink="/auth/register" class="text-primary fw-bold text-decoration-none">Regístrate aquí</a>
-        </p>
-    </div>
-
-</form>
+  </div>
+</div>

@@ -1,0 +1,260 @@
+.admin-container-responsive {
+  background-color: #ffffff;
+  min-height: calc(100vh - 64px);
+  font-family: 'Inter', sans-serif;
+  margin: 0 auto;
+  max-width: 100%;
+  padding: 2rem;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.admin-page {
+  margin: 0 auto;
+  max-width: 100%;
+  min-height: calc(100vh - 64px);
+  background: #f5f7fa;
+  padding: 2rem;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #00325E;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.page-subtitle {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin: 0.25rem 0 0 0;
+}
+
+.content-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  max-width: 100%;
+}
+
+.card-header-custom {
+  background: linear-gradient(135deg, #00325E 0%, #0055a0 100%);
+  color: white;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: none;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.card-header-custom h5 {
+  font-weight: 600;
+  margin: 0;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+
+table {
+  max-width: 100%;
+  width: 100%;
+}
+
+.table-header {
+  background: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.table-header th {
+  font-weight: 600;
+  color: #495057;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  padding: 1rem;
+  border: none;
+}
+
+.table-hover tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.table tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.status-badge {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border-radius: 6px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+}
+
+.info-row:not(:last-child) {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.info-label {
+  color: #6c757d;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.info-value {
+  color: #212529;
+  font-weight: 600;
+}
+
+/* Alerts */
+.alert {
+  border-radius: 8px;
+  border: none;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.alert i {
+  margin-right: 0.5rem;
+}
+
+/* Buttons */
+.btn {
+  border-radius: 6px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: #00325E;
+  border-color: #00325E;
+}
+
+.btn-primary:hover {
+  background: #002347;
+  border-color: #002347;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 50, 94, 0.2);
+}
+
+.btn-outline-secondary:hover {
+  background: #6c757d;
+  border-color: #6c757d;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .admin-container-responsive {
+    padding: 1rem;
+    margin: 0 auto;
+  }
+
+  .admin-page {
+    padding: 1rem;
+    margin: 0 auto;
+  }
+
+  .page-container {
+    padding: 0;
+  }
+
+  .page-title {
+    font-size: 1.25rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .card-header-custom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+
+  .table-header th {
+    font-size: 0.7rem;
+    padding: 0.75rem 0.5rem;
+  }
+
+  .table tbody td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .admin-container-responsive {
+    padding: 1.5rem;
+    margin: 0 auto;
+  }
+
+  .admin-page {
+    padding: 1.5rem;
+    margin: 0 auto;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+}
+
+@media (min-width: 1025px) {
+  .admin-container-responsive {
+    padding: 2rem;
+    margin: 0 auto;
+  }
+
+  .admin-page {
+    padding: 2rem;
+    margin: 0 auto;
+  }
+}

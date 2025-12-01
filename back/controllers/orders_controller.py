@@ -1,79 +1,224 @@
-from flask import jsonify
+# orders_controller.py
+from flask import jsonify, request
 from database import get_connection
+from pymysql import Error as PyMySQLError
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
-# 📌 Obtener todos los pedidos de un usuario
-def obtener_pedidos_por_usuario(usuario_id):
+def get_orders_history():
+    """
+    Retorna el historial de pedidos del cliente autenticado.
+    Cumple con el Criterio 2, 3, 6 y 8.
+    """
+    # Obtener el ID del usuario autenticado desde el JWT
+    current_user_id = get_jwt_identity()
+    
     connection = None
     try:
         connection = get_connection()
         with connection.cursor() as cursor:
-            sql = """
-                SELECT 
-                    id, fecha_pedido, total, estado, numero_seguimiento
-                FROM pedidos 
-                WHERE usuario_id = %s
-                ORDER BY fecha_pedido DESC
+            # Primero obtener el cliente_id asociado al usuario
+            cursor.execute("""
+                SELECT id FROM clientes WHERE usuario_id = %s
+            """, (current_user_id,))
+            cliente_result = cursor.fetchone()
+            
+            if not cliente_result:
+                return jsonify({
+                    "message": "No se encontró información del cliente.",
+                    "total_pedidos": 0,
+                    "pedidos": []
+                }), 200
+            
+            cliente_id = cliente_result['id'] if isinstance(cliente_result, dict) else cliente_result[0]
+            
+            # Obtener historial de pedidos
+            query = """
+                SELECT
+                    v.id AS pedido_id,
+                    v.fecha AS fecha_pedido,
+                    v.total,
+                    v.estado AS estado_venta,
+                    e.estado_envio
+                FROM ventas v
+                LEFT JOIN envios e ON v.id = e.venta_id
+                WHERE v.cliente_id = %s
+                ORDER BY v.fecha DESC;
             """
-            cursor.execute(sql, (usuario_id,))
+            cursor.execute(query, (cliente_id,))
             pedidos = cursor.fetchall()
+            
+            total_pedidos = len(pedidos)
 
-        return jsonify({
-            'mensaje': "Pedidos consultados.",
-            'exito': True,
-            'data': pedidos
-        }), 200
+            if not pedidos:
+                return jsonify({
+                    "message": "No hay pedidos para mostrar.",
+                    "total_pedidos": 0,
+                    "pedidos": []
+                }), 200
 
-    except Exception as ex:
-        return jsonify({'mensaje': f"Error al consultar pedidos: {ex}", 'exito': False}), 500
+            # Procesar el estado de cada pedido
+            for pedido in pedidos:
+                pedido['estado_display'] = pedido['estado_envio'] if pedido.get('estado_envio') else pedido['estado_venta']
+                if 'estado_venta' in pedido:
+                    del pedido['estado_venta']
+                if 'estado_envio' in pedido:
+                    del pedido['estado_envio']
+
+            return jsonify({
+                "message": "Historial de pedidos recuperado con éxito.",
+                "total_pedidos": total_pedidos,
+                "pedidos": pedidos
+            }), 200
+
+    except ConnectionError as e:
+        return jsonify({"error": str(e)}), 500
+    except PyMySQLError as e:
+        return jsonify({"error": f"Error de base de datos: {e}"}), 500
     finally:
-        if connection: connection.close()
+        if connection:
+            connection.close()
 
 
-# 📌 Obtener un pedido específico
-def obtener_detalle_pedido(usuario_id, pedido_id):
+def get_order_details(order_id):
+    """
+    Retorna el detalle completo de un pedido del usuario autenticado.
+    Cumple con Criterio 4 y 5.
+    """
+    # Obtener el ID del usuario autenticado desde el JWT
+    current_user_id = get_jwt_identity()
+    
     connection = None
     try:
         connection = get_connection()
+        
         with connection.cursor() as cursor:
-
-            # Validar que el pedido sí pertenece al usuario
-            sql_pedido = """
-                SELECT *
-                FROM pedidos
-                WHERE id = %s AND usuario_id = %s
-            """
-            cursor.execute(sql_pedido, (pedido_id, usuario_id))
+            # Obtener el cliente_id del usuario
+            cursor.execute("""
+                SELECT id FROM clientes WHERE usuario_id = %s
+            """, (current_user_id,))
+            cliente_result = cursor.fetchone()
+            
+            if not cliente_result:
+                return jsonify({"error": "Usuario no encontrado."}), 404
+            
+            cliente_id = cliente_result['id'] if isinstance(cliente_result, dict) else cliente_result[0]
+            
+            # Consulta principal del pedido
+            cursor.execute("""
+                SELECT
+                    v.id, v.fecha, v.total, v.estado AS estado_venta,
+                    e.estado_envio, e.numero_guia, e.direccion_envio_id
+                FROM ventas v
+                LEFT JOIN envios e ON v.id = e.venta_id
+                WHERE v.id = %s AND v.cliente_id = %s;
+            """, (order_id, cliente_id))
             pedido = cursor.fetchone()
 
-            if pedido is None:
-                return jsonify({'mensaje': "Pedido no encontrado.", 'exito': False}), 404
+            if not pedido:
+                return jsonify({"error": "Pedido no encontrado o no pertenece a este usuario."}), 404
 
-            # Obtener items
-            sql_detalles = """
-                SELECT 
-                    dp.cantidad,
-                    dp.precio_unitario,
-                    dp.subtotal,
-                    p.nombre AS nombre_producto,
-                    i.nombre_color,
-                    i.nombre_talla
-                FROM detalles_pedido dp
-                JOIN inventario i ON dp.inventario_id = i.id
-                JOIN productos p ON i.producto_id = p.id
-                WHERE dp.pedido_id = %s
-            """
-            cursor.execute(sql_detalles, (pedido_id,))
-            detalles = cursor.fetchall()
+            # Estado claro para el cliente
+            pedido['estado_display'] = pedido['estado_envio'] if pedido.get('estado_envio') else pedido['estado_venta']
+            
+            # Mostrar número de seguimiento si está 'enviado'
+            if pedido['estado_display'] != 'enviado':
+                pedido['numero_guia'] = 'N/A'
 
-            pedido["items"] = detalles
+            # Obtener los ítems
+            cursor.execute("""
+                SELECT
+                    nombre_producto_venta, cantidad, precio_unitario_venta
+                FROM venta_detalle
+                WHERE venta_id = %s;
+            """, (order_id,))
+            items = cursor.fetchall()
 
-        return jsonify({
-            'mensaje': "Detalle consultado.",
-            'exito': True,
-            'data': pedido
-        }), 200
+            # Obtener la dirección de envío
+            direccion_id = pedido.pop('direccion_envio_id', None)
+            direccion = None
+            if direccion_id:
+                cursor.execute("""
+                    SELECT
+                        nombre_destinatario, calle, codigo_postal, ciudad, estado
+                    FROM direcciones_cliente
+                    WHERE id = %s;
+                """, (direccion_id,))
+                direccion = cursor.fetchone()
+            
+            # Limpiar campos internos
+            pedido.pop('estado_venta', None)
+            pedido.pop('estado_envio', None)
+            
+            return jsonify({
+                "message": f"Detalles del pedido {order_id} recuperados.",
+                "pedido": pedido,
+                "items": items,
+                "direccion_entrega": direccion
+            }), 200
 
-    except Exception as ex:
-        return jsonify({'mensaje': f"Error al consultar el pedido: {ex}", 'exito': False}), 500
+    except ConnectionError as e:
+        return jsonify({"error": str(e)}), 500
+    except PyMySQLError as e:
+        return jsonify({"error": f"Error de base de datos: {e}"}), 500
     finally:
-        if connection: connection.close()
+        if connection:
+            connection.close()
+
+
+def update_user_profile():
+    """
+    Permite al cliente autenticado editar su información de contacto personal.
+    Cumple con Criterio 7.
+    """
+    # Obtener el ID del usuario autenticado desde el JWT
+    current_user_id = get_jwt_identity()
+    
+    data = request.json
+    telefono = data.get('telefono')
+    direccion = data.get('direccion', '')
+
+    if not telefono:
+        return jsonify({"error": "Falta el campo 'telefono' requerido."}), 400
+
+    connection = None
+    try:
+        connection = get_connection()
+        with connection.cursor() as cursor:
+            # Obtener el cliente_id del usuario
+            cursor.execute("""
+                SELECT id FROM clientes WHERE usuario_id = %s
+            """, (current_user_id,))
+            cliente_result = cursor.fetchone()
+            
+            if not cliente_result:
+                return jsonify({"error": "Cliente no encontrado."}), 404
+            
+            cliente_id = cliente_result['id'] if isinstance(cliente_result, dict) else cliente_result[0]
+            
+            # Actualizar información del cliente
+            update_query = """
+                UPDATE clientes
+                SET telefono = %s, direccion = %s
+                WHERE id = %s;
+            """
+            cursor.execute(update_query, (telefono, direccion, cliente_id))
+            connection.commit()
+
+            if cursor.rowcount == 0:
+                return jsonify({"error": "No se pudo actualizar la información."}), 404
+                
+            return jsonify({
+                "message": "Información de contacto actualizada con éxito.",
+                "telefono_actualizado": telefono,
+                "direccion_actualizada": direccion
+            }), 200
+
+    except ConnectionError as e:
+        return jsonify({"error": str(e)}), 500
+    except PyMySQLError as e:
+        if connection:
+            connection.rollback()
+        return jsonify({"error": f"Error de base de datos al actualizar: {e}"}), 500
+    finally:
+        if connection:
+            connection.close()

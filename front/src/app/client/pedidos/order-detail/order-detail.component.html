@@ -1,1 +1,117 @@
-<p>order-detail works!</p>
+<div class="container py-4">
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-3 text-muted">Cargando detalles del pedido...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="errorMsg && !isLoading" class="alert alert-danger">
+    <i class="bi bi-exclamation-triangle"></i> {{ errorMsg }}
+    <button class="btn btn-sm btn-outline-danger ms-3" (click)="goBack()">
+      Volver a pedidos
+    </button>
+  </div>
+
+  <!-- Detalles del pedido -->
+  <div *ngIf="orderDetail && !isLoading && !errorMsg">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3>Detalle del Pedido #{{ orderDetail.pedido.id }}</h3>
+      <button class="btn btn-outline-secondary" (click)="goBack()">
+        <i class="bi bi-arrow-left"></i> Volver
+      </button>
+    </div>
+
+    <div class="row">
+      <!-- Información del pedido -->
+      <div class="col-md-6 mb-3">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Información del Pedido</h5>
+          </div>
+          <div class="card-body">
+            <p><strong>Fecha:</strong> {{ orderDetail.pedido.fecha | date:'dd/MM/yyyy HH:mm' }}</p>
+            <p><strong>Estado:</strong> 
+              <span class="badge" [ngClass]="getStatusClass(orderDetail.pedido.estado_display)">
+                {{ orderDetail.pedido.estado_display | uppercase }}
+              </span>
+            </p>
+            <p><strong>Total:</strong> 
+              <span class="text-success fw-bold">MXN {{ orderDetail.pedido.total | number:'1.2-2' }}</span>
+            </p>
+            <p *ngIf="orderDetail.pedido.numero_guia && orderDetail.pedido.numero_guia !== 'N/A'">
+              <strong>Número de Guía:</strong> 
+              <span class="badge bg-info">{{ orderDetail.pedido.numero_guia }}</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dirección de entrega -->
+      <div class="col-md-6 mb-3">
+        <div class="card shadow-sm">
+          <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Dirección de Entrega</h5>
+          </div>
+          <div class="card-body">
+            <div *ngIf="orderDetail.direccion_entrega; else noAddress">
+              <p><strong>Destinatario:</strong> {{ orderDetail.direccion_entrega.nombre_destinatario }}</p>
+              <p><strong>Calle:</strong> {{ orderDetail.direccion_entrega.calle }}</p>
+              <p><strong>Ciudad:</strong> {{ orderDetail.direccion_entrega.ciudad }}</p>
+              <p><strong>Estado:</strong> {{ orderDetail.direccion_entrega.estado }}</p>
+              <p><strong>C.P.:</strong> {{ orderDetail.direccion_entrega.codigo_postal }}</p>
+            </div>
+            <ng-template #noAddress>
+              <p class="text-muted">No se registró dirección de entrega.</p>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Items del pedido -->
+    <div class="card shadow-sm mt-3">
+      <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Productos</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Producto</th>
+                <th class="text-center">Cantidad</th>
+                <th class="text-end">Precio Unitario</th>
+                <th class="text-end">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of orderDetail.items">
+                <td>{{ item.nombre_producto_venta }}</td>
+                <td class="text-center">{{ item.cantidad }}</td>
+                <td class="text-end">MXN {{ item.precio_unitario_venta | number:'1.2-2' }}</td>
+                <td class="text-end fw-bold">
+                  MXN {{ (item.cantidad * item.precio_unitario_venta) | number:'1.2-2' }}
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="table-light">
+                <td colspan="3" class="text-end fw-bold">Subtotal:</td>
+                <td class="text-end fw-bold">MXN {{ calculateSubtotal() | number:'1.2-2' }}</td>
+              </tr>
+              <tr class="table-success">
+                <td colspan="3" class="text-end fw-bold fs-5">Total:</td>
+                <td class="text-end fw-bold fs-5 text-success">
+                  MXN {{ orderDetail.pedido.total | number:'1.2-2' }}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

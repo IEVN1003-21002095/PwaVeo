@@ -1,83 +1,72 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../services/auth.service'; 
 
 @Component({
   selector: 'app-sign-in',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink], 
   templateUrl: './sign-in.component.html',
-  styleUrls: ['./sign-in.component.css']
+  styleUrl: './sign-in.component.css'
 })
-export class SignInComponent implements OnInit {
-
-  form!: FormGroup;
-  loading = false;
-  errorMsg = '';
-  successMsg = '';
+export class SignInComponent {
+  formGroup: FormGroup;
 
   constructor(
     private fb: FormBuilder,
-    private auth: AuthService,
+    private authService: AuthService,
     private router: Router
-  ) {}
-
-  ngOnInit(): void {
-    this.form = this.fb.group({
+  ) {
+    // Inicialización del formulario con validaciones actualizadas
+    this.formGroup = this.fb.group({
       nombre: ['', Validators.required],
       correo: ['', [Validators.required, Validators.email]],
-      contrasena: ['', [Validators.required, Validators.minLength(8)]],
-      confirmContrasena: ['', Validators.required],
-      aceptaTerminos: [false, Validators.requiredTrue]
-    }, {
-      validators: this.passwordsMatchValidator
+      // 👇 ACTUALIZADO: Se agrega minLength(8) para cumplir el criterio
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', Validators.required],
+      politica: [false, Validators.requiredTrue]
     });
   }
 
-  // Validación manual para contraseñas iguales
-  passwordsMatchValidator(form: FormGroup) {
-    const pass = form.get('contrasena')?.value;
-    const confirm = form.get('confirmContrasena')?.value;
-    return pass === confirm ? null : { mismatch: true };
+  // 👇 FUNCIÓN SEGURA PARA NAVEGAR
+  irAlLogin() {
+    this.router.navigate(['/auth/login']);
   }
 
-  // =============== REGISTRO ===============
   onSubmit() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
+    if (this.formGroup.valid) {
+      const values = this.formGroup.value;
 
-    this.loading = true;
-    this.errorMsg = '';
-
-    const payload = {
-      nombre: this.form.value.nombre,
-      correo: this.form.value.correo,
-      contrasena: this.form.value.contrasena
-    };
-
-    this.auth.register(payload).subscribe({
-      next: (resp) => {
-        this.loading = false;
-
-        if (!resp.exito) {
-          this.errorMsg = resp.mensaje;
-          return;
-        }
-
-        this.successMsg = 'Cuenta creada con éxito. Redirigiendo...';
-
-        setTimeout(() => {
-          this.router.navigate(['/auth/login']);
-        }, 1500);
-      },
-      error: () => {
-        this.loading = false;
-        this.errorMsg = 'Error de conexión con el servidor.';
+      if (values.password !== values.confirmPassword) {
+        alert('Las contraseñas no coinciden');
+        return;
       }
-    });
+
+      // Preparamos los datos
+      const datosUsuario = {
+        nombre: values.nombre,
+        email: values.correo, 
+        password: values.password
+      };
+
+      this.authService.register(datosUsuario).subscribe({
+        next: (response) => {
+          console.log('Registro exitoso:', response);
+          alert('¡Usuario registrado con éxito!');
+          // 👇 Redirección correcta a la ruta padre 'auth'
+          this.router.navigate(['/auth/login']); 
+        },
+        error: (error) => {
+          console.error('Error al registrar:', error);
+          alert('Hubo un error al registrar. Revisa la consola.');
+        }
+      });
+
+    } else {
+      this.formGroup.markAllAsTouched();
+      alert('Por favor completa todos los campos correctamente.');
+    }
   }
 }

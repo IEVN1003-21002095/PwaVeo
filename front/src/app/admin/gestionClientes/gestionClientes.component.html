@@ -1,0 +1,206 @@
+<div class="admin-container-responsive">
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+                <div>
+                    <h4 class="fw-bold text-dark mb-1">Gestión de Clientes</h4>
+                    <p class="text-muted small mb-0">Administración de usuarios y base de datos</p>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button (click)="exportarCSV()" class="btn btn-success d-flex align-items-center gap-2 px-3 fw-medium text-white">
+                        <i class="bi bi-file-earmark-spreadsheet"></i> Exportar CSV
+                    </button>
+                    <button (click)="exportarPDF()" class="btn btn-danger d-flex align-items-center gap-2 px-3 fw-medium text-white">
+                        <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+                    </button>
+                </div>
+            </div>
+
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 p-3 bg-light rounded-3 bg-opacity-25 gap-3">
+                <div class="fw-bold text-secondary">
+                    Total Registrados: <span class="text-primary fs-5">{{ totalClientes }}</span>
+                </div>
+                <div class="input-group" style="max-width: 400px;">
+                    <span class="input-group-text bg-white border-end-0 text-muted">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" class="form-control border-start-0 ps-0 shadow-none" 
+                        placeholder="Buscar por nombre o correo..."
+                        [ngModel]="searchTerm" (ngModelChange)="onSearch($event)">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" *ngIf="clientes.length; else noData">
+                    <thead class="bg-light">
+                        <tr class="text-muted small text-uppercase">
+                            <th scope="col" class="py-3 ps-4 border-0 rounded-start">ID</th>
+                            <th scope="col" class="py-3 border-0">Nombre</th>
+                            <th scope="col" class="py-3 border-0">Email</th>
+                            <th scope="col" class="py-3 border-0">Fecha Registro</th>
+                            <th scope="col" class="py-3 text-end pe-4 border-0 rounded-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let cliente of clientes">
+                            <td class="ps-4 fw-bold text-muted">#{{ cliente.id }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold" 
+                                         style="width: 35px; height: 35px;">
+                                        {{ cliente.nombre_completo.charAt(0).toUpperCase() }}
+                                    </div>
+                                    <span class="fw-medium text-dark">{{ cliente.nombre_completo }}</span>
+                                </div>
+                            </td>
+                            <td class="text-muted">{{ cliente.correo }}</td>
+                            <td class="text-muted">{{ cliente.fecha_registro }}</td>
+                            
+                            <td class="text-end pe-4">
+                                <div class="d-flex justify-content-end gap-2">
+                                    
+                                    <button (click)="abrirModalEditar(cliente)" 
+                                            class="btn btn-sm btn-info text-white d-flex align-items-center justify-content-center" 
+                                            style="width: 32px; height: 32px;" 
+                                            title="Ver Historial de Pedidos">
+                                        <i class="bi bi-receipt"></i>
+                                    </button>
+
+                                    <button (click)="abrirModalEditar(cliente)" 
+                                            class="btn btn-sm btn-warning text-white d-flex align-items-center justify-content-center" 
+                                            style="width: 32px; height: 32px;" 
+                                            title="Editar Información">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    
+                                    <button (click)="eliminarCliente(cliente.id)"
+                                            class="btn btn-sm btn-danger text-white d-flex align-items-center justify-content-center" 
+                                            style="width: 32px; height: 32px;" 
+                                            title="Eliminar Cliente">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <ng-template #noData>
+                <div class="text-center py-5">
+                    <div class="mb-3 text-muted opacity-50">
+                        <i class="bi bi-inbox fs-1"></i>
+                    </div>
+                    <h6 class="text-muted fw-normal">No se encontraron resultados.</h6>
+                </div>
+            </ng-template>
+
+            <div class="d-flex justify-content-between align-items-center mt-4 border-top pt-3" *ngIf="totalPaginas > 1">
+                <span class="text-muted small">
+                    Mostrando página <span class="fw-bold text-dark">{{ paginaActual }}</span> de {{ totalPaginas }}
+                </span>
+                <nav aria-label="Navegación de clientes">
+                    <ul class="pagination mb-0 gap-1">
+                        <li class="page-item" [class.disabled]="paginaActual === 1">
+                            <button class="page-link border-0 rounded" (click)="prevPage()">Anterior</button>
+                        </li>
+                        <li class="page-item active">
+                            <span class="page-link border-0 rounded bg-primary">{{ paginaActual }}</span>
+                        </li>
+                        <li class="page-item" [class.disabled]="paginaActual === totalPaginas">
+                            <button class="page-link border-0 rounded" (click)="nextPage()">Siguiente</button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade show d-block" tabindex="-1" *ngIf="mostrarModal" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-primary text-white border-0 py-3">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-person-gear me-2"></i> Detalle y Edición
+                </h5>
+                <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()"></button>
+            </div>
+
+            <div class="modal-body p-0">
+                <div class="row g-0 h-100">
+                    <div class="col-lg-5 bg-white p-4 border-end">
+                        <h6 class="text-primary fw-bold mb-3">Información de Contacto</h6>
+                        <form *ngIf="clienteSeleccionado" (ngSubmit)="guardarCambiosCliente()">
+                            <div class="mb-3">
+                                <label class="fw-bold small text-muted">Cliente</label>
+                                <input type="text" class="form-control bg-light" [value]="clienteSeleccionado.nombre_completo" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="fw-bold small text-muted">Correo</label>
+                                <input type="text" class="form-control bg-light" [value]="clienteSeleccionado.correo" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="fw-bold small text-muted">Teléfono</label>
+                                <input type="text" class="form-control" [(ngModel)]="clienteSeleccionado.telefono" name="telefono">
+                            </div>
+                            <div class="mb-4">
+                                <label class="fw-bold small text-muted">Dirección de Envío</label>
+                                <textarea class="form-control" [(ngModel)]="clienteSeleccionado.direccion" name="direccion" rows="3"></textarea>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary fw-bold">
+                                    <i class="bi bi-save me-2"></i> Guardar Cambios
+                                </button>
+                                <button type="button" class="btn btn-light" (click)="cerrarModal()">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="col-lg-7 bg-light p-4">
+                        <h6 class="text-success fw-bold mb-3">Historial de Pedidos (Base de Datos)</h6>
+                        <div class="card border-0 shadow-sm rounded-3">
+                            <div class="table-responsive" style="max-height: 400px;">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-white sticky-top">
+                                        <tr class="text-muted small text-uppercase">
+                                            <th class="ps-4 border-bottom">ID Venta</th>
+                                            <th class="border-bottom">Total</th>
+                                            <th class="border-bottom">Método Pago</th>
+                                            <th class="pe-4 text-end border-bottom">Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let p of pedidos">
+                                            <td class="ps-4 fw-bold">#{{ p.id }}</td>
+                                            <td class="fw-bold text-dark">${{ p.total }}</td>
+                                            <td class="text-muted small">{{ p.metodo_pago }}</td>
+                                            <td class="pe-4 text-end">
+                                                <span class="badge rounded-pill px-3"
+                                                    [ngClass]="{
+                                                        'bg-success': p.estado === 'completada' || p.estado === 'entregado',
+                                                        'bg-warning text-dark': p.estado === 'pendiente',
+                                                        'bg-danger': p.estado === 'cancelada'
+                                                    }">
+                                                    {{ p.estado | titlecase }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr *ngIf="pedidos.length === 0">
+                                            <td colspan="4" class="text-center py-4 text-muted">
+                                                Este cliente no tiene pedidos registrados.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

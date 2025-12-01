@@ -1,110 +1,124 @@
-<div class="admin-layout">
-    
-    <aside class="sidebar bg-dark text-white">
-        <div class="sidebar-header">
-            <h3>AdminPro</h3>
-        </div>
-        <nav class="sidebar-nav">
-            <ul>
-                <li><a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a href="#"><i class="fas fa-box-open"></i> Gestión de Catálogo</a></li>
-                <li><a href="#"><i class="fas fa-warehouse"></i> Gestión de Stock</a></li>
-                <li class="active">
-                    <a href="#"><i class="fas fa-shopping-cart"></i> Gestión de Ventas</a>
-                </li>
-                <li><a href="#"><i class="fas fa-users"></i> Gestión de Clientes</a></li>
-                <li><a href="#"><i class="fas fa-cog"></i> Configuración</a></li>
-            </ul>
-        </nav>
-    </aside>
+<div class="admin-page">
+  <div class="page-container">
 
-    <main class="main-content">
-        
-        <header class="top-header">
-            <span>Administrador</span>
-            <div class="user-profile">
-                <span class="initials">AD</span>
-                </div>
-        </header>
-        
-        <div class="page-title">
-            <h1>Gestión de Ventas</h1>
-            <p class="text-muted">Pedidos Recientes</p>
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="alert alert-info">
+      <i class="bi bi-hourglass-split"></i> Cargando detalles de la venta...
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error && !isLoading" class="alert alert-danger">
+      <i class="bi bi-exclamation-circle"></i> {{ error }}
+    </div>
+
+    <!-- Content -->
+    <div *ngIf="!isLoading && venta">
+      
+      <!-- Header -->
+      <div class="page-header">
+        <div>
+          <h2 class="page-title">
+            <i class="bi bi-receipt me-2"></i>Detalles Venta #{{ venta.venta_id || venta.id }}
+          </h2>
+          <p class="page-subtitle">Información completa del pedido</p>
+        </div>
+        <button [routerLink]="['/admin/ventas']" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i> Volver
+        </button>
+      </div>
+
+      <!-- Info Cards Row -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <div class="content-card">
+            <div class="card-header-custom">
+              <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Información General</h5>
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <span class="info-label"><i class="bi bi-person me-2"></i>Cliente ID:</span>
+                <span class="info-value">{{ venta.cliente_id || venta.clienteId }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label"><i class="bi bi-calendar3 me-2"></i>Fecha:</span>
+                <span class="info-value">{{ venta.fecha | date:'dd/MM/yyyy, h:mm a' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label"><i class="bi bi-tag me-2"></i>Estado:</span>
+                <span class="badge status-badge"
+                      [class.bg-success]="venta.estado === 'completada'"
+                      [class.bg-warning]="venta.estado === 'pendiente'"
+                      [class.bg-danger]="venta.estado === 'cancelada'">
+                  {{ venta.estado | uppercase }}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-striped">
-                
-                <thead>
-                    <tr>
-                        <th>ID PEDIDO</th> <th>CLIENTE</th> <th>FECHA</th> <th>TOTAL</th> <th>ESTADO ACTUAL</th> <th>ACTUALIZAR ESTADO</th>
-                    </tr>
-                </thead>
-                
-                <tbody>
-                    <tr>
-                        <td><span class="badge badge-pedido">#PED-10521</span></td>
-                        
-                        <td>Ana Garcia</td>
-                        
-                        <td>07/11/2025</td>
-                        
-                        <td>$240.00</td>
-                        
-                        <td>
-                            <span class="badge-status status-aprobacion">Diseño en Aprobación</span>
-                        </td>
-                        
-                        <td>
-                            <select class="form-control form-control-sm update-status-select">
-                                <option selected>Diseño en Aprobación</option>
-                                <option>En Producción</option>
-                                <option>Enviado</option>
-                                <option>Entregado</option>
-                            </select>
-                            <button class="btn btn-sm btn-link"><i class="fas fa-check-circle"></i></button>
-                        </td>
-                    </tr>
-                    
-                    <tr>
-                        <td><span class="badge badge-pedido">#PED-10520</span></td>
-                        <td>Carlos Mendoza</td>
-                        <td>06/11/2025</td>
-                        <td>$89.50</td>
-                        <td>
-                            <span class="badge-status status-produccion">En Producción</span>
-                        </td>
-                        <td>
-                            <select class="form-control form-control-sm update-status-select">
-                                <option>Diseño en Aprobación</option>
-                                <option selected>En Producción</option>
-                                <option>Enviado</option>
-                                <option>Entregado</option>
-                            </select>
-                            <button class="btn btn-sm btn-link"><i class="fas fa-check-circle"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><span class="badge badge-pedido">#PED-10519</span></td>
-                        <td>Laura Jiménez</td>
-                        <td>05/11/2025</td>
-                        <td>$450.00</td>
-                        <td>
-                            <span class="badge-status status-enviado">Enviado</span>
-                        </td>
-                        <td>
-                            <select class="form-control form-control-sm update-status-select">
-                                <option>Diseño en Aprobación</option>
-                                <option>En Producción</option>
-                                <option selected>Enviado</option>
-                                <option>Entregado</option>
-                            </select>
-                            <button class="btn btn-sm btn-link"><i class="fas fa-check-circle"></i></button>
-                        </td>
-                    </tr>
-
-                </tbody>
-            </table>
+        <div class="col-md-6">
+          <div class="content-card">
+            <div class="card-header-custom">
+              <h5 class="mb-0"><i class="bi bi-cash-stack me-2"></i>Resumen Financiero</h5>
+            </div>
+            <div class="card-body">
+              <div class="info-row">
+                <span class="info-label">Subtotal:</span>
+                <span class="info-value">MX${{ venta['subtotal'] | number:'1.2-2' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Descuento:</span>
+                <span class="info-value text-danger">-MX${{ venta['descuento'] | number:'1.2-2' }}</span>
+              </div>
+              <div class="info-row border-top pt-2 mt-2">
+                <span class="info-label fw-bold">Total:</span>
+                <span class="info-value fw-bold text-success fs-5">MX${{ venta.total | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          </div>
         </div>
-        </main>
+      </div>
+
+      <!-- Products Table -->
+      <div class="content-card">
+        <div class="card-header-custom">
+          <h5 class="mb-0"><i class="bi bi-box-seam me-2"></i>Productos Comprados</h5>
+          <span class="badge bg-primary">{{ detalles.length || 0 }} Productos</span>
+        </div>
+
+        <div *ngIf="!detalles || detalles.length === 0" class="card-body text-center text-muted py-5">
+          <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+          <p class="mb-0">No hay detalles disponibles</p>
+        </div>
+
+        <div *ngIf="detalles && detalles.length > 0" class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-header">
+              <tr>
+                <th>Producto</th>
+                <th class="text-center">Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Precio Venta</th>
+                <th>Descuento</th>
+                <th class="text-end">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let det of detalles">
+                <td class="fw-semibold">{{ det.nombre_producto_venta }}</td>
+                <td class="text-center">
+                  <span class="badge bg-secondary">{{ det.cantidad }}</span>
+                </td>
+                <td>MX${{ det.precio_unitario | number:'1.2-2' }}</td>
+                <td>MX${{ det.precio_unitario_venta | number:'1.2-2' }}</td>
+                <td class="text-danger">-MX${{ det.descuento_unitario | number:'1.2-2' }}</td>
+                <td class="text-end fw-bold text-success">MX${{ (det.cantidad * det.precio_unitario_venta) | number:'1.2-2' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>

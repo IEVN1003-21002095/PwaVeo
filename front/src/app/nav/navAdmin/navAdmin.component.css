@@ -1,0 +1,195 @@
+:host {
+    --veo-navy: #00325E;
+    --navbar-bg: #1a1d29;
+    --navbar-hover: #252936;
+    --navbar-active: #00325E;
+    --text-primary: #ffffff;
+    --text-secondary: #a0aec0;
+}
+
+/* Navbar Container */
+.navbar {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: var(--navbar-bg);
+    color: var(--text-primary);
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.navbar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    max-width: 100%;
+    height: 64px;
+}
+
+/* Brand */
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 1px;
+    white-space: nowrap;
+    margin-right: 2rem;
+}
+
+/* Menu */
+.navbar-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 0.25rem;
+    flex: 1;
+    justify-content: center;
+}
+
+.navbar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.navbar-item i {
+    font-size: 1.1rem;
+}
+
+.navbar-item:hover {
+    background: var(--navbar-hover);
+    color: var(--text-primary);
+}
+
+.navbar-item.active {
+    background: var(--navbar-active);
+    color: var(--text-primary);
+}
+
+/* User Section */
+.navbar-user {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    white-space: nowrap;
+    transition: background 0.2s ease;
+}
+
+.navbar-user:hover {
+    background: var(--navbar-hover);
+}
+
+.navbar-user i {
+    font-size: 1.5rem;
+}
+
+/* Dropdown */
+.user-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: var(--navbar-bg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    min-width: 180px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+}
+
+.user-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.dropdown-item:hover {
+    background: var(--navbar-hover);
+    color: var(--text-primary);
+}
+
+.dropdown-item i {
+    font-size: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar-container {
+        padding: 0 1rem;
+        height: 56px;
+    }
+
+    .navbar-brand {
+        font-size: 1.1rem;
+        margin-right: 1rem;
+    }
+
+    .navbar-menu {
+        gap: 0;
+    }
+
+    .navbar-item {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .navbar-item span {
+        display: none;
+    }
+
+    .navbar-item i {
+        font-size: 1.25rem;
+    }
+
+    .navbar-user span {
+        display: none;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .navbar-container {
+        padding: 0 1.5rem;
+        height: 60px;
+    }
+
+    .navbar-brand {
+        font-size: 1.3rem;
+    }
+
+    .navbar-item {
+        padding: 0.625rem 1rem;
+        font-size: 0.9rem;
+    }
+}

@@ -1,66 +1,76 @@
-<form>
-    <h3>Detalles de entrega:</h3>
-    
-    <div class="form-row">
-        <div class="form-group col-md-6">
-            <label for="calle">Calle</label>
-            <input type="text" class="form-control" id="calle" 
-                   name="calle" placeholder="Nombre de la calle" required>
-        </div>
-        <div class="form-group col-md-3">
-            <label for="numero_ext">Num. Exterior</label>
-            <input type="text" class="form-control" id="numero_ext" 
-                   name="numero_ext" placeholder="Núm. Exterior" required>
-        </div>
-        <div class="form-group col-md-3">
-            <label for="numero_int">Num. Interior (Opcional)</label>
-            <input type="text" class="form-control" id="numero_int" 
-                   name="numero_int" placeholder="Núm. Interior">
-        </div>
+<div class="container py-4">
+  <h3>Paso 1: Detalles de Entrega</h3>
+  
+  <form [formGroup]="addressForm" (ngSubmit)="onSubmit()">
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="nombre_destinatario" class="form-label">Nombre Completo</label>
+        <input type="text" class="form-control" id="nombre_destinatario" formControlName="nombre_destinatario" required>
+      </div>
+      <div class="col-md-6">
+        <label for="telefono" class="form-label">Teléfono</label>
+        <input type="tel" class="form-control" id="telefono" formControlName="telefono" placeholder="+52 55 1234 5678" required>
+      </div>
     </div>
 
-    <div class="form-row">
-        <div class="form-group col-md-6">
-            <label for="colonia">Colonia / Barrio</label>
-            <input type="text" class="form-control" id="colonia" 
-                   name="colonia" placeholder="Colonia" required>
-        </div>
-        <div class="form-group col-md-6">
-            <label for="codigo_postal">Código postal</label>
-            <input type="text" class="form-control" id="codigo_postal" 
-                   name="codigo_postal" placeholder="Código postal" 
-                   pattern="[0-9A-Za-z]{3,10}" required>
-            </div>
-    </div>
-    
-    <div class="form-row">
-        <div class="form-group col-md-6">
-            <label for="ciudad">Ciudad / Municipio</label>
-            <input type="text" class="form-control" id="ciudad" 
-                   name="ciudad" placeholder="Ciudad" required>
-        </div>
-        <div class="form-group col-md-6">
-            <label for="estado">Estado / Provincia</label>
-            <select id="estado" name="estado" class="form-control" required>
-                <option value="" disabled selected>Selecciona un Estado...</option>
-                </select>
-        </div>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="calle" class="form-label">Calle</label>
+        <input type="text" class="form-control" id="calle" formControlName="calle" required>
+      </div>
+      <div class="col-md-3">
+        <label for="numero_ext" class="form-label">Núm. Exterior</label>
+        <input type="text" class="form-control" id="numero_ext" formControlName="numero_ext" required>
+      </div>
+      <div class="col-md-3">
+        <label for="numero_int" class="form-label">Núm. Interior (Opcional)</label>
+        <input type="text" class="form-control" id="numero_int" formControlName="numero_int">
+      </div>
     </div>
 
-    <div class="form-row">
-         <div class="form-group col-md-6">
-            <label for="telefono">Teléfono</label>
-            <input type="tel" class="form-control" id="telefono" 
-                   name="telefono" placeholder="+52 55 1234 5678" required>
-        </div>
-         <div class="form-group col-md-6">
-            <label for="referencia">Referencias (Entre calles, color de casa, etc.)</label>
-            <input type="text" class="form-control" id="referencia" 
-                   name="referencia" placeholder="Referencias de la dirección">
-        </div>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="colonia" class="form-label">Colonia / Barrio</label>
+        <input type="text" class="form-control" id="colonia" formControlName="colonia" required>
+      </div>
+      <div class="col-md-6">
+        <label for="codigo_postal" class="form-label">Código Postal</label>
+        <input type="text" class="form-control" id="codigo_postal" formControlName="codigo_postal" pattern="[0-9]{5}" required>
+      </div>
     </div>
-    
-    <div class="text-right">
-        <button type="submit" class="btn btn-primary">Continuar</button>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="ciudad" class="form-label">Ciudad / Municipio</label>
+        <input type="text" class="form-control" id="ciudad" formControlName="ciudad" required>
+      </div>
+      <div class="col-md-6">
+        <label for="estado" class="form-label">Estado</label>
+        <select id="estado" formControlName="estado" class="form-control" required>
+          <option value="">Selecciona un Estado...</option>
+          <option value="Aguascalientes">Aguascalientes</option>
+          <option value="Baja California">Baja California</option>
+          <option value="Ciudad de México">Ciudad de México</option>
+          <option value="Jalisco">Jalisco</option>
+          <option value="Nuevo León">Nuevo León</option>
+          <!-- Agrega más estados según necesites -->
+        </select>
+      </div>
     </div>
-</form>
+
+    <div class="row mb-3">
+      <div class="col-md-12">
+        <label for="referencia" class="form-label">Referencias (Entre calles, color de casa, etc.)</label>
+        <input type="text" class="form-control" id="referencia" formControlName="referencia">
+      </div>
+    </div>
+
+    <div *ngIf="errorMsg" class="alert alert-danger">{{ errorMsg }}</div>
+
+    <div class="text-end">
+      <button type="submit" class="btn btn-primary" [disabled]="loading || addressForm.invalid">
+        {{ loading ? 'Guardando...' : 'Continuar a Pago' }}
+      </button>
+    </div>
+  </form>
+</div>

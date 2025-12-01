@@ -1,142 +1,163 @@
-<div class="container-fluid bg-light min-vh-100 p-0">
+<div class="container-fluid bg-white min-vh-100 p-0 font-sans">
 
   <header 
-    class="w-100 mb-5 shadow-sm" 
-    style="
-      height: 300px; 
-      background-image: url(); 
-      background-size: cover; 
-      background-position: center; 
-    "
-  >
-    <div class="d-flex align-items-center justify-content-center h-100" style="background-color: rgba(0, 0, 0, 0.3);">
-    </div>
+    class="w-100 mb-5 position-relative d-flex align-items-center justify-content-center overflow-hidden catalog-header">
   </header>
 
-  <ng-container *ngIf="currentView() === 'catalogo'">
-
-    <div class="container-central">
-      <div class="d-flex justify-content-center align-items-center mb-5 position-relative">
-        <h2 class="fw-bolder text-dark">Nuestros productos</h2>
-        <button class="btn text-secondary position-absolute end-0" style="right: 15px;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
-            <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
-          </svg>
-        </button>
-      </div>
+  <div class="container mb-5">
+    <div class="text-center mb-4">
+      <h1 class="catalog-title">CATÁLOGO</h1>
+      <div class="catalog-separator"></div>
     </div>
-  
-    <div class="container-central py-4 bg-custom-opacity"> 
 
-      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
-        
-        <div *ngFor="let p of productos" class="col">
-          <div 
-            (click)="verDetalle(p.id)"
-            class="card h-100 cursor-pointer shadow-none"
-          >
-            <!-- Imagen con margen interno dentro de la card -->
-            <div class="card-img-top overflow-hidden producto-img-con-margen">
-              <img 
-                [src]="p.imagen" 
-                class="w-100 h-100 object-fit-cover img-padding"
-                [alt]="p.nombre"
-              >
-            </div>
-  
-            <div class="card-body text-center d-flex flex-column justify-content-between py-1">
-              <h5 class="card-title fs-6 fw-semibold mb-1 text-truncate">
-                {{ p.nombre }}
-              </h5>
-              <p class="card-text text-muted small mb-0">
-                Gs. {{ p.precio | number:'1.0-0' }}
-              </p>
-            </div>
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4 g-lg-5">
+      <div *ngFor="let p of productos()" class="col">
+        <div (click)="verDetalle(p.id)" class="card h-100 cursor-pointer border-0 bg-transparent product-card">
+
+          <div class="position-relative overflow-hidden w-100 product-img-wrapper mb-3">
+            <img 
+              [src]="p.imagen" 
+              class="w-100 h-100 object-fit-cover product-img" 
+              [alt]="p.nombre">
+            <div class="hover-overlay"></div>
           </div>
+
+          <div class="card-body px-0 py-0 text-center">
+            <h5 class="card-title">{{ p.nombre }}</h5>
+            <span class="product-price">$ {{ p.precio }}</span>
+          </div>
+
         </div>
-        
       </div>
-  
-      <div class="text-center mt-5 mb-4">
-        <button 
-          (click)="verMasProductos()"
-          class="text-dark d-inline-flex align-items-center fw-normal p-0"
-          style="font-size: 1.1rem; letter-spacing: 0.1em; background: none; border: none; cursor: pointer;"
-        >
-          VER MÁS 
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-right-short ms-2" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8z"/>
-          </svg>
-        </button>
-      </div>
-
     </div>
-  </ng-container>
 
-  <app-detalles 
-    *ngIf="currentView() === 'detalle'"
-    [productId]="selectedProductId()"
-    (goBack)="goBackToCatalog()">
-  </app-detalles>
+    <div class="text-center mt-5 mb-5">
+      <button class="btn-clean-outline">CARGAR MÁS</button>
+    </div>
+  </div>
 
 </div>
 
 <style>
-/* Contenedor central */
-.container-central {
-    max-width: 95%;
-    margin: 0 auto;
+:host {
+    --veo-navy: #00325E;
 }
 
-/* Fondo semitransparente */
-.bg-custom-opacity {
-    background-color: rgba(202, 216, 229, 0.5) !important;
+.font-sans { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+.cursor-pointer { cursor: pointer; }
+
+.catalog-header {
+    height: 400px;
+    background-image: url('https://placehold.co/1200x400');
+    background-size: cover;
+    background-position: center;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    box-shadow: inset 0 -20px 40px rgba(0,0,0,0.1);
 }
 
-.cursor-pointer {
-    cursor: pointer; 
+.catalog-title {
+    font-size: 2rem;
+    letter-spacing: 5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #00325E;
+    margin-bottom: 0.5rem;
 }
 
-.card {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    padding: 0.5rem;
+.catalog-separator {
+    width: 100%;             
+    height: 1px;           
+    background: linear-gradient(to right, rgba(0, 8, 15, 0.3) 0%, rgba(0,85,160,0.2) 50%, rgba(0,50,94,0.3) 100%); /* degradado muy sutil */
+    box-shadow: 0 1px 2px rgba(83, 83, 83, 0.03); 
+    margin: 0.5rem 0 1.5rem 0;
+    border-radius: 2px;
 }
 
-/* Imagen con margen interno pequeño dentro de la card */
-.producto-img-con-margen {
-    aspect-ratio: 3 / 4; /* más alto que ancho */
+
+
+.product-card {
+    border-radius: 15px;
+    transition: transform 0.4s ease, box-shadow 0.4s ease, filter 0.4s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+    filter: brightness(1.05);
+}
+
+.product-img-wrapper {
+    aspect-ratio: 3/4;
+    border-radius: 15px;
     overflow: hidden;
-    padding: 0.5rem; /* margen entre la imagen y la card */
+    background: #f9f9f9;
+    position: relative;
+    transition: box-shadow 0.3s ease;
 }
 
-.img-padding {
+.product-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 0.25rem;
-    transition: transform 0.3s ease;
+    transition: transform 0.5s ease, filter 0.5s ease;
 }
 
-.card:hover .img-padding {
+.product-card:hover .product-img {
     transform: scale(1.05);
+    filter: grayscale(10%);
 }
 
-.card-body h5,
-.card-body p {
-    background: transparent !important;
-    padding: 0;
-    margin: 0;
-    color: #000;
+.hover-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0);
+    transition: background 0.3s;
+    pointer-events: none;
+    border-radius: 15px;
+}
+
+.product-card:hover .hover-overlay {
+    background: rgba(0,0,0,0.05);
+}
+
+.card-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #00325E;
+    margin-bottom: 0.25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.product-price {
     font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+    font-family: 'Courier New', monospace;
 }
 
-/* Responsive para móviles */
-@media (max-width: 768px) {
-    .producto-img-con-margen {
-        aspect-ratio: 3 / 5;
-        padding: 0.3rem;
-    }
+.btn-clean-outline {
+    background: transparent;
+    border: 1px solid #ddd;
+    color: #333;
+    padding: 12px 30px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.btn-clean-outline:hover {
+    border-color: #00325E;
+    background: #00325E;
+    color: #fff;
 }
 </style>

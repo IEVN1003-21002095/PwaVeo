@@ -1,1 +1,11 @@
-<router-outlet></router-outlet>
+<ng-container *ngIf="role === 'admin'; else clientNav">
+  <app-nav-admin></app-nav-admin>
+  <div class="admin-content">
+    <router-outlet></router-outlet>
+  </div>
+</ng-container>
+
+<ng-template #clientNav>
+  <app-nav-client></app-nav-client>
+  <router-outlet></router-outlet>
+</ng-template>

@@ -1,25 +1,44 @@
-from flask import Blueprint
-from controllers.stock_controller import (
-    registrar_materia_prima,
-    obtener_materia_prima,
-    actualizar_materia_prima,
-    eliminar_materia_prima
-)
+from flask import Blueprint, jsonify, request
+from controllers.stock_controller import StockController
 
-stock_bp = Blueprint("stock_bp", __name__)
+stock_bp = Blueprint("stock", __name__, url_prefix="/api/stock")
+controller = StockController()
 
-@stock_bp.route("/raw", methods=["POST"])
-def create_raw_material():
-    return registrar_materia_prima()
+# GET /api/stock/list
+@stock_bp.route('/list', methods=['GET'])
+def list_stock():
+    try:
+        result = controller.list_stock()
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
-@stock_bp.route("/raw", methods=["GET"])
-def list_raw_material():
-    return obtener_materia_prima()
+# POST /api/stock/create
+@stock_bp.route('/create', methods=['POST'])
+def create_stock():
+    data = request.get_json(silent=True) or {}
+    try:
+        result = controller.create(data)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
-@stock_bp.route("/raw/<int:materia_prima_id>", methods=["PUT"])
-def update_raw_material(materia_prima_id):
-    return actualizar_materia_prima(materia_prima_id)
+# PUT /api/stock/<id>/update
+@stock_bp.route('/<int:item_id>/update', methods=['PUT'])
+def update_stock(item_id):
+    data = request.get_json(silent=True) or {}
+    
+    try:
+        result = controller.update(item_id, data)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
-@stock_bp.route("/raw/<int:materia_prima_id>", methods=["DELETE"])
-def delete_raw_material(materia_prima_id):
-    return eliminar_materia_prima(materia_prima_id)
+# DELETE /api/stock/<id>/delete
+@stock_bp.route('/<int:item_id>/delete', methods=['DELETE'])
+def delete_stock(item_id):
+    try:
+        result = controller.delete(item_id)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500

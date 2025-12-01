@@ -1,11 +1,66 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { RouterModule, ActivatedRoute } from '@angular/router';
+import { SalesService } from '../services/sales.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
+interface Venta {
+  venta_id?: number;
+  id?: number;
+  cliente_id?: number;
+  clienteId?: number;
+  fecha: string;
+  total: number;
+  estado: string;
+  detalles?: any[];
+  [key: string]: any;
+}
 
 @Component({
   selector: 'app-sales-detail',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule],
   templateUrl: './sales-detail.component.html',
-  styleUrl: './sales-detail.component.scss'
+  styleUrls: ['./sales-detail.component.scss']
 })
-export class SalesDetailComponent {
+export class SalesDetailComponent implements OnInit, OnDestroy {
+  venta: Venta | null = null;
+  detalles: any[] = [];
+  ventaId: number = 0;
+  isLoading = true;
+  error: string | null = null;
+  private destroy$ = new Subject<void>();
 
+  constructor(private route: ActivatedRoute, private salesService: SalesService) {}
+
+  ngOnInit(): void {
+    this.ventaId = +this.route.snapshot.params['ventaId'];
+    this.loadVenta();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  loadVenta(): void {
+    this.isLoading = true;
+    this.error = null;
+    this.salesService.getVentaPorId(this.ventaId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          this.venta = res.data;
+          this.detalles = res.data?.detalles || [];
+          this.isLoading = false;
+        },
+        error: (err) => {
+          this.error = 'Error al cargar la venta';
+          console.error('Error completo:', err);
+          this.isLoading = false;
+        }
+      });
+  }
 }

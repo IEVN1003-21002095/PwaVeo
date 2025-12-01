@@ -1,0 +1,109 @@
+<div class="admin-container-responsive" style="background-color: #f8f9fa;">
+    
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+    <h2 class="fw-bold mb-0" style="color: #083b66;">Gestión de Reseñas</h2>
+      <small style="color: #083b66;">Panel de Administración</small>
+      </div>
+      <div class="btn-group">
+        <button 
+          class="btn btn-success me-2" 
+          routerLink="/admin/reviews/new">
+          <i class="bi bi-plus-circle"></i> Nueva Reseña
+        </button>
+        <button 
+          class="btn" 
+          (click)="loadReviews()" 
+          style="background-color: #083b66; border-color: #083b66; color: white;">
+          <i class="bi bi-arrow-clockwise"></i> Refrescar
+        </button>
+      </div>
+    </div>
+
+    <!-- Alerta de Error -->
+    <div *ngIf="errorMsg" class="alert alert-danger shadow-sm" role="alert">
+      <strong>Error:</strong> {{ errorMsg }}
+    </div>
+
+    <!-- Spinner de Carga -->
+    <div *ngIf="isLoading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="mt-2 text-muted">Conectando con el servidor...</p>
+    </div>
+
+    <!-- Tabla de Contenido -->
+    <div *ngIf="!isLoading && !errorMsg" class="card shadow-sm border-0">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th class="ps-4">Fecha</th>
+                <th>Cliente</th>
+                <th>Producto</th>
+                <th>Calificación</th>
+                <th style="width: 35%;">Comentario</th>
+                <th>Estado</th>
+                <th class="text-end pe-4">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let review of reviews">
+                <td class="ps-4 small text-muted">
+                  {{ review.fecha | date:'dd/MM/yyyy' }} <br>
+                  {{ review.fecha | date:'shortTime' }}
+                </td>
+                <td>
+                  <div class="fw-bold text-dark">{{ review.nombre_completo }}</div>
+                  <div class="small text-muted">ID: {{ review.cliente_id }}</div>
+                </td>
+                <td class="fw-medium" style="color: #083b66;">{{ review.producto_nombre }}</td>
+                <td>
+                  <span class="text-warning fs-5">{{ review.calificacion | stars }}</span>
+                  <span class="ms-1 small text-muted">({{ review.calificacion }})</span>
+                </td>
+                <td>
+                  <p class="mb-0 text-secondary fst-italic" style="font-size: 0.9rem;">
+                    "{{ review.comentario }}"
+                  </p>
+                </td>
+                <td>
+                  <span [class]="getStatusBadgeClass(review.estado)">
+                    {{ review.estado | uppercase }}
+                  </span>
+                </td>
+                <td class="text-end pe-4">
+                  <div class="btn-group">
+                    <button *ngIf="review.estado !== 'aprobado'" 
+                            class="btn btn-sm btn-outline-success" 
+                            (click)="approve(review.id)" 
+                            title="Aprobar">
+                      ✔
+                    </button>
+                    <button *ngIf="review.estado !== 'rechazado'" 
+                            class="btn btn-sm btn-outline-warning" 
+                            (click)="reject(review.id)" 
+                            title="Rechazar">
+                      ✖
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" 
+                            (click)="delete(review.id)" 
+                            title="Eliminar">
+                      🗑
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="reviews.length === 0">
+                <td colspan="7" class="text-center py-5 text-muted">
+                  No hay reseñas para mostrar.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+</div>
