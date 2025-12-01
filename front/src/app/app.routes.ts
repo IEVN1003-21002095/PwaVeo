@@ -2,7 +2,14 @@ import { Routes } from '@angular/router';
 import { CatalogoClienteComponent } from './catalogoCliente/catalogo-c/catalogo-c.component';
 
 export const routes: Routes = [
-
+  // 1. RUTA DE HOME (Ruta Raíz: '/')
+  {
+    path: '', // Esta será la ruta por defecto (ej: http://localhost:4200/)
+    loadComponent: () =>
+      import('./home/home/home.component').then(m => m.HomeComponent)
+  },
+  
+  // Rutas de Módulos (Carga perezosa)
   {
     path: 'auth',
     loadChildren: () =>
@@ -76,6 +83,7 @@ export const routes: Routes = [
       import('./orders/orders.routes').then(m => m.ORDERS_ROUTES)
   },
 
-  { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
-  { path: '**', redirectTo: 'auth/login' }
+  // 2. Ruta Wildcard (para manejar páginas no encontradas)
+  // Ahora que 'home' maneja el path: '', usamos '**' para 404
+  { path: '**', redirectTo: 'catalogo' }
 ];

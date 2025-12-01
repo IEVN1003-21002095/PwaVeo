@@ -1,15 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import GestionCatalogoService from '../services/gestion_catalogo.services';
 import { Product } from '../models/product.model';
 
 @Component({
   selector: 'app-editar-producto',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, RouterLink],
   templateUrl: './editar.component.html'
 })
 export class EditarComponent implements OnInit {
@@ -27,14 +26,14 @@ export class EditarComponent implements OnInit {
   };
 
   categorias = ['Ropa', 'Accesorios', 'Calzado', 'Tecnología'];
-  variantes: Variante[] = []; // Lista de variantes del producto
-
+  formGroup!: FormGroup;
   visible: boolean = false;
 
   constructor(
     private catalogoService: GestionCatalogoService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
@@ -49,95 +48,49 @@ export class EditarComponent implements OnInit {
         error: () => this.router.navigate(['/gestionCatalogo'])
       });
     }
+
+    this.formGroup = this.fb.group({
+      nombre: ['', Validators.required],
+      categoria: ['', Validators.required],
+      costo: [0, Validators.required],
+      precio: [0, Validators.required],
+      activo: [1, Validators.required],
+      descripcion: [''],
+      imagen: ['']
+    });
   }
 
   abrir(producto: Product) {
     this.regProducto = { ...producto };
-    this.cargarVariantes(producto.id);
+    this.formGroup.patchValue({
+      nombre: producto.nombre,
+      categoria: producto.categoria,
+      costo: producto.costo,
+      precio: producto.precio,
+      activo: producto.activo,
+      descripcion: producto.descripcion,
+      imagen: producto.imagen
+    });
     this.visible = true;
   }
 
-  cerrar() {
-    this.visible = false;
-    this.router.navigate(['/gestionCatalogo']);
-  }
-
   modificar() {
-    if (!this.regProducto.id) return;
+    if (!this.regProducto.id || this.formGroup.invalid) return;
 
     const payload = {
       ...this.regProducto,
-      costo: Number(this.regProducto.costo),
-      precio: Number(this.regProducto.precio),
-      activo: Number(this.regProducto.activo),
-      variantes: this.variantes.map(v => ({
-        id: v.id || 0,
-        color: v.color || '',
-        talla: v.talla || '',
-        cantidad: Number(v.cantidad) || 0,
-        ubicacion: v.ubicacion || ''
-      }))
+      ...this.formGroup.value,
+      costo: Number(this.formGroup.value.costo),
+      precio: Number(this.formGroup.value.precio),
+      activo: Number(this.formGroup.value.activo)
     };
 
     this.catalogoService.editarProducto(payload).subscribe({
       next: (resp) => {
-        if (resp.success) {
-          alert('Producto modificado');
-          this.cerrar();
-        } else {
-          alert("Error al guardar: " + resp.message);
-        }
+        if (resp.success) this.router.navigate(['/gestionCatalogo']);
+        else console.error(resp.message);
       },
-      error: (err) => {
-        console.error("Error al actualizar:", err);
-        alert("Error de servidor al actualizar");
-      }
+      error: (err) => console.error(err)
     });
-  }
-
-  cargarVariantes(productId: number) {
-    this.catalogoService.getVariants(productId).subscribe({
-      next: (res) => {
-        if (res.success) {
-          this.variantes = res.data.map((v: any) => ({
-            id: v.id,
-            color: v.color,
-            talla: v.talla,
-            cantidad: v.cantidad,
-            ubicacion: v.ubicacion
-          }));
-        } else {
-          console.error("Error al cargar variantes:", res.message);
-        }
-      },
-      error: (err) => console.error("Error al obtener variantes:", err)
-    });
-  }
-
-  eliminarVariante(variant: Variante) {
-    if (!confirm(`¿Deseas eliminar la variante ${variant.color} - ${variant.talla}?`)) return;
-
-    if (variant.id && variant.id !== 0) {
-      this.catalogoService.eliminarVariante(variant.id).subscribe({
-        next: (res) => {
-          if (res.success) {
-            alert("Variante eliminada");
-            this.cargarVariantes(this.regProducto.id);
-          } else {
-            alert("Error: " + res.message);
-          }
-        },
-        error: (err) => {
-          console.error(err);
-          alert("Error al eliminar variante");
-        }
-      });
-    } else {
-      this.variantes = this.variantes.filter(v => v !== variant);
-    }
-  }
-
-  onVarianteCreada(variante: Variante) {
-    this.variantes.push(variante); // Se agrega automáticamente al listado
   }
 }

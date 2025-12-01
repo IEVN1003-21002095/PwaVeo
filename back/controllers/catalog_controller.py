@@ -5,7 +5,6 @@ import ssl
 class CatalogController:
 
     def __init__(self):
-        # Configurar SSL (opcional, depende de tu DB)
         ssl_context = ssl.create_default_context()
 
         self.connection = pymysql.connect(
@@ -18,7 +17,7 @@ class CatalogController:
         )
 
     # =========================================================
-    # LISTAR PRODUCTOS (solo info general para catálogo cliente)
+    # LISTAR PRODUCTOS 
     # =========================================================
     def list_catalog_products(self):
         try:
@@ -41,7 +40,6 @@ class CatalogController:
     def get_product_detail(self, product_id):
         try:
             with self.connection.cursor() as cursor:
-                # Info general del producto
                 cursor.execute("""
                     SELECT id, nombre, descripcion, precio, categoria, activo
                     FROM productos
@@ -52,7 +50,6 @@ class CatalogController:
                 if not product:
                     return {"success": False, "message": "Producto no encontrado"}
 
-                # Variaciones: unir inventario con colores y tallas
                 cursor.execute("""
                     SELECT 
                         c.color, c.codigo_hex, 

@@ -176,7 +176,7 @@
             <tr *ngFor="let item of inventarioFiltrado">
 
               <td class="ps-3 text-muted small">{{ item.id }}</td>
-              <td class="fw-bold text-dark">{{ item.nombre_insumo }}</td>
+              <td class="fw-bold text-dark">{{ item.nombre_insumo | titlecase}}</td>
 
               <td class="text-center text-dark small fw-bold">{{ getNombreColor(item.color_id) }}</td>
 

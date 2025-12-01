@@ -47,11 +47,9 @@ class ProductController:
 
     def create(self, data):
         try:
-            # Campos que vamos a insertar
             fields = ["nombre", "precio", "categoria", "costo", "descripcion", "proveedor_id", "activo"]
             values = [data.get(f) for f in fields]
 
-            # Validar nombre obligatorio
             if not values[0]:
                 return {"success": False, "message": "El nombre es obligatorio."}
 
@@ -119,6 +117,27 @@ class ProductController:
         except Exception as e:
             return {"success": False, "message": str(e)}
 
+    def get_variant(self, inventory_id):
+        try:
+            with self.get_cursor() as cursor:
+                sql = """
+                    SELECT i.id, i.producto_id,
+                           i.color_id, c.color,
+                           i.talla_id, t.talla,
+                           i.cantidad, i.ubicacion
+                    FROM inventario i
+                    LEFT JOIN colores c ON i.color_id = c.id
+                    LEFT JOIN tallas t ON i.talla_id = t.id
+                    WHERE i.id = %s
+                """
+                cursor.execute(sql, (inventory_id,))
+                data = cursor.fetchone()
+            if not data:
+                return {"success": False, "message": "Variante no encontrada"}, 404
+            return {"success": True, "data": data}
+        except Exception as e:
+            return {"success": False, "message": str(e)}, 500
+
     def add_variant(self, data):
         try:
             producto_id = data.get("producto_id")
@@ -167,7 +186,16 @@ class ProductController:
     def delete_variant(self, inventory_id):
         try:
             with self.get_cursor() as cursor:
-                cursor.execute("DELETE FROM inventario WHERE id=%s", (inventory_id,))
-            return {"success": True, "message": "Variante eliminada"}
+                cursor.execute(
+                    "DELETE FROM venta_detalle WHERE inventario_id = %s",
+                    (inventory_id,)
+                )
+
+                cursor.execute(
+                    "DELETE FROM inventario WHERE id = %s",
+                    (inventory_id,)
+                )
+
+            return {"success": True, "message": "Variante eliminada correctamente"}
         except Exception as e:
             return {"success": False, "message": str(e)}

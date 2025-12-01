@@ -16,7 +16,6 @@ export default class GestionCatalogoService {
 
   get refresh$() { return this._refresh$.asObservable(); }
 
-  // ===================== PRODUCTOS =====================
   getProducts(): Observable<Product[]> {
     return this.http.get<ApiResponse>(`${this.apiUrl}/list`).pipe(
       map(res => (res.success ? res.data : []) as Product[])
@@ -66,23 +65,4 @@ export default class GestionCatalogoService {
       .pipe(tap(() => this._refresh$.next()));
   }
 
-  // ===================== VARIANTES =====================
-  getVariants(productId: number): Observable<ApiResponse> {
-    return this.http.get<ApiResponse>(`${this.apiUrl}/${productId}/inventory`);
-  }
-
-  agregarVariante(data: any): Observable<ApiResponse> {
-    return this.http.post<ApiResponse>(`${this.apiUrl}/inventory/add`, data)
-      .pipe(tap(() => this._refresh$.next()));
-  }
-
-  editarVariante(inventoryId: number, data: any): Observable<ApiResponse> {
-    return this.http.put<ApiResponse>(`${this.apiUrl}/inventory/${inventoryId}/update`, data)
-      .pipe(tap(() => this._refresh$.next()));
-  }
-
-  eliminarVariante(inventoryId: number): Observable<ApiResponse> {
-    return this.http.delete<ApiResponse>(`${this.apiUrl}/inventory/${inventoryId}/delete`)
-      .pipe(tap(() => this._refresh$.next()));
-  }
 }

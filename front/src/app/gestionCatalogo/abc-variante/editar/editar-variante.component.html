@@ -1,32 +1,85 @@
-<div *ngIf="visible" class="modal-overlay font-sans">
-  <div class="modal-card">
+<div class="modal-overlay font-sans">
+
+  <form *ngIf="loaded; else cargando" [formGroup]="formGroup" (ngSubmit)="onSubmit()" class="modal-card">
+
     <div class="modal-header">
-      <h3 class="modal-title">Editar Variante</h3>
-      <button class="btn-close" (click)="cancelar()">&times;</button>
+      <h3 class="modal-title">Editar Variante #{{ inventoryId }}</h3>
     </div>
 
     <div class="modal-body">
-      <div class="mb-3">
-        <label class="form-label">Color</label>
-        <input class="form-control" type="text" [(ngModel)]="variante.color" disabled />
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Color</label>
+          <input type="text" class="form-control" [value]="regVariante.color" disabled>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Talla</label>
+          <input type="text" class="form-control" [value]="regVariante.talla" disabled>
+        </div>
       </div>
-      <div class="mb-3">
-        <label class="form-label">Talla</label>
-        <input class="form-control" type="text" [(ngModel)]="variante.talla" disabled />
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Cantidad *</label>
+          <input type="number" class="form-control" formControlName="cantidad" placeholder="Ej: 10">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Ubicación *</label>
+          <input type="text" class="form-control" formControlName="ubicacion" placeholder="Ej: Almacén A">
+        </div>
       </div>
-      <div class="mb-3">
-        <label class="form-label">Cantidad</label>
-        <input class="form-control" type="number" [(ngModel)]="variante.cantidad" />
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Ubicación</label>
-        <input class="form-control" type="text" [(ngModel)]="variante.ubicacion" />
-      </div>
+
     </div>
 
     <div class="modal-footer">
-      <button class="btn-cancel" (click)="cancelar()">Cancelar</button>
-      <button class="btn-confirm" (click)="guardar()">Guardar Cambios</button>
+      <a [routerLink]="['/gestionCatalogo/inventario', regVariante.producto_id]" class="btn-cancel">Cancelar</a>
+      <button class="btn-confirm" type="submit" [disabled]="formGroup.invalid">Actualizar</button>
     </div>
-  </div>
+
+  </form>
+
+  <ng-template #cargando>
+    <div class="modal-card text-center p-4">
+      <div class="spinner-border" role="status"></div>
+      <p class="mt-2 mb-0">Cargando variante...</p>
+    </div>
+  </ng-template>
+
 </div>
+
+<style>
+.modal-overlay {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  background-color: rgba(202, 216, 229, 0.623);
+  display: flex; justify-content: center; align-items: center;
+  padding: 1rem; backdrop-filter: blur(3px); z-index: 2000;
+}
+
+.modal-card {
+  background: #fff; width: 100%; max-width: 600px; border-radius: 12px;
+  padding: 1rem; display: flex; flex-direction: column;
+}
+
+.modal-header, .modal-footer {
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.modal-title { font-weight: 700; font-size: 1.2rem; }
+.btn-close { text-decoration: none; font-size: 1.5rem; cursor: pointer; }
+
+.modal-body { padding: 1rem 0; }
+.form-label { font-weight: 600; font-size: 0.85rem; text-transform: uppercase; }
+.form-control, .form-select { padding: 0.5rem; border-radius: 6px; border: 1px solid #d1d5db; width: 100%; }
+
+.btn-cancel {
+  background: #fff; border: 1px solid #d1d5db; padding: 8px 20px;
+  border-radius: 6px; text-decoration: none; color: black; font-weight: 600;
+}
+.btn-confirm {
+  background: #00325E; color: #fff; border: none; padding: 8px 24px;
+  border-radius: 6px; font-weight: 600;
+}
+</style>

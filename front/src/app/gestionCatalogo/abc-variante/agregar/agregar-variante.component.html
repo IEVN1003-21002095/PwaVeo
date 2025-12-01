@@ -1,33 +1,105 @@
-<div *ngIf="visible" class="modal-overlay font-sans">
-  <div class="modal-card">
+<div class="modal-overlay font-sans">
+
+  <form [formGroup]="formGroup" (ngSubmit)="onSubmit()" class="modal-card">
+
     <div class="modal-header">
       <h3 class="modal-title">Agregar Variante</h3>
-      <button type="button" class="btn-close" (click)="cerrar()">×</button>
     </div>
 
     <div class="modal-body">
-      <div class="mb-3">
-        <label class="form-label">Color</label>
-        <input class="form-control" formControlName="color" placeholder="Ej. Rojo" />
+
+      <div *ngIf="mensajeError" class="alert-error">
+        {{ mensajeError }}
       </div>
-      <div class="mb-3">
-        <label class="form-label">Talla</label>
-        <input class="form-control" formControlName="talla" placeholder="Ej. M" />
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Color *</label>
+          <select class="form-select" formControlName="color_id">
+            <option value="" disabled selected>Seleccionar...</option>
+            <option *ngFor="let c of coloresOptions" [value]="c.id">{{ c.nombre }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Talla *</label>
+          <select class="form-select" formControlName="talla_id">
+            <option value="" disabled selected>Seleccionar...</option>
+            <option *ngFor="let t of tallasOptions" [value]="t.id">{{ t.nombre }}</option>
+          </select>
+        </div>
       </div>
-      <div class="mb-3">
-        <label class="form-label">Cantidad</label>
-        <input type="number" class="form-control" formControlName="cantidad" />
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Cantidad *</label>
+          <input type="number" class="form-control" formControlName="cantidad" placeholder="Ej: 10">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Ubicación *</label>
+          <input type="text" class="form-control" formControlName="ubicacion" placeholder="Ej: Almacén A">
+        </div>
       </div>
-      <div class="mb-3">
-        <label class="form-label">Ubicación</label>
-        <input class="form-control" formControlName="ubicacion" placeholder="Ej. Almacén A" />
-      </div>
-      <div *ngIf="errorMsg" class="text-red-600 mt-2">{{ errorMsg }}</div>
+
     </div>
 
     <div class="modal-footer">
-      <button class="btn-cancel" type="button" (click)="cerrar()">Cancelar</button>
-      <button class="btn-confirm" type="button" (click)="agregar()" [disabled]="formGroup.invalid">Agregar</button>
+      <a [routerLink]="['../']" class="btn-cancel">Cancelar</a>
+      <button class="btn-confirm" type="submit" [disabled]="formGroup.invalid">Agregar</button>
     </div>
-  </div>
+
+  </form>
+
 </div>
+
+<style>
+.modal-overlay {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  background-color: rgba(202, 216, 229, 0.623);
+  display: flex; justify-content: center; align-items: center;
+  padding: 1rem; backdrop-filter: blur(3px); z-index: 2000;
+}
+
+.modal-card {
+  background: #fff; width: 100%; max-width: 600px; border-radius: 12px;
+  padding: 1rem; display: flex; flex-direction: column;
+}
+
+.modal-header, .modal-footer {
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.modal-title { font-weight: 700; font-size: 1.2rem; }
+.btn-close { text-decoration: none; font-size: 1.5rem; cursor: pointer; }
+
+.modal-body { padding: 1rem 0; }
+.form-label { font-weight: 600; font-size: 0.85rem; text-transform: uppercase; }
+.form-control, .form-select { padding: 0.5rem; border-radius: 6px; border: 1px solid #d1d5db; width: 100%; }
+
+.btn-cancel {
+  background: #fff; border: 1px solid #d1d5db; padding: 8px 20px;
+  border-radius: 6px; text-decoration: none; color: black; font-weight: 600;
+}
+.btn-confirm {
+  background: #00325E; color: #fff; border: none; padding: 8px 24px;
+  border-radius: 6px; font-weight: 600;
+}
+
+
+.alert-error {
+  background-color: #fde2e2; 
+  color: #b71c1c; 
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  text-align: center;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>

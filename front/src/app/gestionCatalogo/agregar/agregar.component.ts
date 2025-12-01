@@ -17,7 +17,6 @@ export class AgregarComponent implements OnInit {
 
   formGroup!: FormGroup;
 
-  // Manteniendo el mismo patrón DEL INVENTARIO
   regProducto: Product = {
     id: 0,
     nombre: '',
@@ -67,7 +66,6 @@ export class AgregarComponent implements OnInit {
   onSubmit(): void {
     const v = this.formGroup.value;
 
-    // PASA EL FORM A regProducto  (igual que el inventario)
     this.regProducto.nombre = v.nombre;
     this.regProducto.descripcion = v.descripcion;
     this.regProducto.categoria = v.categoria;

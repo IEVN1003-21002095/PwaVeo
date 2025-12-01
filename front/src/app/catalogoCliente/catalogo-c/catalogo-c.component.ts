@@ -31,7 +31,6 @@ export class CatalogoClienteComponent implements OnInit {
       .subscribe({
         next: (res) => {
           const productosParseados: Producto[] = (res.data || [])
-            // Filtrar solo los activos
             .filter(p => p.activo === 1)
             .map(p => ({
               ...p,
@@ -47,7 +46,6 @@ export class CatalogoClienteComponent implements OnInit {
 
 
 verDetalle(id: number) {
-  // Navega de manera absoluta a /catalogo/:id
   this.router.navigate(['/catalogo', id]);
 }
 

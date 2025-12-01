@@ -9,35 +9,33 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
+      background-color: rgba(0, 0, 0, 0.5);
       z-index: 1000;
       display: flex;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(2px); /* Efecto borroso elegante */
+      backdrop-filter: blur(2px);
       padding: 1rem;
     }
 
     .modal-card {
       background-color: #ffffff;
       width: 100%;
-      max-width: 800px; /* Ancho máximo del modal similar a la imagen */
+      max-width: 800px;
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
       overflow: hidden;
       animation: slideIn 0.3s ease-out;
       display: flex;
       flex-direction: column;
-      max-height: 90vh; /* Para que no se salga de pantallas pequeñas */
+      max-height: 90vh;
     }
 
-    /* Animación de entrada suave */
     @keyframes slideIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* === HEADER & FOOTER === */
     .modal-header {
       padding: 1.5rem 2rem;
       border-bottom: 1px solid #f0f0f0;
@@ -48,7 +46,7 @@
 
     .modal-body {
       padding: 2rem;
-      overflow-y: auto; /* Scroll interno si es muy alto */
+      overflow-y: auto;
     }
 
     .modal-footer {
@@ -60,7 +58,6 @@
       gap: 12px;
     }
 
-    /* === ESTILOS INTERNOS === */
     .modal-title { font-weight: 700; color: #1a1a1a; font-size: 1.25rem; margin: 0; }
     .btn-close-x { background: none; border: none; font-size: 1.5rem; color: #999; cursor: pointer; }
     .btn-close-x:hover { color: #333; }
@@ -69,12 +66,11 @@
     .form-control, .form-select { border-radius: 6px; border: 1px solid #d1d5db; padding: 0.6rem 0.8rem; font-size: 0.9rem; }
     .form-control:focus, .form-select:focus { border-color: #00325E; box-shadow: 0 0 0 3px rgba(0, 50, 94, 0.1); }
 
-    /* Botones */
     .btn-confirm { background-color: #00325E; color: white; border: none; font-weight: 600; padding: 10px 24px; border-radius: 6px; font-size: 0.9rem; transition: 0.2s; }
     .btn-confirm:hover { background-color: #002244; transform: translateY(-1px); }
     
-    .btn-cancel { background-color: white; border: 1px solid #d1d5db; color: #374151; font-weight: 600; padding: 10px 24px; border-radius: 6px; font-size: 0.9rem; text-decoration: none; transition: 0.2s; }
-    .btn-cancel:hover { background-color: #f3f4f6; color: #111; border-color: #9ca3af; }
+    .btn-cancel { background-color: white; border: 1px solid #d1d5db; color: #374151; font-weight: 600; padding: 10px 20px; border-radius: 6px; text-decoration: none; }
+    .btn-cancel:hover { background-color: #f3f4f6; }
   </style>
 
   <form (ngSubmit)="guardar()" #formAgregar="ngForm" class="modal-card">
@@ -82,8 +78,7 @@
     <!-- HEADER -->
     <div class="modal-header">
       <h2 class="modal-title">Agregar Nuevo Insumo</h2>
-      <!-- Botón X para cerrar rápido -->
-      <a [routerLink]="['/gestionStock']" class="btn-close-x" title="Cerrar">&times;</a>
+      <a [routerLink]="['/gestionStock']" class="btn-close-x">&times;</a>
     </div>
 
     <!-- BODY (Inputs) -->
@@ -120,8 +115,11 @@
         </div>
         <div class="col-md-6">
           <label class="form-label">Unidad de Medida</label>
-          <input type="text" class="form-control" name="unidad" 
-                 [(ngModel)]="regInventario.unidad" placeholder="Ej. pza, kg, m" required />
+          <select class="form-select" name="unidad" [(ngModel)]="regInventario.unidad" required>
+            <option value="" disabled selected>Seleccionar...</option>
+            <option value="PIEZA">PIEZA</option>
+            <option value="KG">KG</option>
+          </select>
         </div>
       </div>
 

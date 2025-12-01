@@ -4,10 +4,9 @@ export interface Product {
   descripcion: string;
   precio: number;
   costo: number;
-  proveedor_id: number; // FK Numérico según tu BD
+  proveedor_id: number; 
   categoria: string;
-  activo: number; // 1 = Activo, 0 = Inactivo
-  // Opcionales para visualización
+  activo: number; 
   imagen?: string; 
   creado_en?: string;
   actualizado_en?: string;

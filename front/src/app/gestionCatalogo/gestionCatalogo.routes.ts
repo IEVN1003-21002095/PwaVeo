@@ -18,16 +18,22 @@ export const GESTION_CATALOGO_ROUTES: Routes = [
         loadComponent: () => import('./eliminar/eliminar.component').then(m => m.EliminarComponent)
       },
       {
-        path: 'abc-variante/agregar',
-        loadComponent: () => import('./abc-variante/agregar/agregar-variante.component').then(m => m.AgregarVarianteComponent)
-      },
-      {
-        path: 'abc-variante/editar/:id',
-        loadComponent: () => import('./abc-variante/editar/editar-variante.component').then(m => m.EditarVarianteComponent)
-      },
-      {
-        path: 'abc-variante/eliminar/:id',
-        loadComponent: () => import('./abc-variante/eliminar/eliminar-variante.component').then(m => m.EliminarVarianteComponent)
+        path: 'inventario/:id',
+        loadComponent: () => import('./abc-variante/inventario-producto/inventario-producto.component').then(m => m.InventarioProductoComponent),
+        children: [
+          {
+            path: 'agregar',
+            loadComponent: () => import('./abc-variante/agregar/agregar-variante.component').then(m => m.AgregarVarianteComponent)
+          },
+          {
+            path: 'editar/:id',
+            loadComponent: () => import('./abc-variante/editar/editar-variante.component').then(m => m.EditarVarianteComponent)
+          },
+          {
+            path: 'eliminar/:id',
+            loadComponent: () => import('./abc-variante/eliminar/eliminar-variante.component').then(m => m.EliminarVarianteComponent)
+          }
+        ]
       }
     ]
   }

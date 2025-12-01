@@ -2,16 +2,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <div class="container-fluid py-5" style="background-color: #ffffff; min-height: 100vh; font-family: 'Inter', sans-serif;">
-  
+
   <style>
-    /* === ESTILOS BASE === */
     .form-control, .form-select, .btn, .input-group-text { border-radius: 6px !important; }
     .form-control:focus, .form-select:focus { border-color: #00325E; box-shadow: 0 0 0 2px rgba(0, 50, 94, 0.1); }
+
+    .form-control, .form-select {
+        text-transform: capitalize;
+    }
 
     .page-title { font-weight: 700; color: #1a1a1a; font-size: 1.5rem; letter-spacing: -0.5px; }
     .page-subtitle { color: #6c757d; font-size: 0.9rem; }
 
-    /* Botón Acción Principal */
     .btn-action-primary {
         background-color: #00325E; color: white; border: none; border-radius: 6px; padding: 10px 24px;
         font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
@@ -21,13 +23,11 @@
     .btn-action-primary:hover { background-color: #002244; transform: translateY(-1px); box-shadow: 0 6px 10px rgba(0, 50, 94, 0.4); color: white; }
     .btn-action-primary i { font-size: 1.1rem; font-weight: bold; }
 
-    /* Tabs de Filtro */
     .segment-group { display: inline-flex; background-color: #f1f3f5; padding: 4px; border-radius: 8px !important; border: 1px solid #e9ecef; }
     .segment-btn { border: none; background: transparent; color: #6c757d; font-size: 0.85rem; font-weight: 500; padding: 6px 16px; border-radius: 6px; transition: all 0.2s ease; cursor: pointer; }
     .segment-btn:hover { color: #00325E; }
     .segment-btn.active { background-color: white; color: #00325E; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
-    /* Buscador y Botón Filtro */
     .search-bar .input-group-text { background-color: white; border: 1px solid #ced4da; border-right: none; color: #999; }
     .search-bar .form-control { border: 1px solid #ced4da; border-left: none; padding-left: 0; }
     .search-bar:focus-within .input-group-text, .search-bar:focus-within .form-control { border-color: #00325E; }
@@ -35,22 +35,18 @@
     .btn-icon-square { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border: 1px solid #ced4da; background: white; color: #6c757d; transition: 0.2s; border-radius: 6px; }
     .btn-icon-square:hover, .btn-icon-square[aria-expanded="true"] { border-color: #00325E; color: #00325E; background-color: #f0f4f8; }
 
-    /* Tabla */
     .table-clean { width: 100%; border-collapse: separate; border-spacing: 0; }
     .table-clean thead th { background-color: #f8f9fc !important; color: #4a5568; font-weight: 600; font-size: 0.85rem; padding: 12px 16px; border: none; border-bottom: 1px solid #edf2f7; white-space: nowrap; }
     .table-clean tbody td { background-color: white; border-bottom: 1px solid #f0f0f0; padding: 16px; vertical-align: middle; font-size: 0.9rem; color: #2d3748; }
     .table-clean tbody tr:hover td { background-color: #fafbfc; }
 
-    /* Imágenes */
     .product-img-container { width: 45px; height: 45px; border-radius: 6px; overflow: hidden; background-color: #f8f9fa; border: 1px solid #e9ecef; display: flex; align-items: center; justify-content: center; color: #ccc; }
 
-    /* Status Pill */
     .status-pill { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; border: 1px solid; background: white; }
     .status-pill::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; }
     .status-pill.activo { border-color: #c3e6cb; color: #155724; } .status-pill.activo::before { background-color: #28a745; }
     .status-pill.inactivo { border-color: #e2e3e5; color: #6c757d; } .status-pill.inactivo::before { background-color: #6c757d; }
 
-    /* Acciones */
     .btn-action-subtle { color: #a0aec0; transition: 0.2s; font-size: 1.1rem; border: none; background: transparent; padding: 4px; }
     .btn-action-subtle:hover { color: #00325E; transform: scale(1.1); }
     .btn-action-subtle.danger:hover { color: #dc3545; }
@@ -67,13 +63,10 @@
         <p class="page-subtitle m-0">Administración de productos visibles para el cliente</p>
       </div>
 
-      <!-- BARRA DE HERRAMIENTAS -->
       <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
           
-          <!-- IZQUIERDA: Buscador + Filtro + Tabs -->
           <div class="d-flex align-items-center gap-2 flex-grow-1">
               
-              <!-- 1. Buscador -->
               <div class="input-group search-bar" style="max-width: 320px;">
                   <span class="input-group-text"><i class="bi bi-search"></i></span>
                   <input
@@ -85,12 +78,10 @@
                   />
               </div>
 
-              <!-- 2. Botón Filtros (Cuadrado) -->
               <button class="btn btn-icon-square" type="button" data-bs-toggle="collapse" data-bs-target="#filtrosCollapse" aria-expanded="false" title="Más filtros">
                 <i class="bi bi-sliders2"></i>
               </button>
 
-              <!-- 3. TABS DE ESTADO (Mapeo a 1/0 de BD) -->
               <div class="segment-group ms-2">
                   <button class="segment-btn" [class.active]="isActive(null)" (click)="setFiltroEstado(null)">Todos</button>
                   <button class="segment-btn" [class.active]="isActive(1)" (click)="setFiltroEstado(1)">Activos</button>
@@ -98,16 +89,13 @@
               </div>
           </div>
 
-          <!-- DERECHA: Botón Nuevo -->
           <div class="d-flex align-items-center">
-              <!-- RouterLink apunta a la ruta hija -->
               <button class="btn-action-primary" [routerLink]="['./agregar']">
                   <i class="bi bi-plus-lg"></i> NUEVO PRODUCTO
               </button>
           </div>
       </div>
 
-      <!-- PANEL DE FILTROS AVANZADOS -->
       <div class="collapse mb-4" id="filtrosCollapse">
         <div class="p-4 border rounded bg-white shadow-sm">
             <h6 class="text-uppercase text-muted small fw-bold mb-3 ls-1">Filtros por categoría</h6>
@@ -119,7 +107,6 @@
                         <option *ngFor="let c of categoriasDisponibles" [value]="c">{{ c }}</option>
                     </select>
                 </div>
-                <!-- Aquí irían más filtros si los tuvieras (ej. Rango de Precios) -->
             </div>
             <div class="d-flex justify-content-end mt-3 border-top pt-2">
                 <button class="btn link-reset" type="button" (click)="limpiarFiltros()">
@@ -129,7 +116,6 @@
         </div>
       </div>
 
-      <!-- TABLA DE PRODUCTOS -->
       <div class="table-responsive">
         <table class="table table-clean mb-0" *ngIf="productosFiltrados.length">
           <thead>
@@ -139,8 +125,8 @@
               <th>Nombre Producto</th>
               <th>Categoría</th>
               <th style="width: 30%;">Descripción</th>
-              <th class="text-end">$$ Costo</th>
-              <th class="text-end">$$ Venta</th>
+              <th class="text-end">Costo</th>
+              <th class="text-end">Venta</th>
               <th class="text-center">Estado</th>
               <th class="text-end pe-3">Acciones</th>
             </tr>
@@ -150,41 +136,29 @@
               
               <td class="ps-3 text-muted small">{{ p.id }}</td>
 
-              <!-- Imagen -->
               <td class="ps-3">
                   <div class="product-img-container">
-                    <!-- Placeholder si no hay imagen -->
                     <i class="bi bi-image fs-5"></i>
                   </div>
               </td>
               
-              <!-- Nombre -->
-              <td class="fw-bold text-dark">{{ p.nombre }}</td>
+              <td class="fw-bold text-dark">{{ p.nombre | titlecase}}</td>
               
-              <!-- Categoría -->
-              <td><span class="badge bg-light text-dark border fw-normal">{{ p.categoria }}</span></td>
+              <td><span class="badge bg-light text-dark border fw-normal">{{ p.categoria | titlecase }}</span></td>
               
-              <!-- Descripción -->
-              <td class="small text-muted text-truncate" style="max-width: 250px;">{{ p.descripcion }}</td>
+              <td class="small text-muted text-truncate" style="max-width: 250px;">{{ p.descripcion | titlecase}}</td>
               
-              <!-- Costo -->
               <td class="text-end font-monospace text-muted">{{ p.costo | currency:'MXN':'symbol-narrow':'1.2-2' }}</td>
               
-              <!-- Precio Venta -->
               <td class="text-end font-monospace fw-bold text-dark">{{ p.precio | currency:'MXN':'symbol-narrow':'1.2-2' }}</td>
               
-              <!-- Estado (Mapeo de 1/0 a Activo/Inactivo) -->
               <td class="text-center">
                 <span class="status-pill" 
-                      [ngClass]="{
-                        'activo': p.activo === 1,
-                        'inactivo': p.activo === 0
-                      }">
+                      [ngClass]="{'activo': p.activo === 1,'inactivo': p.activo === 0}">
                   {{ p.activo === 1 ? 'Activo' : 'Inactivo' }}
                 </span>
               </td>
 
-              <!-- Acciones -->
               <td class="pe-3 text-end">
                 <div class="d-flex justify-content-end gap-2">
                     <button class="btn-action-subtle" [routerLink]="['./editar', p.id]" title="Editar">
@@ -193,6 +167,10 @@
                     <button class="btn-action-subtle danger" [routerLink]="['./eliminar', p.id]" title="Eliminar">
                         <i class="bi bi-trash"></i>
                     </button>
+                    <button class="btn-action-subtle" [routerLink]="['./inventario', p.id]" title="Ver Variantes">
+                        <i class="bi bi-diagram-3"></i>
+                    </button>
+
                 </div>
               </td>
             </tr>
@@ -200,14 +178,12 @@
         </table>
       </div>
 
-      <!-- Empty State -->
       <div *ngIf="!productosFiltrados.length && !cargando" class="text-center py-5 mt-4 border rounded bg-light">
         <h5 class="text-muted fw-normal">No se encontraron productos</h5>
         <p class="small text-muted">Intenta ajustar los filtros o buscar otro nombre.</p>
         <button class="btn btn-sm btn-outline-dark mt-2" (click)="limpiarFiltros()">Ver Todo</button>
       </div>
 
-      <!-- Loading -->
       <div *ngIf="cargando" class="text-center py-5 mt-4">
         <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Cargando...</span>
@@ -219,5 +195,4 @@
   </div>
 </div>
 
-<!-- Router Outlet para los Modales Hijos -->
 <router-outlet></router-outlet>

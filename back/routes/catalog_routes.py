@@ -5,7 +5,7 @@ catalog_bp = Blueprint("catalog", __name__)
 controller = CatalogController()
 
 # =========================================================
-# CATALOGO GENERAL (solo info general)
+# CATALOGO GENERAL 
 # =========================================================
 @catalog_bp.route('/', methods=['GET'])
 def catalog_products():

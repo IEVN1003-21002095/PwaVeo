@@ -53,11 +53,8 @@
       padding: 0.6rem 0.8rem; font-size: 0.9rem;
     }
 
-    .btn-cancel {
-      background: #fff; border: 1px solid #d1d5db;
-      padding: 10px 20px; border-radius: 6px; font-weight: 600;
-      text-decoration: none;
-    }
+ .btn-cancel { background-color: white; border: 1px solid #d1d5db; color: #374151; font-weight: 600; padding: 10px 20px; border-radius: 6px; text-decoration: none; }
+    .btn-cancel:hover { background-color: #f3f4f6; }
 
     .btn-confirm {
       background: #00325E; color: white; border: none;
@@ -68,13 +65,11 @@
 
   <form [formGroup]="formGroup" (ngSubmit)="onSubmit()" class="modal-card">
 
-    <!-- HEADER -->
     <div class="modal-header">
       <h3 class="modal-title">Nuevo Producto</h3>
       <a [routerLink]="['/gestionCatalogo']" class="btn-close">&times;</a>
     </div>
 
-    <!-- BODY -->
     <div class="modal-body">
 
       <div class="row mb-3">
@@ -89,8 +84,6 @@
             <option value="" disabled selected>Seleccionar...</option>
             <option value="Ropa">Ropa</option>
             <option value="Accesorios">Accesorios</option>
-            <option value="Calzado">Calzado</option>
-            <option value="Tecnología">Tecnología</option>
           </select>
         </div>
       </div>
@@ -127,7 +120,6 @@
 
     </div>
 
-    <!-- FOOTER -->
     <div class="modal-footer">
       <a [routerLink]="['/gestionCatalogo']" class="btn-cancel">Cancelar</a>
       <button class="btn-confirm" type="submit" [disabled]="formGroup.invalid">

@@ -4,9 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import GestionCatalogoService from '../services/gestion_catalogo.services';
-// Importamos el componente que manejará la sub-tabla de inventario
 
-// Definición de la interfaz Producto según tu BD
 export interface Producto {
   id: number;
   nombre: string;
@@ -14,13 +12,12 @@ export interface Producto {
   precio: number;
   costo: number;
   categoria: string;
-  activo: number; // 1 = Activo, 0 = Inactivo
+  activo: number; 
 }
 
 @Component({
   selector: 'app-catalogo',
   standalone: true,
-  // Agregamos InventarioProductoComponent a los imports
   imports: [CommonModule, FormsModule, RouterModule, HttpClientModule], 
   templateUrl: './catalogo.component.html'
 })
@@ -42,7 +39,6 @@ export class CatalogoComponent implements OnInit {
   ngOnInit(): void {
     this.cargarDatos();
     
-    // Suscribirse al refresh$ del servicio para actualizar la lista de productos
     this.catalogoService.refresh$.subscribe(() => this.cargarDatos());
   }
 
@@ -60,7 +56,6 @@ export class CatalogoComponent implements OnInit {
     });
   }
 
-  // === CONTROL DE TABS (ESTADO) ===
   setFiltroEstado(estado: number | null): void {
     this.filtros.activo = estado;
   }
@@ -69,7 +64,6 @@ export class CatalogoComponent implements OnInit {
     return this.filtros.activo === estado;
   }
 
-  // === FILTRADO ===
   get productosFiltrados(): Producto[] {
     return this.productos.filter(p => {
       

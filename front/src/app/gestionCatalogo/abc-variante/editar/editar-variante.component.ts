@@ -1,51 +1,74 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common'; // <--- Agregado
-import GestionCatalogoService from '../../services/gestion_catalogo.services';
+import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import GestionInventarioService, { Variante } from '../../services/gestion_inventario.services';
 
 @Component({
   selector: 'app-editar-variante',
   standalone: true,
-  imports: [FormsModule, CommonModule], // <--- Agregado CommonModule
-  templateUrl: './editar-variante.component.html',
+  imports: [ReactiveFormsModule, RouterModule, CommonModule],
+  templateUrl: './editar-variante.component.html'
 })
-export class EditarVarianteComponent {
-  @Input() variante: any; // variante que se edita
-  @Output() varianteActualizada = new EventEmitter<void>();
-  visible: boolean = false;
+export class EditarVarianteComponent implements OnInit {
 
-  constructor(private catalogoService: GestionCatalogoService) {}
+  formGroup!: FormGroup;
+  inventoryId!: number;
+  regVariante!: Variante;
 
-  abrir(variante: any) {
-    this.variante = { ...variante }; // clonar
-    this.visible = true;
-  }
+  loaded = false;
 
-  guardar() {
-    if (!this.variante) return;
-    const payload = {
-      cantidad: Number(this.variante.cantidad),
-      ubicacion: this.variante.ubicacion || ''
-    };
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
+    private inventarioService: GestionInventarioService
+  ) {}
 
-    this.catalogoService.editarVariante(this.variante.id, payload).subscribe({
-      next: (res) => {
-        if (res.success) {
-          alert('Variante actualizada');
-          this.visible = false;
-          this.varianteActualizada.emit();
-        } else {
-          alert('Error: ' + res.message);
+  ngOnInit(): void {
+    this.inventoryId = Number(this.route.snapshot.paramMap.get('id'));
+
+    this.formGroup = this.fb.group({
+      cantidad: [0, [Validators.required, Validators.min(0)]],
+      ubicacion: ['', Validators.required]
+    });
+
+    this.inventarioService.getInventory(this.inventoryId).subscribe({
+      next: (v: Variante) => {
+        if (!v) {
+          this.router.navigate(['../'], { relativeTo: this.route });
+          return;
         }
+        this.regVariante = { ...v };
+        this.formGroup.patchValue({
+          cantidad: v.cantidad,
+          ubicacion: v.ubicacion
+        });
+        this.loaded = true;
       },
       error: (err) => {
-        console.error(err);
-        alert('Error al actualizar variante');
+        console.error('Error cargando variante:', err);
+        this.router.navigate(['../'], { relativeTo: this.route });
       }
     });
   }
 
-  cancelar() {
-    this.visible = false;
+  onSubmit(): void {
+    if (this.formGroup.invalid) return;
+
+    const v = this.formGroup.value;
+
+    this.regVariante.cantidad = Number(v.cantidad);
+    this.regVariante.ubicacion = v.ubicacion;
+
+    this.inventarioService.updateVariant(this.inventoryId, this.regVariante).subscribe({
+      next: () => {
+        this.inventarioService.triggerRefresh();
+        this.router.navigate(['/gestionCatalogo/inventario', this.regVariante.producto_id]);
+      },
+      error: (err) => {
+        console.error('Error actualizando variante:', err);
+      }
+    });
   }
 }

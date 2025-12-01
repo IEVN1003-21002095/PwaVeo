@@ -1,65 +1,50 @@
-<div *ngIf="visible" class="modal-overlay font-sans">
+<div class="modal-overlay font-sans" *ngIf="visible">
 
   <style>
     .modal-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background-color: rgba(0, 0, 0, 0.6);
-      z-index: 2000;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.6); z-index: 2000;
       display: flex; align-items: center; justify-content: center;
       backdrop-filter: blur(3px); padding: 1rem;
     }
-
     .modal-card {
-      background-color: #ffffff;
-      width: 100%; max-width: 800px;
-      border-radius: 12px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      background-color: #ffffff; width: 100%; max-width: 800px;
+      border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.25);
       display: flex; flex-direction: column; max-height: 90vh;
       animation: zoomIn 0.2s ease-out;
     }
-
     @keyframes zoomIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
-
-    .modal-header { padding: 1.25rem 2rem; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; background: #fff; border-radius: 12px 12px 0 0; }
-    .modal-title { font-weight: 700; color: #111; font-size: 1.2rem; margin: 0; }
-    .btn-close { background: none; border: none; font-size: 1.5rem; line-height: 1; color: #999; cursor: pointer; text-decoration: none; }
+    .modal-header { padding: 1.25rem 2rem; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; background-color: #fff; }
+    .modal-title { font-weight: 700; color: #111; font-size: 1.2rem; }
+    .btn-close { background: none; border: none; font-size: 1.5rem; color: #999; text-decoration: none; cursor: pointer; }
     .btn-close:hover { color: #333; }
-
     .modal-body { padding: 2rem; overflow-y: auto; }
-    .modal-footer { padding: 1.25rem 2rem; background-color: #f8f9fa; border-top: 1px solid #e9ecef; display: flex; justify-content: flex-end; gap: 10px; border-radius: 0 0 12px 12px; }
-
+    .modal-footer { padding: 1.25rem 2rem; background-color: #f8f9fa; border-top: 1px solid #e9ecef; display: flex; justify-content: flex-end; gap: 10px; }
     .form-label { font-weight: 600; color: #374151; font-size: 0.8rem; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.03em; }
     .form-control, .form-select { border-radius: 6px; border: 1px solid #d1d5db; padding: 0.6rem 0.8rem; font-size: 0.9rem; }
-    .form-control:focus, .form-select:focus { border-color: #00325E; box-shadow: 0 0 0 3px rgba(0, 50, 94, 0.1); }
-
-    .btn-cancel { background-color: white; border: 1px solid #d1d5db; color: #374151; font-weight: 600; padding: 10px 20px; border-radius: 6px; font-size: 0.9rem; text-decoration: none; }
-    .btn-cancel:hover { background-color: #f3f4f6; color: #111; }
-    .btn-confirm { background-color: #00325E; color: white; border: none; font-weight: 600; padding: 10px 24px; border-radius: 6px; font-size: 0.9rem; }
-    .btn-confirm:hover { background-color: #002244; transform: translateY(-1px); }
+.btn-cancel { background-color: white; border: 1px solid #d1d5db; color: #374151; font-weight: 600; padding: 10px 20px; border-radius: 6px; text-decoration: none; }
+    .btn-cancel:hover { background-color: #f3f4f6; }    .btn-confirm { background: #00325E; color: white; border: none; padding: 10px 24px; border-radius: 6px; font-weight: 600; }
   </style>
 
-  <form (ngSubmit)="modificar()" #formEditar="ngForm" class="modal-card">
+  <form [formGroup]="formGroup" (ngSubmit)="modificar()" class="modal-card">
 
-    <!-- HEADER -->
     <div class="modal-header">
       <h3 class="modal-title">Editar Producto</h3>
-      <button type="button" class="btn-close" (click)="cerrar()">×</button>
+      <a [routerLink]="['/gestionCatalogo']" class="btn-close">&times;</a>
     </div>
 
-    <!-- BODY -->
     <div class="modal-body">
-      <!-- PRODUCTO -->
       <div class="row mb-3">
         <div class="col-md-8">
-          <label class="form-label">Nombre del Producto</label>
-          <input type="text" class="form-control" name="nombre" [(ngModel)]="regProducto.nombre" required />
+          <label class="form-label">Nombre *</label>
+          <input class="form-control" formControlName="nombre" />
         </div>
         <div class="col-md-4">
-          <label class="form-label">Categoría</label>
-          <select class="form-select" name="categoria" [(ngModel)]="regProducto.categoria" required>
-            <option *ngFor="let cat of categorias" [value]="cat">{{ cat }}</option>
+          <label class="form-label">Categoría *</label>
+          <select class="form-select" formControlName="categoria">
+            <option value="" disabled selected>Seleccionar...</option>
+            <option value="Ropa">Ropa</option>
+            <option value="Accesorios">Accesorios</option>
           </select>
         </div>
       </div>
@@ -67,15 +52,15 @@
       <div class="row mb-3">
         <div class="col-md-4">
           <label class="form-label">Costo ($)</label>
-          <input type="number" class="form-control" name="costo" [(ngModel)]="regProducto.costo" required />
+          <input type="number" class="form-control" formControlName="costo" />
         </div>
         <div class="col-md-4">
           <label class="form-label">Precio Venta ($)</label>
-          <input type="number" class="form-control" name="precio" [(ngModel)]="regProducto.precio" required />
+          <input type="number" class="form-control" formControlName="precio" />
         </div>
         <div class="col-md-4">
           <label class="form-label">Estado</label>
-          <select class="form-select" name="activo" [(ngModel)]="regProducto.activo" required>
+          <select class="form-select" formControlName="activo">
             <option [ngValue]="1">Activo</option>
             <option [ngValue]="0">Inactivo</option>
           </select>
@@ -84,45 +69,18 @@
 
       <div class="mb-3">
         <label class="form-label">Descripción</label>
-        <textarea class="form-control" rows="3" name="descripcion" [(ngModel)]="regProducto.descripcion"></textarea>
+        <textarea class="form-control" formControlName="descripcion" rows="3"></textarea>
       </div>
 
-      <!-- VARIANTES -->
-      <div class="mt-4">
-        <h5 class="mb-2">Variantes del producto</h5>
-        <button type="button" class="btn-confirm mb-3" (click)="agregarVariante()">Agregar Variante</button>
-
-        <table class="table table-bordered w-100">
-          <thead>
-            <tr>
-              <th>Color</th>
-              <th>Talla</th>
-              <th>Cantidad</th>
-              <th>Ubicación</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let v of variantes; let i = index">
-              <td><input class="form-control" [(ngModel)]="v.color" name="color-{{i}}" /></td>
-              <td><input class="form-control" [(ngModel)]="v.talla" name="talla-{{i}}" /></td>
-              <td><input type="number" class="form-control" [(ngModel)]="v.cantidad" name="cantidad-{{i}}" /></td>
-              <td><input class="form-control" [(ngModel)]="v.ubicacion" name="ubicacion-{{i}}" /></td>
-              <td>
-                <button type="button" class="btn-cancel btn-sm me-1" (click)="editarVariante(v)">Editar</button>
-                <button type="button" class="btn-confirm btn-sm" (click)="eliminarVariante(v)">Eliminar</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="mb-3">
+        <label class="form-label">Imagen (URL)</label>
+        <input class="form-control" formControlName="imagen" />
       </div>
-
     </div>
 
-    <!-- FOOTER -->
     <div class="modal-footer">
-      <button type="button" class="btn-cancel" (click)="cerrar()">Cancelar</button>
-      <button type="submit" class="btn-confirm" [disabled]="!formEditar.form.valid">Guardar Cambios</button>
+      <a [routerLink]="['/gestionCatalogo']" class="btn-cancel">Cancelar</a>
+      <button class="btn-confirm" type="submit" [disabled]="formGroup.invalid">Guardar</button>
     </div>
 
   </form>

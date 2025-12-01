@@ -17,23 +17,20 @@ export class EliminarComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private catalogoService: GestionCatalogoService, // Tu servicio conectado al API
+    private catalogoService: GestionCatalogoService, 
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    // 1. Obtener ID de la URL (Ruta hija)
     this.id = Number(this.route.snapshot.paramMap.get('id'));
     console.log("Eliminando Producto ID:", this.id);
 
-    // 2. Cargar datos para mostrar en el modal antes de borrar
     if (this.id) {
       this.catalogoService.getProductById(this.id).subscribe({
         next: (p) => {
           if (p) {
             this.producto = p;
           } else {
-            // Si no existe, cerrar modal
             this.router.navigate(['/gestionCatalogo']);
           }
         },
@@ -48,8 +45,6 @@ export class EliminarComponent implements OnInit {
     this.catalogoService.eliminarProducto(this.id).subscribe({
       next: () => {
         console.log("Producto eliminado");
-        // 3. Navegar de vuelta al catálogo (esto cierra el modal)
-        // Como el servicio tiene el Subject 'refresh$', la tabla padre se actualizará sola
         this.router.navigate(['/gestionCatalogo']);
       },
       error: (err) => {

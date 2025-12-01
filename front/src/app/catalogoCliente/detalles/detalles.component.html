@@ -2,30 +2,65 @@
 
   <style>
     :host { --veo-navy: #00325E; --veo-border: #e5e5e5; }
+
     .font-sans { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
     .btn-back { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: #666; background: transparent; border: none; padding: 0; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.3s; }
     .btn-back:hover { color: #000; padding-left: 5px; }
-    .product-image-container { width: 100%; background-color: #f4f4f4; overflow: hidden; }
-    .product-detail-img { width: 100%; height: auto; object-fit: cover; display: block; }
-    .badge-stock { font-size: 0.65rem; letter-spacing: 1.5px; text-transform: uppercase; padding: 6px 12px; border: 1px solid var(--veo-border); background: #fff; color: #000; font-weight: 600; }
+    .product-image-container { width: 100%; background-color: #f4f4f4; overflow: hidden; border-radius: 10px; }
+    .product-detail-img { width: 100%; height: auto; object-fit: cover; display: block; border-radius: 10%; }
     .section-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem; font-weight: 700; color: #000; }
-    .color-option { width: 30px; height: 30px; border: 1px solid var(--veo-border); border-radius: 50%; cursor: pointer; transition: transform 0.2s, border-color 0.2s; position: relative; }
-    .color-option:hover { transform: scale(1.1); }
-    .color-option.selected { border: 1px solid #000; box-shadow: 0 0 0 1px #fff inset; }
-    .color-option.selected::after { content: ''; position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px; border: 1px solid #000; border-radius: 50%; }
-    .size-option { min-width: 45px; height: 45px; border: 1px solid var(--veo-border); background: #fff; color: #000; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; font-weight: 500; }
-    .size-option:hover { border-color: #000; }
-    .size-option.active { background: #000; color: #fff; border-color: #000; }
-    .qty-container { display: inline-flex; border: 1px solid var(--veo-border); }
-    .qty-btn { width: 45px; height: 45px; border: none; background: #fff; color: #000; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; font-weight: 300; transition: background 0.2s; }
+
+    .color-option-wrapper { position: relative; display: inline-block; }
+    .color-radio { display: none; }
+    .color-option { 
+        width: 30px; 
+        height: 30px; 
+        border: 2px solid var(--veo-border); 
+        border-radius: 50%; 
+        cursor: pointer; 
+        display: inline-block; 
+        transition: transform 0.2s, border-color 0.2s; 
+        margin-right: 5px; 
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1) inset; 
+    }
+    .color-radio:checked + .color-option { border-color: currentColor; transform: scale(1.2); }
+    .color-option.white { background-color: #fff !important; border-color: var(--veo-border); }
+    .color-option.black { background-color: #000 !important; }
+    .color-radio:checked + .color-option.white { border-color: #000; }
+
+    .size-option { min-width: 45px; height: 45px; border: 1px solid var(--veo-border); background: #fff; color: #000; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 500; border-radius: 10%; margin-right: 5px; margin-bottom: 5px; transition: all 0.2s; }
+    .size-option.active { border-color: var(--veo-navy); background: var(--veo-navy); color: #fff; transform: scale(1.1); }
+
+    .qty-container { display: inline-flex; border: 1px solid var(--veo-border); border-radius: 10%; overflow: hidden; }
+    .qty-btn { width: 45px; height: 45px; border: none; background: #fff; color: #000; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; font-weight: 300; transition: background 0.2s; border-radius: 10%; }
     .qty-btn:hover:not(:disabled) { background: #f9f9f9; }
     .qty-btn:disabled { color: #ccc; cursor: default; }
     .qty-display { width: 45px; height: 45px; border-left: 1px solid var(--veo-border); border-right: 1px solid var(--veo-border); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 600; }
-    .btn-add-cart { background-color: var(--veo-navy); color: #fff; border: 1px solid var(--veo-navy); width: 100%; padding: 1.1rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
-    .btn-add-cart:hover { background-color: #000; border-color: #000; color: #fff; }
-    .btn-fav { width: 58px; border: 1px solid var(--veo-border); background: #fff; color: #000; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; font-size: 1.2rem; }
-    .btn-fav:hover { border-color: #000; }
-    @media (min-width: 992px) { .sticky-details { position: sticky; top: 2rem; } }
+
+    .btn-add-cart { 
+        background-color: var(--veo-navy); 
+        color: #fff; 
+        border: 1px solid var(--veo-navy); 
+        width: 100%; 
+        padding: 1.1rem; 
+        font-size: 0.8rem; 
+        text-transform: uppercase; 
+        letter-spacing: 3px; 
+        font-weight: 600; 
+        cursor: pointer; 
+        transition: all 0.3s; 
+        border-radius: 10px; 
+    }
+    .btn-add-cart:hover:not(:disabled) { background-color: #002244; border-color: #002244; } 
+    .btn-add-cart:disabled { background-color: #ccc; border-color: #aaa; color: #666; cursor: not-allowed; }
+
+    .alerta-carrito { position: fixed; bottom: 2rem; right: 2rem; background-color: #00325E; color: #fff; padding: 1rem 1.5rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.9rem; z-index: 9999; animation: slideIn 0.5s ease, fadeOut 0.5s 2.5s forwards; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes fadeOut { to { opacity: 0; transform: translateX(100%); } }
+
+    @media (min-width: 992px) { 
+      .sticky-details { display: flex; flex-direction: column; justify-content: center; height: 100%; }
+    }
   </style>
 
   <div class="container px-4 px-md-5 mb-5">
@@ -35,53 +70,52 @@
       </button>
     </div>
 
-    <div class="row g-5">
-      <!-- IMAGEN -->
-      <div class="col-lg-7">
-        <div class="product-image-container mb-5">
+    <div class="row g-5 align-items-center" style="min-height: 70vh;">
+      <div class="col-lg-7 d-flex flex-column justify-content-center">
+        <div class="product-image-container mb-4">
           <img [src]="producto()?.imagen || 'https://placehold.co/800x1000/f4f4f4/cccccc?text=VEO'" 
                [alt]="producto()?.nombre" class="product-detail-img">
         </div>
 
-        <!-- DESCRIPCIÓN DEL API -->
-        <div class="d-none d-lg-block pe-5 mt-3">
+        <div class="pe-3 mt-3">
           <h4 class="section-title border-bottom pb-2 mb-3">DESCRIPCIÓN</h4>
-          <p class="text-muted" style="line-height: 1.8; font-size: 0.95rem;">
-            {{ producto()?.descripcion }}
-          </p>
+          <p class="text-muted" style="line-height: 1.8; font-size: 0.95rem;">{{ producto()?.descripcion }}</p>
+        </div>
+
+        <div class="pe-3 mt-4">
+          <h4 class="section-title border-bottom pb-2 mb-4">RESEÑAS DEL PRODUCTO</h4>
         </div>
       </div>
 
-      <!-- DETALLES -->
-      <div class="col-lg-5">
-        <div class="sticky-details ps-lg-4">
-
-          <div class="mb-5">
+      <div class="col-lg-5 d-flex align-items-center">
+        <div class="sticky-details ps-lg-4 w-100">
+          <div class="mb-5 text-center text-lg-start">
             <h1 class="display-5 fw-bold text-uppercase m-0">{{ producto()?.nombre }}</h1>
-            <div class="d-flex align-items-center gap-3 mt-3">
+            <div class="d-flex align-items-center gap-3 mt-3 justify-content-center justify-content-lg-start">
               <span class="fs-4 fw-normal font-monospace">$ {{ producto()?.precio }}</span>
-              <span class="badge-stock">DISPONIBLE</span>
             </div>
           </div>
 
-          <!-- COLORES -->
           <div class="mb-4">
             <p class="section-title">SELECCIONAR COLOR</p>
             <div class="d-flex gap-3">
-              <div *ngFor="let color of colores" 
-                   class="color-option"
-                   [class.selected]="colorSeleccionadoSignal() === color"
-                   [style.background-color]="color === 'Blanco' ? '#fff' : '#121212'"
-                   (click)="seleccionarColor(color)">
-              </div>
+              <label class="color-option-wrapper" *ngFor="let color of colores">
+                <input type="radio" name="color" class="color-radio"
+                       [value]="color"
+                       [checked]="colorSeleccionadoSignal() === color"
+                       (change)="seleccionarColor(color)" />
+                <span class="color-option" 
+                      [ngClass]="{ 'white': color.toLowerCase() === 'blanco', 'black': color.toLowerCase() === 'negro' }"
+                      [style.backgroundColor]="color.toLowerCase()">
+                </span>
+              </label>
             </div>
           </div>
 
-          <!-- TALLAS -->
           <div class="mb-4">
             <p class="section-title mb-2">SELECCIONAR TALLA</p>
             <div class="d-flex flex-wrap gap-2">
-              <button *ngFor="let talla of ['S','M','L','XL']" 
+              <button *ngFor="let talla of tallas" 
                       class="size-option" 
                       [class.active]="tallaSeleccionadaSignal() === talla"
                       (click)="seleccionarTalla(talla)">
@@ -90,26 +124,31 @@
             </div>
           </div>
 
-          <!-- CANTIDAD -->
           <div class="mb-5">
             <p class="section-title">CANTIDAD</p>
-            <div class="qty-container">
+            <div class="qty-container justify-content-center">
               <button class="qty-btn" (click)="ajustarCantidad(-1)" [disabled]="cantidadSignal() <= 1">&minus;</button>
               <div class="qty-display">{{ cantidadSignal() }}</div>
               <button class="qty-btn" (click)="ajustarCantidad(1)">&plus;</button>
             </div>
           </div>
 
-          <div class="d-flex gap-3 mb-4 align-items-stretch">
-            <button class="btn-add-cart flex-grow-1" (click)="agregarAlCarrito()">AÑADIR AL CARRITO</button>
-            <button class="btn-fav" (click)="favorito = !favorito">
-              <i class="bi" [ngClass]="favorito ? 'bi-heart-fill text-danger' : 'bi-heart'"></i>
-            </button>
+          <div class="d-flex gap-3 mb-2 align-items-stretch justify-content-center justify-content-lg-start">
+            <button class="btn-add-cart flex-grow-1" 
+                    [disabled]="!varianteDisponible"
+                    (click)="agregarAlCarrito()">AÑADIR AL CARRITO</button>
           </div>
 
+          <div *ngIf="!varianteDisponible" class="text-danger mt-2" style="font-size: 0.85rem;">
+            Lo sentimos, este producto no esta disponible en esa ta.
+          </div>
         </div>
       </div>
     </div>
+  </div>
+
+  <div *ngIf="alertaCarrito()" class="alerta-carrito">
+    <i class="bi bi-check-circle-fill"></i> {{ alertaMensaje() }}
   </div>
 </div>
 
