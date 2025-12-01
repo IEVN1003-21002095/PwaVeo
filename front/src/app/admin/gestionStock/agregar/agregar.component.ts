@@ -65,7 +65,7 @@ export class AgregarComponent implements OnInit {
     this.inventarioService.agregar(this.regInventario).subscribe({
       next: (resp) => {
         console.log("Insumo agregado:", this.regInventario);
-        this.router.navigate(['/gestionStock']);
+        this.router.navigate(['/admin/inventario']);
       },
       error: (err) => {
         console.error("Error al agregar:", err);

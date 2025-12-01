@@ -138,27 +138,36 @@ def update_venta_controller(venta_id):
     try:
         conn = get_connection()
         with conn.cursor() as cursor:
-            fecha = data.get("fecha")
-            if fecha:
-                fecha = datetime.fromisoformat(fecha)
+            # Si solo se envía el estado, actualizar solo ese campo
+            if len(data) == 1 and 'estado' in data:
+                cursor.execute("""
+                    UPDATE ventas
+                    SET estado=%s
+                    WHERE id=%s
+                """, (data.get("estado"), venta_id))
+            else:
+                # Actualización completa
+                fecha = data.get("fecha")
+                if fecha:
+                    fecha = datetime.fromisoformat(fecha)
 
-            cursor.execute("""
-                UPDATE ventas
-                SET cliente_id=%s, usuario_id=%s, fecha=%s, metodo_pago_id=%s,
-                    subtotal=%s, descuento=%s, total=%s, estado=%s, notas=%s
-                WHERE id=%s
-            """, (
-                data.get("cliente_id"),
-                data.get("usuario_id"),
-                fecha,
-                data.get("metodo_pago_id"),
-                float(data.get("subtotal", 0)),
-                float(data.get("descuento", 0)),
-                float(data.get("total", 0)),
-                data.get("estado"),
-                data.get("notas"),
-                venta_id
-            ))
+                cursor.execute("""
+                    UPDATE ventas
+                    SET cliente_id=%s, usuario_id=%s, fecha=%s, metodo_pago_id=%s,
+                        subtotal=%s, descuento=%s, total=%s, estado=%s, notas=%s
+                    WHERE id=%s
+                """, (
+                    data.get("cliente_id"),
+                    data.get("usuario_id"),
+                    fecha,
+                    data.get("metodo_pago_id"),
+                    float(data.get("subtotal", 0)),
+                    float(data.get("descuento", 0)),
+                    float(data.get("total", 0)),
+                    data.get("estado"),
+                    data.get("notas"),
+                    venta_id
+                ))
             conn.commit()
 
         return jsonify({"success": True, "message": "Venta actualizada correctamente"})

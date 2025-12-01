@@ -31,7 +31,14 @@ export class SalesDetailComponent implements OnInit, OnDestroy {
   ventaId: number = 0;
   isLoading = true;
   error: string | null = null;
+  isUpdatingStatus = false;
   private destroy$ = new Subject<void>();
+
+  estadosDisponibles = [
+    { value: 'pendiente', label: 'Pendiente', class: 'bg-warning' },
+    { value: 'completada', label: 'Completada', class: 'bg-success' },
+    { value: 'cancelada', label: 'Cancelada', class: 'bg-danger' }
+  ];
 
   constructor(private route: ActivatedRoute, private salesService: SalesService) {}
 
@@ -62,5 +69,30 @@ export class SalesDetailComponent implements OnInit, OnDestroy {
           this.isLoading = false;
         }
       });
+  }
+
+  cambiarEstado(nuevoEstado: string): void {
+    if (!this.venta || this.isUpdatingStatus) return;
+    
+    if (confirm(`¿Está seguro de cambiar el estado a "${nuevoEstado.toUpperCase()}"?`)) {
+      this.isUpdatingStatus = true;
+      
+      this.salesService.updateVenta(this.ventaId, { estado: nuevoEstado })
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (res) => {
+            if (res.success && this.venta) {
+              this.venta.estado = nuevoEstado;
+              alert('Estado actualizado correctamente');
+            }
+            this.isUpdatingStatus = false;
+          },
+          error: (err) => {
+            console.error('Error actualizando estado:', err);
+            alert('Error al actualizar el estado');
+            this.isUpdatingStatus = false;
+          }
+        });
+    }
   }
 }

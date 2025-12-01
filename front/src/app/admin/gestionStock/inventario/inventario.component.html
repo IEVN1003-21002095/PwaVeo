@@ -116,7 +116,7 @@
         </div>
 
         <div class="d-flex align-items-center">
-            <button class="btn-action-primary" [routerLink]="['/gestionStock/agregar']">
+            <button class="btn-action-primary" [routerLink]="['/admin/inventario/agregar']">
                 <i class="bi bi-plus-lg"></i> NUEVO INSUMO
             </button>
         </div>
@@ -218,13 +218,13 @@
                 <div class="d-flex justify-content-end gap-2">
 
                     <button class="btn-action-subtle"
-                            [routerLink]="['/gestionStock/editar', item.id]"
+                            [routerLink]="['/admin/inventario/editar', item.id]"
                             title="Editar">
                         <i class="bi bi-pencil-square"></i>
                     </button>
 
                     <button class="btn-action-subtle danger"
-                            [routerLink]="['/gestionStock/eliminar', item.id]"
+                            [routerLink]="['/admin/inventario/eliminar', item.id]"
                             title="Eliminar">
                         <i class="bi bi-trash"></i>
                     </button>

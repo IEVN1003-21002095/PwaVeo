@@ -45,12 +45,27 @@
               </div>
               <div class="info-row">
                 <span class="info-label"><i class="bi bi-tag me-2"></i>Estado:</span>
-                <span class="badge status-badge"
-                      [class.bg-success]="venta.estado === 'completada'"
-                      [class.bg-warning]="venta.estado === 'pendiente'"
-                      [class.bg-danger]="venta.estado === 'cancelada'">
-                  {{ venta.estado | uppercase }}
-                </span>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="badge status-badge"
+                        [class.bg-success]="venta.estado === 'completada'"
+                        [class.bg-warning]="venta.estado === 'pendiente'"
+                        [class.bg-danger]="venta.estado === 'cancelada'">
+                    {{ venta.estado | uppercase }}
+                  </span>
+                  <div class="btn-group" role="group">
+                    <button *ngFor="let estado of estadosDisponibles"
+                            type="button"
+                            class="btn btn-sm"
+                            [class.btn-outline-secondary]="venta.estado !== estado.value"
+                            [ngClass]="estado.class"
+                            [class.text-white]="venta.estado === estado.value"
+                            [disabled]="isUpdatingStatus || venta.estado === estado.value"
+                            (click)="cambiarEstado(estado.value)"
+                            [title]="'Cambiar a ' + estado.label">
+                      {{ estado.label }}
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

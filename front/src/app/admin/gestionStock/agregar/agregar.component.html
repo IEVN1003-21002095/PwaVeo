@@ -78,7 +78,7 @@
     <!-- HEADER -->
     <div class="modal-header">
       <h2 class="modal-title">Agregar Nuevo Insumo</h2>
-      <a [routerLink]="['/gestionStock']" class="btn-close-x">&times;</a>
+      <a [routerLink]="['/admin/inventario']" class="btn-close-x">&times;</a>
     </div>
 
     <!-- BODY (Inputs) -->
@@ -142,7 +142,7 @@
 
     <!-- FOOTER (Botones) -->
     <div class="modal-footer">
-      <a [routerLink]="['/gestionStock']" class="btn-cancel">Cancelar</a>
+      <a [routerLink]="['/admin/inventario']" class="btn-cancel">Cancelar</a>
       <button type="submit" class="btn-confirm" [disabled]="!formAgregar.form.valid">
         Guardar Insumo
       </button>

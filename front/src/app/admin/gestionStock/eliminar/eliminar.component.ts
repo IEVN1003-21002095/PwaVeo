@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 
 import { Insumo } from '../models/insumo.model';
 import { InventarioService } from '../services/inventario.service';
@@ -30,23 +30,36 @@ export class EliminarComponent implements OnInit {
   mapTallas: any = { 1: 'S', 2: 'M', 3: 'L', 4: 'XL' };
 
   constructor(
-    private location: Location,
+    private route: ActivatedRoute,
     private inventarioService: InventarioService,
     private router: Router
   ) {}
 
   ngOnInit() {
-    this.tem = this.location.path().split('/');
-    const id = parseInt(this.tem[3]); 
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (!idParam) {
+      console.error("No se proporcionó ID");
+      this.router.navigate(['/admin/inventario']);
+      return;
+    }
+    
+    const id = parseInt(idParam);
+    console.log("Cargando insumo para eliminar ID: " + id);
 
     if (id) {
       this.inventarioService.getInventarioPorId(id).subscribe({
         next: (item) => {
           if (item) {
             this.regInventario = { ...item };
+          } else {
+            console.error("Insumo no encontrado");
+            this.router.navigate(['/admin/inventario']);
           }
         },
-        error: (err) => console.error(err)
+        error: (err) => {
+          console.error("Error cargando insumo:", err);
+          this.router.navigate(['/admin/inventario']);
+        }
       });
     }
   }
@@ -61,7 +74,7 @@ export class EliminarComponent implements OnInit {
     this.inventarioService.eliminar(id).subscribe({
       next: () => {
         console.log("Eliminado ID:", id);
-        this.router.navigate(['/gestionStock']);
+        this.router.navigate(['/admin/inventario']);
       },
       error: (err) => console.error("Error al eliminar:", err)
     });

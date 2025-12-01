@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { CommonModule, Location } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 
 import { Insumo } from '../models/insumo.model';
 import { InventarioService } from '../services/inventario.service';
@@ -43,7 +43,7 @@ export class EditarComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private location: Location,
+    private route: ActivatedRoute,
     public inventarioService: InventarioService,
     private router: Router
   ) {}
@@ -51,9 +51,15 @@ export class EditarComponent implements OnInit {
   ngOnInit() {
     this.formGroup = this.initForm();
     
-    this.tem = this.location.path().split('/');
-    const id = parseInt(this.tem[3]); 
-    console.log("Componente ID: " + id);
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (!idParam) {
+      console.error("No se proporcionó ID");
+      this.router.navigate(['/admin/inventario']);
+      return;
+    }
+    
+    const id = parseInt(idParam);
+    console.log("Cargando insumo ID: " + id);
 
     this.inventarioService.getInventarioPorId(id).subscribe({
       next: (insumo) => {
@@ -62,10 +68,13 @@ export class EditarComponent implements OnInit {
           this.asignaCampos(this.dataSource);
         } else {
           console.error("Insumo no encontrado");
-          this.router.navigate(['/gestionStock']);
+          this.router.navigate(['/admin/inventario']);
         }
       },
-      error: (err) => console.error(err)
+      error: (err) => {
+        console.error("Error cargando insumo:", err);
+        this.router.navigate(['/admin/inventario']);
+      }
     });
   }
 
@@ -100,7 +109,7 @@ export class EditarComponent implements OnInit {
     this.inventarioService.actualizar(this.regInventario.id, this.regInventario).subscribe({
       next: () => {
         console.log("Insumo modificado:", this.regInventario);
-        this.router.navigate(['/gestionStock']);
+        this.router.navigate(['/admin/inventario']);
       },
       error: (err) => console.error("Error al actualizar:", err)
     });

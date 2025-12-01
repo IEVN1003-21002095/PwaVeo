@@ -36,7 +36,7 @@
     
     <div class="modal-header">
       <h2 class="modal-title">Editar Insumo</h2>
-      <a [routerLink]="['/gestionStock']" class="btn-close-x">&times;</a>
+      <a [routerLink]="['/admin/inventario']" class="btn-close-x">&times;</a>
     </div>
 
     <div class="modal-body">
@@ -96,7 +96,7 @@
     </div>
 
     <div class="modal-footer">
-      <a [routerLink]="['/gestionStock']" class="btn-cancel">Cancelar</a>
+      <a [routerLink]="['/admin/inventario']" class="btn-cancel">Cancelar</a>
       <button type="submit" class="btn-confirm" [disabled]="!formEditar.form.valid">
         Guardar Cambios
       </button>
